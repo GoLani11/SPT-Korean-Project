@@ -1,7 +1,5 @@
 # SPT-Korean-Project-Alpha_Test / SPT-한글화-프로젝트-알파-테스트
 
-[English](#english) | [한국어](#한국어)
-
 ## English
 Hello! Welcome to SPT-Korean-Project-Alpha_Test.
 
@@ -23,7 +21,7 @@ The order of mode priority is still being tested, but please raise it to the fir
 안녕하세요! SPT-한글화-프로젝트-알파-테스트에 오신 것을 환영합니다.
 
 저는 이 프로젝트를 주도하고 있는 고라니(Golani)입니다.
-저와 함께 프로젝트에 참여해주고 많은 도움을 주신 마키나(Makina)님께 깊은 감사를 드립니다.
+저와 함께 프로젝트에 처음부터 참여해주고 많은 도움을 주신 마키나(Makina)님께 깊은 감사의 말씀드립니다.
 또한 이 모드를 적극적으로 제공해 주신 고맹(Gomeng)님께도 감사드립니다.
 
 아직 오역이 많으니 테스트해 주시고 제보해 주시면 감사하겠습니다.
@@ -35,3 +33,5 @@ SPT 설치 파일 / user / mods / spt_korean_localization_alpha_test_gm
 
 이렇게 경로가 되도록 적용해주세요.
 모드 우선 순위는 아직 테스트중이지만 제일 1순위 즉, 맨 위로 올려주세요.
+
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FGoLani11%2FSPT-Korean-Project-Alpha_Test&count_bg=%2346D3CF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=%EB%B0%A9%EB%AC%B8%EC%9E%90+%EC%88%98&edge_flat=false)](https://hits.seeyoufarm.com)
