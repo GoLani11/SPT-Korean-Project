@@ -1,6 +1,6 @@
 {
     "name": "SPT_Korean_Localization_Alpha_Test_(GM)",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "sptVersion": "~3.9",
     "loadBefore": [],
     "loadAfter": [],
