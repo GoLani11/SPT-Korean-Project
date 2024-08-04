@@ -13,9 +13,14 @@ Thank you for reading and I hope to see you in the official version soon.
 ### How to apply it?
 
 SPT / user / mods / spt_korean_localization_alpha_test_gm
+SPT / BepInEx / plugins / GoLani.KoreanModFix.dll
 
 Please apply it so that it becomes a path like this.
 The order of mode priority is still being tested, but please raise it to the first priority, that is, the top.
+
+### Plugin source code
+https://github.com/GoLani11/GoLani.KoreanModFix
+You can use the source code freely if you just leave a comment and an address.
 
 ## 한국어
 안녕하세요! SPT-한글화-프로젝트-알파-테스트에 오신 것을 환영합니다.
@@ -30,8 +35,13 @@ The order of mode priority is still being tested, but please raise it to the fir
 ### 모드 적용 방법
 
 SPT 설치 파일 / user / mods / spt_korean_localization_alpha_test_gm
+SPT 설치 파일 / BepInEx / plugins / GoLani.KoreanModFix.dll
 
 이렇게 경로가 되도록 적용해주세요.
 모드 우선 순위는 아직 테스트중이지만 제일 1순위 즉, 맨 위로 올려주세요.
+
+### 플러그인 소스 코드
+https://github.com/GoLani11/GoLani.KoreanModFix
+댓글과 출처만 남겨주시면 자유롭게 소스 코드 활용하셔도 됍니다.
 
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FGoLani11%2FSPT-Korean-Project-Alpha_Test&count_bg=%2346D3CF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=%EB%B0%A9%EB%AC%B8%EC%9E%90+%EC%88%98&edge_flat=false)](https://hits.seeyoufarm.com)
