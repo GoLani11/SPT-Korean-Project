@@ -13,6 +13,7 @@ Thank you for reading.
 ### How to apply it?
 
 SPT / user / mods / spt_korean_localization_G&M
+
 SPT / BepInEx / plugins / GoLani.KoreanModFix.dll
 
 Please apply it so that it becomes a path like this.
@@ -36,6 +37,7 @@ You can use the source code freely if you just leave a comment and an address.
 ### 모드 적용 방법
 
 SPT 설치 파일 / user / mods / spt_korean_localization_G&M
+
 SPT 설치 파일 / BepInEx / plugins / GoLani.KoreanModFix.dll
 
 이렇게 경로가 되도록 적용해주세요.
