@@ -1,0 +1,11 @@
+node_modules/
+dist/
+types/
+.buildignore
+.eslintignore
+.eslintrc.json
+모드 업데이트 시 엑셀로 변환할 때 고급 편집기 코드.txt
+build.mjs
+package-lock.json
+tsconfig.json
+mod.code-workspace
