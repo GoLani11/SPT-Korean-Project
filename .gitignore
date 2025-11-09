@@ -1,11 +1,33 @@
+# C# 빌드 결과
+bin/
+obj/
+
+# Visual Studio 관련
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# 디버그 파일
+*.pdb
+
+# NuGet 패키지
+*.nupkg
+*.snupkg
+packages/
+
+# 이전 TypeScript/Node.js 관련 (참고용)
 node_modules/
 dist/
 types/
+package-lock.json
+tsconfig.json
+build.mjs
+
+# 기타
 .buildignore
 .eslintignore
 .eslintrc.json
 모드 업데이트 시 엑셀로 변환할 때 고급 편집기 코드.txt
-build.mjs
-package-lock.json
-tsconfig.json
 mod.code-workspace
