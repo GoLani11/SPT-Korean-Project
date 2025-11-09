@@ -1,9 +1,0 @@
-C:\Users\gomim\Documents\GitHub\SPT-Korean-Project\bin\Release\SPT_Korean_Localization\locale\kr.json
-C:\Users\gomim\Documents\GitHub\SPT-Korean-Project\bin\Release\SPT_Korean_Localization\SPT_Korean_Localization.deps.json
-C:\Users\gomim\Documents\GitHub\SPT-Korean-Project\bin\Release\SPT_Korean_Localization\SPT_Korean_Localization.dll
-C:\Users\gomim\Documents\GitHub\SPT-Korean-Project\obj\Release\SPT_Korean_Localization.csproj.AssemblyReference.cache
-C:\Users\gomim\Documents\GitHub\SPT-Korean-Project\obj\Release\SPT_Korean_Localization.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\gomim\Documents\GitHub\SPT-Korean-Project\obj\Release\SPT_Korean_Localization.csproj.CoreCompileInputs.cache
-C:\Users\gomim\Documents\GitHub\SPT-Korean-Project\obj\Release\SPT_Korean_Localization.sourcelink.json
-C:\Users\gomim\Documents\GitHub\SPT-Korean-Project\obj\Release\SPT_Korean_Localization.dll
-C:\Users\gomim\Documents\GitHub\SPT-Korean-Project\obj\Release\SPT_Korean_Localization.pdb
