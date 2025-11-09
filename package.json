@@ -1,7 +1,7 @@
 {
     "name": "SPT_Korean_Localization_(G&M)",
-    "version": "1.3.1",
-    "sptVersion": "~3.11",
+    "version": "1.4.0",
+    "sptVersion": "~4.0",
     "loadBefore": [],
     "loadAfter": [],
     "incompatibilities": [],
