@@ -1,8 +1,13 @@
 # Business Rules
 
-## Localization Scope
+## Package Scope
 
-The project exists to make SPT Korean locale text available through the SPT server locale endpoint. It is not a gameplay mod, launcher mod, client patch, asset bundle, or anti-cheat workaround.
+The project provides a Korean SPT package with two pieces:
+
+- A server locale mod that applies Korean locale strings.
+- A BepInEx client plugin that adjusts Korean UI display issues.
+
+It is not a gameplay mod, launcher mod, asset bundle, anti-cheat workaround, or account/profile migration tool.
 
 ## Translation Preservation
 
@@ -10,18 +15,19 @@ Existing Korean translations are project data. Do not refresh, rewrite, normaliz
 
 ## Compatibility Target
 
-The current supported family is SPT 4.0.x. Package references are pinned to SPT 4.0.13 because the local target install reports SPT 4.0.13.
+The current supported family is SPT 4.0.x. The verified local target is SPT 4.0.13.
 
-## Install Location
+## Install Locations
 
-The canonical install path for the local target is:
+The canonical install paths for the local target are:
 
 ```text
 D:\SPT\SPT\user\mods\SPT_Korean_Localization
+D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-Equivalent installs under another SPT root must preserve the same `SPT\user\mods` layout.
+Equivalent installs under another SPT root must preserve the same server and BepInEx layout.
 
 ## User-Facing Promise
 
-The README command should remain the simplest supported path for non-technical users. If scripts or output layout change, README instructions must change in the same work.
+The README command should remain the simplest supported path for non-technical users. If scripts, source layout, or output layout change, README instructions must change in the same work.

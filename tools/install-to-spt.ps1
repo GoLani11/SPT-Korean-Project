@@ -1,6 +1,7 @@
 param(
     [string]$TargetSptRoot = "D:\SPT",
-    [string]$Configuration = "Release"
+    [string]$Configuration = "Release",
+    [switch]$SkipClientPlugin
 )
 
 $ErrorActionPreference = "Stop"
@@ -27,11 +28,16 @@ if ([string]::IsNullOrWhiteSpace($ServerVersion) -or $ServerVersion -notmatch "^
 }
 
 $PackageScript = Join-Path $PSScriptRoot "package-release.ps1"
-& $PackageScript -Configuration $Configuration
+& $PackageScript -Configuration $Configuration -SptRoot $TargetRootPath
 
 $SourceModRoot = Join-Path $ProjectRoot "release\SPT\user\mods\SPT_Korean_Localization"
 if (-not (Test-Path -LiteralPath $SourceModRoot)) {
     throw "Package output is missing: $SourceModRoot"
+}
+
+$SourceClientPlugin = Join-Path $ProjectRoot "release\BepInEx\plugins\GoLani.KoreanModFix.dll"
+if (-not $SkipClientPlugin -and -not (Test-Path -LiteralPath $SourceClientPlugin)) {
+    throw "Package output is missing: $SourceClientPlugin"
 }
 
 $ModsRoot = Join-Path $TargetRootPath "SPT\user\mods"
@@ -58,6 +64,30 @@ if (-not (Test-Path -LiteralPath (Join-Path $DestinationFull "SPT_Korean_Localiz
 
 if (-not (Test-Path -LiteralPath (Join-Path $DestinationFull "locale\kr.json"))) {
     throw "Install failed. locale\kr.json missing from: $DestinationFull"
+}
+
+if (-not $SkipClientPlugin) {
+    $ClientPluginsRoot = Join-Path $TargetRootPath "BepInEx\plugins"
+    if (-not (Test-Path -LiteralPath $ClientPluginsRoot)) {
+        throw "Target does not look like a BepInEx-enabled SPT install. Missing: $ClientPluginsRoot"
+    }
+
+    $ClientPluginsRootFull = [IO.Path]::GetFullPath((Resolve-Path -LiteralPath $ClientPluginsRoot).Path)
+    $ClientPluginDestination = Join-Path $ClientPluginsRootFull "GoLani.KoreanModFix.dll"
+    $ClientPluginDestinationFull = [IO.Path]::GetFullPath($ClientPluginDestination)
+    $ClientPluginsPrefix = $ClientPluginsRootFull.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+
+    if (-not $ClientPluginDestinationFull.StartsWith($ClientPluginsPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing to install outside BepInEx plugins folder: $ClientPluginDestinationFull"
+    }
+
+    Copy-Item -LiteralPath $SourceClientPlugin -Destination $ClientPluginDestinationFull -Force
+
+    if (-not (Test-Path -LiteralPath $ClientPluginDestinationFull)) {
+        throw "Install failed. Client plugin missing from: $ClientPluginDestinationFull"
+    }
+
+    Write-Output "Installed GoLani.KoreanModFix to $ClientPluginDestinationFull"
 }
 
 Write-Output "Installed SPT_Korean_Localization to $DestinationFull"

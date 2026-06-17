@@ -10,7 +10,18 @@ There are still mistranslations, so I would appreciate testing and reports.
 
 ### Supported SPT version
 
-This repository currently targets SPT `4.0.x` as a C# server mod.
+This repository currently targets SPT `4.0.x`, verified against SPT `4.0.13`.
+
+### What this package contains
+
+This repository now builds two runtime components:
+
+```text
+Server locale mod:      SPT\user\mods\SPT_Korean_Localization
+Client UI fix plugin:   BepInEx\plugins\GoLani.KoreanModFix.dll
+```
+
+The server mod applies Korean locale data through the SPT server. The client plugin applies Korean UI display fixes through BepInEx.
 
 ### How to apply it
 
@@ -20,32 +31,43 @@ For an SPT install at `D:\SPT`, run:
 pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\install-to-spt.ps1 -TargetSptRoot D:\SPT
 ```
 
-The installed layout should be:
+The installed layout should include:
 
 ```text
 D:\SPT\SPT\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
 D:\SPT\SPT\user\mods\SPT_Korean_Localization\locale\kr.json
+D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-This repository's current output is a server mod. Do not install `SPT_Korean_Localization.dll` into `D:\SPT\BepInEx\plugins`.
+To install only the server locale mod, use:
+
+```powershell
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\install-to-spt.ps1 -TargetSptRoot D:\SPT -SkipClientPlugin
+```
 
 ### Manual package build
 
 ```powershell
-pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps1
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps1 -SptRoot D:\SPT
 ```
 
 The package is created under:
 
 ```text
 release\SPT\user\mods\SPT_Korean_Localization
+release\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-Copy the `SPT` folder from `release` into the SPT install root if installing manually.
+Copy the `SPT` and `BepInEx` folders from `release` into the SPT install root if installing manually.
 
-### Plugin source code credit
+### Source layout
 
-Earlier plugin source reference:
+```text
+src\ServerLocaleMod
+src\ClientModFixPlugin
+```
+
+The client plugin source was merged from:
 
 https://github.com/GoLani11/GoLani.KoreanModFix
 
@@ -61,7 +83,18 @@ You can use the source code freely if you leave a comment and source address.
 
 ### 지원 SPT 버전
 
-현재 이 저장소는 SPT `4.0.x`용 C# 서버 모드입니다.
+현재 이 저장소는 SPT `4.0.x`를 대상으로 하며, SPT `4.0.13`에서 확인했습니다.
+
+### 포함된 구성
+
+이 저장소는 이제 두 가지 구성물을 함께 빌드합니다.
+
+```text
+서버 로케일 모드:       SPT\user\mods\SPT_Korean_Localization
+클라이언트 UI 보정 플러그인: BepInEx\plugins\GoLani.KoreanModFix.dll
+```
+
+서버 모드는 SPT 서버에서 한국어 로케일을 적용합니다. 클라이언트 플러그인은 BepInEx를 통해 한국어 UI 표시 문제를 보정합니다.
 
 ### 모드 적용 방법
 
@@ -76,27 +109,38 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\install-to-spt.ps1
 ```text
 D:\SPT\SPT\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
 D:\SPT\SPT\user\mods\SPT_Korean_Localization\locale\kr.json
+D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-현재 이 저장소에서 빌드되는 파일은 서버 모드입니다. `SPT_Korean_Localization.dll`을 `D:\SPT\BepInEx\plugins`에 넣지 마세요.
+서버 로케일 모드만 설치하려면 아래처럼 실행하세요.
+
+```powershell
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\install-to-spt.ps1 -TargetSptRoot D:\SPT -SkipClientPlugin
+```
 
 ### 수동 패키지 생성
 
 ```powershell
-pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps1
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps1 -SptRoot D:\SPT
 ```
 
 패키지는 아래 폴더에 생성됩니다.
 
 ```text
 release\SPT\user\mods\SPT_Korean_Localization
+release\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-수동으로 설치할 때는 `release` 안의 `SPT` 폴더를 SPT 설치 루트에 복사하세요.
+수동으로 설치할 때는 `release` 안의 `SPT` 폴더와 `BepInEx` 폴더를 SPT 설치 루트에 복사하세요.
 
-### 플러그인 소스 코드 출처
+### 소스 구조
 
-이전 플러그인 소스 참고:
+```text
+src\ServerLocaleMod
+src\ClientModFixPlugin
+```
+
+클라이언트 플러그인 소스는 아래 저장소에서 통합했습니다.
 
 https://github.com/GoLani11/GoLani.KoreanModFix
 

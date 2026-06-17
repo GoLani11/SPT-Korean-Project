@@ -1,6 +1,7 @@
 param(
     [string]$Configuration = "Release",
-    [string]$OutputRoot
+    [string]$OutputRoot,
+    [string]$SptRoot = "D:\SPT"
 )
 
 $ErrorActionPreference = "Stop"
@@ -18,26 +19,39 @@ if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
     $OutputRoot = Join-Path $ProjectRoot "release"
 }
 
-$SolutionPath = Join-Path $ProjectRoot "SPT_Korean_Localization.sln"
-$BuildOutput = Join-Path $ProjectRoot "bin\$Configuration\SPT_Korean_Localization"
+$SolutionPath = Join-Path $ProjectRoot "SPT-Korean-Project.sln"
+$ServerBuildOutput = Join-Path $ProjectRoot "bin\$Configuration\ServerLocaleMod"
+$ClientBuildOutput = Join-Path $ProjectRoot "bin\$Configuration\ClientModFixPlugin"
 $PackageModRoot = Join-Path $OutputRoot "SPT\user\mods\SPT_Korean_Localization"
+$PackageClientPluginsRoot = Join-Path $OutputRoot "BepInEx\plugins"
+$PackageClientPluginPath = Join-Path $PackageClientPluginsRoot "GoLani.KoreanModFix.dll"
 $OutputRootFull = [IO.Path]::GetFullPath($OutputRoot)
 $PackageModRootFull = [IO.Path]::GetFullPath($PackageModRoot)
+$PackageClientPluginsRootFull = [IO.Path]::GetFullPath($PackageClientPluginsRoot)
+$PackageClientPluginFull = [IO.Path]::GetFullPath($PackageClientPluginPath)
 $OutputPrefix = $OutputRootFull.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 
 if (-not $PackageModRootFull.StartsWith($OutputPrefix, [StringComparison]::OrdinalIgnoreCase)) {
     throw "Refusing to package outside output root: $PackageModRootFull"
 }
 
-dotnet restore $SolutionPath -v:minimal
-dotnet build $SolutionPath -c $Configuration --no-restore -v:minimal
-
-if (-not (Test-Path -LiteralPath (Join-Path $BuildOutput "SPT_Korean_Localization.dll"))) {
-    throw "Build output is missing SPT_Korean_Localization.dll: $BuildOutput"
+if (-not $PackageClientPluginFull.StartsWith($OutputPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to package outside output root: $PackageClientPluginFull"
 }
 
-if (-not (Test-Path -LiteralPath (Join-Path $BuildOutput "locale\kr.json"))) {
-    throw "Build output is missing locale\kr.json: $BuildOutput"
+dotnet restore $SolutionPath -p:SptRoot=$SptRoot -v:minimal
+dotnet build $SolutionPath -c $Configuration --no-restore -p:SptRoot=$SptRoot -v:minimal
+
+if (-not (Test-Path -LiteralPath (Join-Path $ServerBuildOutput "SPT_Korean_Localization.dll"))) {
+    throw "Build output is missing SPT_Korean_Localization.dll: $ServerBuildOutput"
+}
+
+if (-not (Test-Path -LiteralPath (Join-Path $ServerBuildOutput "locale\kr.json"))) {
+    throw "Build output is missing locale\kr.json: $ServerBuildOutput"
+}
+
+if (-not (Test-Path -LiteralPath (Join-Path $ClientBuildOutput "GoLani.KoreanModFix.dll"))) {
+    throw "Build output is missing GoLani.KoreanModFix.dll: $ClientBuildOutput"
 }
 
 if (Test-Path -LiteralPath $PackageModRootFull) {
@@ -45,16 +59,19 @@ if (Test-Path -LiteralPath $PackageModRootFull) {
 }
 
 New-Item -ItemType Directory -Path $PackageModRootFull -Force | Out-Null
-Copy-Item -LiteralPath (Join-Path $BuildOutput "SPT_Korean_Localization.dll") -Destination $PackageModRootFull -Force
+New-Item -ItemType Directory -Path $PackageClientPluginsRootFull -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $ServerBuildOutput "SPT_Korean_Localization.dll") -Destination $PackageModRootFull -Force
 
-$DepsPath = Join-Path $BuildOutput "SPT_Korean_Localization.deps.json"
+$DepsPath = Join-Path $ServerBuildOutput "SPT_Korean_Localization.deps.json"
 if (Test-Path -LiteralPath $DepsPath) {
     Copy-Item -LiteralPath $DepsPath -Destination $PackageModRootFull -Force
 }
 
-Copy-Item -LiteralPath (Join-Path $BuildOutput "locale") -Destination $PackageModRootFull -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $ServerBuildOutput "locale") -Destination $PackageModRootFull -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $ClientBuildOutput "GoLani.KoreanModFix.dll") -Destination $PackageClientPluginFull -Force
 
 $LocalePath = Join-Path $PackageModRootFull "locale\kr.json"
 $null = Get-Content -LiteralPath $LocalePath -Raw | ConvertFrom-Json -AsHashtable
 
 Write-Output "Package created: $PackageModRootFull"
+Write-Output "Client plugin packaged: $PackageClientPluginFull"

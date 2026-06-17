@@ -3,24 +3,25 @@
 ## Build
 
 ```powershell
-dotnet restore .\SPT_Korean_Localization.sln
-dotnet build .\SPT_Korean_Localization.sln -c Release --no-restore
+dotnet restore .\SPT-Korean-Project.sln -p:SptRoot=D:\SPT
+dotnet build .\SPT-Korean-Project.sln -c Release --no-restore -p:SptRoot=D:\SPT
 ```
 
-The expected build output is:
+Expected build outputs:
 
 ```text
-bin\Release\SPT_Korean_Localization\SPT_Korean_Localization.dll
-bin\Release\SPT_Korean_Localization\locale\kr.json
+bin\Release\ServerLocaleMod\SPT_Korean_Localization.dll
+bin\Release\ServerLocaleMod\locale\kr.json
+bin\Release\ClientModFixPlugin\GoLani.KoreanModFix.dll
 ```
 
 ## Package
 
 ```powershell
-pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps1
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps1 -SptRoot D:\SPT
 ```
 
-The script restores, builds, copies the DLL and locale folder, copies `.deps.json` when present, and validates the packaged JSON.
+The script restores, builds, packages the server mod, packages the client plugin, and validates the packaged locale JSON.
 
 ## Install
 
@@ -28,7 +29,9 @@ The script restores, builds, copies the DLL and locale folder, copies `.deps.jso
 pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\install-to-spt.ps1 -TargetSptRoot D:\SPT
 ```
 
-The script requires `D:\SPT\SPT\SPT.Server.exe`, checks that the server version starts with `4.`, packages the mod, then replaces only `D:\SPT\SPT\user\mods\SPT_Korean_Localization`.
+The script requires `D:\SPT\SPT\SPT.Server.exe`, checks that the server version is in the `4.0.x` family, packages the solution, replaces only `D:\SPT\SPT\user\mods\SPT_Korean_Localization`, and copies `GoLani.KoreanModFix.dll` into `D:\SPT\BepInEx\plugins`.
+
+Use `-SkipClientPlugin` when only the server locale mod should be installed.
 
 ## Runtime Check
 
@@ -38,13 +41,15 @@ Start `D:\SPT\SPT\SPT.Server.exe` and inspect the latest log under:
 D:\SPT\SPT\user\logs\spt
 ```
 
-Expected evidence includes:
+Expected server evidence includes:
 
 ```text
 SPT_Korean_Localization_(G&M)
 31084
 /client/locale/kr
 ```
+
+Client plugin runtime evidence requires launching the SPT client and checking the BepInEx log plus the affected UI screens.
 
 ## Cleanup
 

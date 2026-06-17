@@ -2,31 +2,38 @@
 
 ## Allowed Write Surface
 
-The installer may replace only this mod folder:
+The installer may replace only this server mod folder:
 
 ```text
 <TargetSptRoot>\SPT\user\mods\SPT_Korean_Localization
 ```
 
-The package script may replace only the configured package folder under its output root.
+The installer may copy only this client plugin file:
+
+```text
+<TargetSptRoot>\BepInEx\plugins\GoLani.KoreanModFix.dll
+```
+
+The package script may write only under the configured release output root.
 
 ## Disallowed Surfaces
 
 Do not write to:
 
 ```text
-<TargetSptRoot>\BepInEx\plugins
 <TargetSptRoot>\EscapeFromTarkov.exe
 <TargetSptRoot>\SPT\SPT.Server.exe
 <TargetSptRoot>\SPT_Data
+<TargetSptRoot>\BepInEx\core
+<TargetSptRoot>\BepInEx\plugins\spt
 <TargetSptRoot>\SPT\user\mods\<other mod>
 ```
 
-Do not modify BattlEye, launcher authentication, game executables, managed game assemblies, or unrelated SPT files.
+Do not modify BattlEye, launcher authentication, game executables, managed game assemblies, BepInEx core files, SPT client support plugins, or unrelated SPT files.
 
 ## Guard Requirements
 
-Recursive delete operations must resolve full paths and prove the target remains inside the intended output or mod folder. Install scripts must reject a target root that does not contain `SPT\SPT.Server.exe`.
+Recursive delete operations must resolve full paths and prove the target remains inside the intended output or server mod folder. The installer must reject a target root that does not contain `SPT\SPT.Server.exe`. Client plugin installation must be a single-file copy into `BepInEx\plugins`.
 
 ## Secrets
 

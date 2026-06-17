@@ -10,7 +10,9 @@ Scripts in this folder are user entry points for package and local install work.
 - Set UTF-8 console and Python encoding variables when locale data can appear in output.
 - Resolve full paths before recursive delete operations.
 - Restrict package writes to the chosen output root.
-- Restrict install writes to the target SPT `user\mods\SPT_Korean_Localization` folder.
+- Restrict server install writes to the target SPT `user\mods\SPT_Korean_Localization` folder.
+- Restrict client install writes to the single target `BepInEx\plugins\GoLani.KoreanModFix.dll` file.
+- Do not recursively delete anything under `BepInEx`.
 - Reject a target that lacks `SPT\SPT.Server.exe`.
 - Reject SPT versions outside the supported `4.0.x` family.
 

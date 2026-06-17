@@ -7,14 +7,14 @@
         <Nullable>enable</Nullable>
         <OutputType>Library</OutputType>
         <Version>1.4.0</Version>
-        <!-- The two lines below will set the output path for the binaries -->
-        <OutputPath>bin\$(Configuration)\$(ProjectName)\$(AssemblyName)\</OutputPath>
+        <AssemblyName>SPT_Korean_Localization</AssemblyName>
+        <OutputPath>..\..\bin\$(Configuration)\ServerLocaleMod\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
-        <!-- 자동 생성되는 AssemblyInfo 비활성화 -->
+        <!-- AssemblyInfo is kept in source for the SPT mod metadata. -->
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-        <!-- 불필요한 파일 생성 안 함 -->
+        <!-- Keep package output small. -->
         <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
         <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
         <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
@@ -26,21 +26,7 @@
         <PackageReference Include="SPTarkov.Server.Core" Version="4.0.13" />
     </ItemGroup>
 
-    <!-- 다른 폴더의 파일들 제외 -->
-    <ItemGroup>
-        <Compile Remove="server-mod-examples-main\**" />
-        <Compile Remove="src\**" />
-        <Content Remove="server-mod-examples-main\**" />
-        <Content Remove="src\**" />
-        <Content Remove="package.json" />
-        <EmbeddedResource Remove="server-mod-examples-main\**" />
-        <EmbeddedResource Remove="src\**" />
-        <None Remove="server-mod-examples-main\**" />
-        <None Remove="src\**" />
-        <None Remove="package.json" />
-    </ItemGroup>
-
-    <!-- locale 폴더를 출력 디렉토리에 복사 -->
+    <!-- Copy locale data beside the server mod DLL. -->
     <ItemGroup>
         <None Include="locale\**\*" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>

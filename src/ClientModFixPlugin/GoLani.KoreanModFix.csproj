@@ -1,0 +1,87 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <RootNamespace>KoreanPatchFix</RootNamespace>
+        <AssemblyName>GoLani.KoreanModFix</AssemblyName>
+        <OutputType>Library</OutputType>
+        <LangVersion>latest</LangVersion>
+        <Nullable>disable</Nullable>
+        <Version>1.3.0</Version>
+        <OutputPath>..\..\bin\$(Configuration)\ClientModFixPlugin\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+        <CopyLocalDependenciesWhenParentReferenceInPackage>false</CopyLocalDependenciesWhenParentReferenceInPackage>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <SptRoot Condition="'$(SptRoot)' == ''">D:\SPT</SptRoot>
+        <BepInExCore>$(SptRoot)\BepInEx\core</BepInExCore>
+        <SptClientPluginRefs>$(SptRoot)\BepInEx\plugins\spt</SptClientPluginRefs>
+        <ManagedRefs>$(SptRoot)\EscapeFromTarkov_Data\Managed</ManagedRefs>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="0Harmony">
+            <HintPath>$(BepInExCore)\0Harmony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="BepInEx">
+            <HintPath>$(BepInExCore)\BepInEx.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(ManagedRefs)\Assembly-CSharp.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Comfort">
+            <HintPath>$(ManagedRefs)\Comfort.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Newtonsoft.Json">
+            <HintPath>$(ManagedRefs)\Newtonsoft.Json.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Sirenix.Serialization">
+            <HintPath>$(ManagedRefs)\Sirenix.Serialization.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="spt-common">
+            <HintPath>$(SptClientPluginRefs)\spt-common.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="spt-core">
+            <HintPath>$(SptClientPluginRefs)\spt-core.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="spt-reflection">
+            <HintPath>$(SptClientPluginRefs)\spt-reflection.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="spt-singleplayer">
+            <HintPath>$(SptClientPluginRefs)\spt-singleplayer.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>$(ManagedRefs)\Unity.TextMeshPro.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>$(ManagedRefs)\UnityEngine.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(ManagedRefs)\UnityEngine.CoreModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>$(ManagedRefs)\UnityEngine.UI.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UIModule">
+            <HintPath>$(ManagedRefs)\UnityEngine.UIModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+</Project>

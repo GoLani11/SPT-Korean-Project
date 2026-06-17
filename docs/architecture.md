@@ -2,9 +2,16 @@
 
 ## Runtime Shape
 
-The project builds one .NET 9 library, `SPT_Korean_Localization.dll`. SPT loads it as a server mod through dependency injection. `KoreanPatcher` implements `IOnLoad`, so the mod applies its locale transformer during server startup after the SPT mod loader has prepared the database services.
+The repository builds two independent runtime components from one solution:
 
-## Load Flow
+```text
+src\ServerLocaleMod       -> SPT_Korean_Localization.dll
+src\ClientModFixPlugin    -> GoLani.KoreanModFix.dll
+```
+
+The server locale mod is loaded by the SPT server. The client mod fix plugin is loaded by BepInEx inside the EFT client.
+
+## Server Load Flow
 
 1. SPT discovers `SPT_Korean_Localization.dll` under `SPT\user\mods\SPT_Korean_Localization`.
 2. The dependency injection container creates `KoreanPatcher` with `ISptLogger<KoreanPatcher>` and `DatabaseService`.
@@ -13,26 +20,23 @@ The project builds one .NET 9 library, `SPT_Korean_Localization.dll`. SPT loads 
 5. The parsed patch dictionary is attached with `koreanLocale.AddTransformer(...)`.
 6. When SPT resolves the lazy locale data, each patch key overwrites or adds a value in the `kr` locale dictionary.
 
-## File Layout
+## Client Load Flow
 
-The installable mod folder contains:
+1. BepInEx discovers `GoLani.KoreanModFix.dll` under `BepInEx\plugins`.
+2. `Plugin.Awake()` enables the UI fix patches.
+3. Harmony and SPT reflection patches adjust Korean text display in affected client UI screens.
 
-```text
-SPT_Korean_Localization.dll
-SPT_Korean_Localization.deps.json
-locale\kr.json
-```
-
-The release package mirrors the SPT install layout:
+## Release Layout
 
 ```text
 release\SPT\user\mods\SPT_Korean_Localization
+release\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
+
+The release mirrors the SPT install root so users can copy `SPT` and `BepInEx` into the target install.
 
 ## Dependency Shape
 
-The project references `SPTarkov.Common`, `SPTarkov.DI`, and `SPTarkov.Server.Core`. The current package version set is `4.0.13`, matching the verified local server target.
+The server mod references `SPTarkov.Common`, `SPTarkov.DI`, and `SPTarkov.Server.Core` package version `4.0.13`.
 
-## Failure Behavior
-
-Startup should continue without crashing if the base Korean locale, assembly path, patch file, or parsed patch data is unavailable. The mod logs a specific error or warning and exits `OnLoad()` early.
+The client plugin targets `.NET Framework 4.8` and references DLLs from the active SPT install through the `SptRoot` MSBuild property. The default `SptRoot` is `D:\SPT`.

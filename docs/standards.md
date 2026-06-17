@@ -16,7 +16,7 @@ Set UTF-8 input and output when commands read or write locale data. Avoid Window
 
 ## Editing
 
-Keep compatibility edits small. Avoid broad formatting churn in `locale/kr.json`, `KoreanPatcher.cs`, and the project file. Treat generated `bin/`, `obj/`, and `release/` folders as disposable output.
+Keep compatibility edits small. Avoid broad formatting churn in `src\ServerLocaleMod\locale\kr.json`, `src\ServerLocaleMod\KoreanPatcher.cs`, client patch files, and project files. Treat generated `bin/`, `obj/`, and `release/` folders as disposable output.
 
 ## Verification
 

@@ -1,6 +1,6 @@
 # Contracts
 
-## Mod Metadata Contract
+## Server Mod Metadata Contract
 
 `ModMetadata` must provide a stable GUID, display name, author list, version, SPT version range, and license. The current GUID is:
 
@@ -8,9 +8,19 @@
 com.golani.makina.korean
 ```
 
+## Client Plugin Metadata Contract
+
+The BepInEx plugin identity must remain stable unless the user intentionally creates a new plugin lineage:
+
+```text
+com.GoLani.koreanpatchfix
+Korean Patch Fix
+1.3.0
+```
+
 ## Runtime Data Contract
 
-`locale\kr.json` must deserialize into a `Dictionary<string, string>`. Keys are SPT locale keys. Values are Korean locale strings or preserved source strings.
+`src\ServerLocaleMod\locale\kr.json` must deserialize into a `Dictionary<string, string>`. Keys are SPT locale keys. Values are Korean locale strings or preserved source strings.
 
 ## Package Contract
 
@@ -19,9 +29,10 @@ The release package root must contain:
 ```text
 SPT\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
 SPT\user\mods\SPT_Korean_Localization\locale\kr.json
+BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-The package may include:
+The server package may include:
 
 ```text
 SPT\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.deps.json
@@ -33,6 +44,8 @@ The installer accepts an SPT root, not the inner server folder. For the default 
 
 The installer must reject non-SPT paths and SPT versions outside `4.0.x`.
 
+The installer must replace only the Korean server mod folder and the Korean client plugin DLL.
+
 ## README Contract
 
-README install instructions must match the actual script parameters, default target, output layout, and current server-mod classification.
+README install instructions must match the actual script parameters, default target, output layout, and dual-runtime package shape.
