@@ -19985,7 +19985,7 @@
 "arena/matching/UnavailableReason":	"Unavailable",
 "arena/matching/buyPreset":	"BUY PRESET",
 "arena/matching/presetSelection":	"PRESET SELECTION",
-"arena/matching/readyPlayers0 Ready\nplayers":	"Players ready",
+"arena/matching/readyPlayers0 Ready\\nplayers":	"Players ready",
 "arena/merchants/DayLimitOferflowed":	"Daily limit exceeded",
 "arena/merchants/NoMoneyForCommission":	"Not enough money to pay the commission",
 "arena/merchants/NoSyncedServerButton":	"Service temporarily unavailable",

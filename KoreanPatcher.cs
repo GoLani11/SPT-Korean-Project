@@ -37,7 +37,7 @@ public class KoreanPatcher(
             // 한국어 로케일 데이터 가져오기
             if (!databaseService.GetLocales().Global.TryGetValue("kr", out var koreanLocale))
             {
-                logger.Error("기존 한국어 언어파일을 찾을 수 없습니다. .../SPT_Data/Server/database/locales/global/kr.json 이 있는지 확인하세요.");
+                logger.Error("기존 한국어 언어파일을 찾을 수 없습니다. .../SPT_Data/database/locales/global/kr.json 이 있는지 확인하세요.");
                 return Task.CompletedTask;
             }
 
@@ -70,6 +70,12 @@ public class KoreanPatcher(
             // Lazy loaded 로케일에 변환기 추가
             koreanLocale.AddTransformer(localeData =>
             {
+                if (localeData == null)
+                {
+                    logger.Error("SPT 한국어 로케일 데이터가 비어 있어 한글 패치를 적용하지 못했습니다.");
+                    return localeData;
+                }
+
                 // 기존 로케일에 패치 적용
                 foreach (var kvp in koreanPatch)
                 {
