@@ -22,8 +22,8 @@ if (-not (Test-Path -LiteralPath $ServerExe)) {
 }
 
 $ServerVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo($ServerExe).ProductVersion
-if ([string]::IsNullOrWhiteSpace($ServerVersion) -or $ServerVersion -notmatch "^4\.") {
-    throw "Target SPT version must be 4.x. Found: $ServerVersion"
+if ([string]::IsNullOrWhiteSpace($ServerVersion) -or $ServerVersion -notmatch "^4\.0(\.|-|$)") {
+    throw "Target SPT version must be 4.0.x. Found: $ServerVersion"
 }
 
 $PackageScript = Join-Path $PSScriptRoot "package-release.ps1"

@@ -4,7 +4,7 @@
 
 - The repository is a C# SPT server mod, not a BepInEx client plugin.
 - The correct default install root is `D:\SPT`, producing `D:\SPT\SPT\user\mods\SPT_Korean_Localization`.
-- The local SPT target reports a 4.x server version compatible with the guarded installer.
+- The local SPT target reports a 4.0.x server version compatible with the guarded installer.
 - SPT 4.0.13 serves a base Korean locale with `31084` keys.
 - The project patch file also contains `31084` keys after the escaped-newline key repair.
 

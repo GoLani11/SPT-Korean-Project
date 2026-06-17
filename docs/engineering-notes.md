@@ -2,7 +2,7 @@
 
 ## Current Compatibility Notes
 
-The SPT package references are aligned to `4.0.13`. The mod metadata keeps `SptVersion` at `~4.0.0`, so it accepts the 4.0.x compatibility family while avoiding a false claim for later major versions.
+The SPT package references are aligned to `4.0.13`. The mod metadata keeps `SptVersion` at `~4.0.0`, so it accepts the 4.0.x compatibility family while avoiding a false claim for later SPT release families.
 
 ## Locale Key Repair
 
@@ -18,4 +18,4 @@ A successful startup reports that the mod loaded, the Korean localization projec
 
 ## Risk Notes
 
-The mod overlays keys at runtime. It does not verify semantic correctness of every translation string. Future SPT releases can change locale key names, server mod APIs, or package names, so each compatibility bump needs a build, key comparison, package, install, and startup check.
+The mod overlays keys at runtime. It does not verify semantic correctness of every translation string. Future SPT releases outside the verified 4.0.x family can change locale key names, server mod APIs, or package names, so each compatibility bump needs a build, key comparison, package, install, and startup check.

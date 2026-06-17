@@ -14,7 +14,7 @@ The project has been updated for SPT 4.0.x server-mod compatibility and verified
 - Locale key identity mismatch repaired without refreshing translations.
 - Release package script added.
 - Guarded local SPT installer added.
-- README install guidance updated for the SPT 4.x server-mod layout.
+- README install guidance updated for the SPT 4.0.x server-mod layout.
 - Local install applied to `D:\SPT\SPT\user\mods\SPT_Korean_Localization`.
 
 ## Verified Evidence
@@ -33,4 +33,4 @@ The project has been updated for SPT 4.0.x server-mod compatibility and verified
 
 - Full in-game visual QA has not been performed.
 - Translation quality remains outside the compatibility repair scope.
-- Future SPT major versions require a fresh API and locale-key comparison.
+- Future SPT releases outside 4.0.x require a fresh API and locale-key comparison.

@@ -12,7 +12,7 @@ Scripts in this folder are user entry points for package and local install work.
 - Restrict package writes to the chosen output root.
 - Restrict install writes to the target SPT `user\mods\SPT_Korean_Localization` folder.
 - Reject a target that lacks `SPT\SPT.Server.exe`.
-- Reject unsupported SPT major versions.
+- Reject SPT versions outside the supported `4.0.x` family.
 
 ## Verification
 

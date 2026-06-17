@@ -31,7 +31,7 @@ SPT\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.deps.json
 
 The installer accepts an SPT root, not the inner server folder. For the default local install, the input is `D:\SPT`, and the server executable must exist at `D:\SPT\SPT\SPT.Server.exe`.
 
-The installer must reject non-SPT paths and SPT major versions outside `4.x`.
+The installer must reject non-SPT paths and SPT versions outside `4.0.x`.
 
 ## README Contract
 

@@ -24,6 +24,6 @@ Do not install this repository output under:
 
 ## Consequences
 
-Packaging mirrors the SPT server mod layout. The installer accepts the outer SPT root, verifies `SPT\SPT.Server.exe`, rejects non-4.x servers, and replaces only this mod folder.
+Packaging mirrors the SPT server mod layout. The installer accepts the outer SPT root, verifies `SPT\SPT.Server.exe`, rejects servers outside the `4.0.x` family, and replaces only this mod folder.
 
 Runtime verification should use server startup logs and the SPT locale endpoint rather than BepInEx client logs.
