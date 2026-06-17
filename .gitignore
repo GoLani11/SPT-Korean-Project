@@ -28,6 +28,10 @@ build.mjs
 
 # 기타
 .dryforge/
+AGENTS.md
+**/AGENTS.md
+CLAUDE.md
+**/CLAUDE.md
 .buildignore
 .eslintignore
 .eslintrc.json
