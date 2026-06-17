@@ -26,6 +26,7 @@ tsconfig.json
 build.mjs
 
 # 기타
+.dryforge/
 .buildignore
 .eslintignore
 .eslintrc.json
