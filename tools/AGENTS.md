@@ -1,0 +1,19 @@
+# Tools Guide
+
+## Scope
+
+Scripts in this folder are user entry points for package and local install work. Keep them conservative, Windows-friendly, and safe for non-technical use.
+
+## Rules
+
+- Use PowerShell 7 compatible syntax.
+- Set UTF-8 console and Python encoding variables when locale data can appear in output.
+- Resolve full paths before recursive delete operations.
+- Restrict package writes to the chosen output root.
+- Restrict install writes to the target SPT `user\mods\SPT_Korean_Localization` folder.
+- Reject a target that lacks `SPT\SPT.Server.exe`.
+- Reject unsupported SPT major versions.
+
+## Verification
+
+Test the package script, a successful install path, and at least one rejected fake target path after changing installer logic.
