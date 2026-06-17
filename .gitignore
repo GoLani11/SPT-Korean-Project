@@ -1,6 +1,7 @@
 # C# 빌드 결과
 bin/
 obj/
+release/
 
 # Visual Studio 관련
 .vs/
