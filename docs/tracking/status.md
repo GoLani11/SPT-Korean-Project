@@ -22,8 +22,8 @@ The repository is being reorganized into an integrated SPT Korean package with t
 - `tools\package-release.ps1 -SptRoot D:\SPT` succeeded.
 - `tools\install-to-spt.ps1 -TargetSptRoot D:\SPT` succeeded.
 - Packaged `locale\kr.json` parsed as JSON.
-- Server output exists under `release\SPT\user\mods\SPT_Korean_Localization`.
-- Client output exists under `release\BepInEx\plugins\GoLani.KoreanModFix.dll`.
+- Server output exists under `artifacts\release\SPT\user\mods\SPT_Korean_Localization`.
+- Client output exists under `artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll`.
 - Hidden SPT server startup loaded the server mod, `/client/locale/kr` returned HTTP `200`, and the verification server process was stopped.
 - Fake non-SPT install target was rejected before any package/install write.
 

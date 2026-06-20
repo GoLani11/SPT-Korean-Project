@@ -54,11 +54,34 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps
 The package is created under:
 
 ```text
-release\SPT\user\mods\SPT_Korean_Localization
-release\BepInEx\plugins\GoLani.KoreanModFix.dll
+artifacts\release\SPT\user\mods\SPT_Korean_Localization
+artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-Copy the `SPT` and `BepInEx` folders from `release` into the SPT install root if installing manually.
+Copy the `SPT` and `BepInEx` folders from `artifacts\release` into the SPT install root if installing manually.
+
+### GitHub release asset build
+
+To create both GitHub release zip files, double-click:
+
+```text
+make-release-packages.bat
+```
+
+Or run:
+
+```powershell
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release-variants.ps1 -SptRoot D:\SPT
+```
+
+The script creates:
+
+```text
+artifacts\release\SPT_Korean_Localization.KR.EN._G.M.zip
+artifacts\release\SPT_Korean_Localization.KR._G.M.zip
+```
+
+The `KR.EN` zip keeps the bilingual locale. The `KR` zip is generated from the same build output and removes trailing English helper lines such as `\n(English item name)` from locale values.
 
 ### Source layout
 
@@ -127,11 +150,34 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps
 패키지는 아래 폴더에 생성됩니다.
 
 ```text
-release\SPT\user\mods\SPT_Korean_Localization
-release\BepInEx\plugins\GoLani.KoreanModFix.dll
+artifacts\release\SPT\user\mods\SPT_Korean_Localization
+artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-수동으로 설치할 때는 `release` 안의 `SPT` 폴더와 `BepInEx` 폴더를 SPT 설치 루트에 복사하세요.
+수동으로 설치할 때는 `artifacts\release` 안의 `SPT` 폴더와 `BepInEx` 폴더를 SPT 설치 루트에 복사하세요.
+
+### GitHub 릴리즈 파일 생성
+
+GitHub 릴리즈에 올릴 zip 2종을 만들려면 아래 파일을 더블클릭하세요.
+
+```text
+make-release-packages.bat
+```
+
+명령으로 실행하려면 아래처럼 실행하세요.
+
+```powershell
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release-variants.ps1 -SptRoot D:\SPT
+```
+
+생성되는 파일은 아래 2개입니다.
+
+```text
+artifacts\release\SPT_Korean_Localization.KR.EN._G.M.zip
+artifacts\release\SPT_Korean_Localization.KR._G.M.zip
+```
+
+`KR.EN` zip은 한영 병기 로케일을 유지합니다. `KR` zip은 같은 빌드 결과에서 자동 생성하며, `\n(영어 아이템명)`처럼 값 끝에 붙은 영어 보조 줄을 제거합니다.
 
 ### 소스 구조
 

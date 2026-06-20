@@ -29,11 +29,11 @@ The server locale mod is loaded by the SPT server. The client mod fix plugin is 
 ## Release Layout
 
 ```text
-release\SPT\user\mods\SPT_Korean_Localization
-release\BepInEx\plugins\GoLani.KoreanModFix.dll
+artifacts\release\SPT\user\mods\SPT_Korean_Localization
+artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-The release mirrors the SPT install root so users can copy `SPT` and `BepInEx` into the target install.
+The release output mirrors the SPT install root so users can copy `SPT` and `BepInEx` into the target install.
 
 ## Dependency Shape
 

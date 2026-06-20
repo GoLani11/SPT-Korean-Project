@@ -30,12 +30,12 @@ if ([string]::IsNullOrWhiteSpace($ServerVersion) -or $ServerVersion -notmatch "^
 $PackageScript = Join-Path $PSScriptRoot "package-release.ps1"
 & $PackageScript -Configuration $Configuration -SptRoot $TargetRootPath
 
-$SourceModRoot = Join-Path $ProjectRoot "release\SPT\user\mods\SPT_Korean_Localization"
+$SourceModRoot = Join-Path $ProjectRoot "artifacts\release\SPT\user\mods\SPT_Korean_Localization"
 if (-not (Test-Path -LiteralPath $SourceModRoot)) {
     throw "Package output is missing: $SourceModRoot"
 }
 
-$SourceClientPlugin = Join-Path $ProjectRoot "release\BepInEx\plugins\GoLani.KoreanModFix.dll"
+$SourceClientPlugin = Join-Path $ProjectRoot "artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll"
 if (-not $SkipClientPlugin -and -not (Test-Path -LiteralPath $SourceClientPlugin)) {
     throw "Package output is missing: $SourceClientPlugin"
 }

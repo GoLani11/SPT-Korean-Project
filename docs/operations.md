@@ -10,9 +10,9 @@ dotnet build .\SPT-Korean-Project.sln -c Release --no-restore -p:SptRoot=D:\SPT
 Expected build outputs:
 
 ```text
-bin\Release\ServerLocaleMod\SPT_Korean_Localization.dll
-bin\Release\ServerLocaleMod\locale\kr.json
-bin\Release\ClientModFixPlugin\GoLani.KoreanModFix.dll
+artifacts\build\Release\ServerLocaleMod\SPT_Korean_Localization.dll
+artifacts\build\Release\ServerLocaleMod\locale\kr.json
+artifacts\build\Release\ClientModFixPlugin\GoLani.KoreanModFix.dll
 ```
 
 ## Package
@@ -22,6 +22,29 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps
 ```
 
 The script restores, builds, packages the server mod, packages the client plugin, and validates the packaged locale JSON.
+
+## GitHub Release Assets
+
+Double-click:
+
+```text
+make-release-packages.bat
+```
+
+Or run:
+
+```powershell
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release-variants.ps1 -SptRoot D:\SPT
+```
+
+Expected zip outputs:
+
+```text
+artifacts\release\SPT_Korean_Localization.KR.EN._G.M.zip
+artifacts\release\SPT_Korean_Localization.KR._G.M.zip
+```
+
+The `KR.EN` zip keeps the bilingual locale. The `KR` zip is generated from the same package output and strips trailing English helper lines from locale values. Use `-RemoveDescriptionEnglishHeader` only when the release should also remove leading `[English name]` description headers.
 
 ## Install
 
@@ -56,6 +79,7 @@ Client plugin runtime evidence requires launching the SPT client and checking th
 Generated folders may be removed after verification:
 
 ```text
+artifacts
 bin
 obj
 release

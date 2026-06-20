@@ -1,4 +1,5 @@
-# C# 빌드 결과
+# Generated build and release output
+artifacts/
 bin/
 obj/
 release/

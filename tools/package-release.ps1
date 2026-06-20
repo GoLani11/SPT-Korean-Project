@@ -16,12 +16,13 @@ $env:PYTHONIOENCODING = "utf-8"
 
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-    $OutputRoot = Join-Path $ProjectRoot "release"
+    $OutputRoot = Join-Path $ProjectRoot "artifacts\release"
 }
 
 $SolutionPath = Join-Path $ProjectRoot "SPT-Korean-Project.sln"
-$ServerBuildOutput = Join-Path $ProjectRoot "bin\$Configuration\ServerLocaleMod"
-$ClientBuildOutput = Join-Path $ProjectRoot "bin\$Configuration\ClientModFixPlugin"
+$BuildRoot = Join-Path $ProjectRoot "artifacts\build\$Configuration"
+$ServerBuildOutput = Join-Path $BuildRoot "ServerLocaleMod"
+$ClientBuildOutput = Join-Path $BuildRoot "ClientModFixPlugin"
 $PackageModRoot = Join-Path $OutputRoot "SPT\user\mods\SPT_Korean_Localization"
 $PackageClientPluginsRoot = Join-Path $OutputRoot "BepInEx\plugins"
 $PackageClientPluginPath = Join-Path $PackageClientPluginsRoot "GoLani.KoreanModFix.dll"
@@ -69,6 +70,11 @@ if (Test-Path -LiteralPath $DepsPath) {
 
 Copy-Item -LiteralPath (Join-Path $ServerBuildOutput "locale") -Destination $PackageModRootFull -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $ClientBuildOutput "GoLani.KoreanModFix.dll") -Destination $PackageClientPluginFull -Force
+
+$PackagedLocaleRoot = Join-Path $PackageModRootFull "locale"
+Get-ChildItem -LiteralPath $PackagedLocaleRoot -Recurse -File |
+    Where-Object { $_.Name -in @("AGENTS.md", "CLAUDE.md") } |
+    Remove-Item -Force
 
 $LocalePath = Join-Path $PackageModRootFull "locale\kr.json"
 $null = Get-Content -LiteralPath $LocalePath -Raw | ConvertFrom-Json -AsHashtable

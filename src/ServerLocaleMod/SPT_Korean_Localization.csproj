@@ -8,7 +8,7 @@
         <OutputType>Library</OutputType>
         <Version>1.5.0</Version>
         <AssemblyName>SPT_Korean_Localization</AssemblyName>
-        <OutputPath>..\..\bin\$(Configuration)\ServerLocaleMod\</OutputPath>
+        <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ServerLocaleMod\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
         <!-- AssemblyInfo is kept in source for the SPT mod metadata. -->
@@ -28,7 +28,7 @@
 
     <!-- Copy locale data beside the server mod DLL. -->
     <ItemGroup>
-        <None Include="locale\**\*" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="locale\**\*" Exclude="locale\**\AGENTS.md;locale\**\CLAUDE.md" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
 </Project>
