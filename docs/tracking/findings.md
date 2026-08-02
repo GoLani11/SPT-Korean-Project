@@ -11,6 +11,7 @@
 - The local SPT target reports a 4.1.x server version compatible with the guarded installer.
 - SPT 4.1.0 provides the reference DLL surfaces needed for the client plugin build: `BepInEx\core`, `BepInEx\plugins\spt`, and `EscapeFromTarkov_Data\Managed`.
 - The bilingual overlay has 31,084 keys; against the SPT 4.1.0 base locale it has 468 missing base keys and 2 extra legacy keys.
+- BepInEx loaded Korean Patch Fix 1.3.0, but no custom `Enabled patch` entries followed because the first patch still targeted the removed `OfferItemDescription.method_1` method.
 
 ## Repaired
 
@@ -20,6 +21,7 @@
 - The server transformer callback had a nullable warning path.
 - The client plugin source was moved from a separate repository into the integrated project and builds cleanly against the local SPT reference set.
 - SPT 4.1 renamed the flea-market handbook node and insurance company types; the client patches now target the current public types and method names.
+- Korean Patch Fix 1.4.0 targets `OfferItemDescription.SetItemName`, handles the current public TMP fields and `UiPools.Init` overload, loads after SPT.Core, and isolates patch-group failures so one incompatible screen does not disable all later fixes.
 
 ## Residual Risks
 

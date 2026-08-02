@@ -18,22 +18,21 @@ namespace KoreanPatchFix
         // 패치 활성화 메서드
         public static void Enable()
         {
-            try
+            Harmony harmony = new Harmony("com.GoLani.koreanpatchfix.quickaccesspanel");
+
+            // InventoryScreenQuickAccessPanel의 Show 메서드에 대한 Postfix 패치 적용
+            MethodInfo original = typeof(InventoryScreenQuickAccessPanel).GetMethod("Show",
+                new Type[] { typeof(InventoryController), typeof(ItemUiContext), typeof(GamePlayerOwner), typeof(InsuranceCompany) });
+
+            MethodInfo postfix = typeof(QuickAccessPanelFix).GetMethod(nameof(AfterShow),
+                BindingFlags.Static | BindingFlags.NonPublic);
+
+            if (original == null || postfix == null)
             {
-                Harmony harmony = new Harmony("com.GoLani.koreanpatchfix.quickaccesspanel");
-
-                // InventoryScreenQuickAccessPanel의 Show 메서드에 대한 Postfix 패치 적용
-                MethodInfo original = typeof(InventoryScreenQuickAccessPanel).GetMethod("Show",
-                    new Type[] { typeof(InventoryController), typeof(ItemUiContext), typeof(GamePlayerOwner), typeof(InsuranceCompany) });
-
-                MethodInfo postfix = typeof(QuickAccessPanelFix).GetMethod(nameof(AfterShow),
-                    BindingFlags.Static | BindingFlags.NonPublic);
-
-                harmony.Patch(original, null, new HarmonyMethod(postfix));
+                throw new MissingMethodException("InventoryScreenQuickAccessPanel.Show 패치 대상을 찾을 수 없습니다.");
             }
-            catch (Exception)
-            {
-            }
+
+            harmony.Patch(original, null, new HarmonyMethod(postfix));
         }
 
         // Show 메서드 실행 후 호출되는 메서드
@@ -49,8 +48,9 @@ namespace KoreanPatchFix
                 // 필요한 경우 다음 프레임에 한번 더 적용 (UI가 완전히 로드된 후)
                 __instance.StartCoroutine(DelayedResizeTexts(__instance.gameObject, 8));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Debug.LogError($"[KoreanPatchFix] 퀵 액세스 패널 조정 중 오류 발생: {ex}");
             }
         }
 

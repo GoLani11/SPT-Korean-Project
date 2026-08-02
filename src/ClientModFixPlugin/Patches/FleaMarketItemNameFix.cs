@@ -17,13 +17,15 @@ using TMPro;
 
 namespace KoreanPatchFix
 {
-    // OfferItemDescription 클래스의 method_1을 패치하는 클래스
+    // 플리마켓 아이템 이름이 갱신된 뒤 텍스트와 레이아웃을 조정하는 패치
     public class OfferItemDescriptionPatch : ModulePatch
     {
         // 패치할 대상 메서드를 지정
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(OfferItemDescription).GetMethod("method_1", BindingFlags.Public | BindingFlags.Instance);
+            return typeof(OfferItemDescription).GetMethod(
+                nameof(OfferItemDescription.SetItemName),
+                BindingFlags.Public | BindingFlags.Instance);
         }
 
         // 원본 메서드 실행 후 실행될 패치 메서드
@@ -37,7 +39,8 @@ namespace KoreanPatchFix
         // OfferItemDescription 인스턴스의 모든 TextMeshProUGUI 컴포넌트를 조정
         private static void AdjustText(OfferItemDescription instance)
         {
-            var fields = typeof(OfferItemDescription).GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            var fields = typeof(OfferItemDescription).GetFields(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             TextMeshProUGUI categoryText = null;
 
             foreach (var field in fields)

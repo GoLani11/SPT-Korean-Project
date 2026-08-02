@@ -16,6 +16,7 @@ The repository is an integrated SPT Korean package with two runtime outputs: a s
 - Installer now installs both outputs by default and supports `-SkipClientPlugin`.
 - Local install applied to `D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization` and `D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll`.
 - Server and client sources were updated for the SPT 4.1 API and runtime layout.
+- Korean Patch Fix 1.4.0 repairs silent client patch registration failures and reports each patch group in the BepInEx log.
 
 ## Verified Evidence
 

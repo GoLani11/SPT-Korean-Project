@@ -35,10 +35,12 @@ namespace KoreanPatchFix
             try
             {
                 // 리플렉션을 통해 _rewardName 필드에 접근
-                var rewardNameField = __instance.GetType().GetField("_rewardName", BindingFlags.NonPublic | BindingFlags.Instance);
+                var rewardNameField = __instance.GetType().GetField(
+                    "_rewardName",
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 if (rewardNameField != null)
                 {
-                    var rewardNameText = rewardNameField.GetValue(__instance) as TextMeshProUGUI;
+                    var rewardNameText = rewardNameField.GetValue(__instance) as TMP_Text;
                     if (rewardNameText != null)
                     {
                         AdjustTextSizeByLength(rewardNameText);
@@ -51,7 +53,7 @@ namespace KoreanPatchFix
             }
         }
 
-        private static void AdjustTextSizeByLength(TextMeshProUGUI text)
+        private static void AdjustTextSizeByLength(TMP_Text text)
         {
             // 텍스트가 null이 아닌지 확인
             if (string.IsNullOrEmpty(text.text))

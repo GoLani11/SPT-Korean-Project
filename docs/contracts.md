@@ -15,7 +15,7 @@ The BepInEx plugin identity must remain stable unless the user intentionally cre
 ```text
 com.GoLani.koreanpatchfix
 Korean Patch Fix
-1.3.0
+1.4.0
 ```
 
 ## Runtime Data Contract

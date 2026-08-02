@@ -4,10 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using SPT.Reflection.Patching;
-using SPT.Reflection.Utils;
-using Bsg.GameSettings;
 using Comfort.Common;
 using EFT;
+using EFT.Settings;
 using EFT.UI;
 using EFT.UI.DragAndDrop;
 using TMPro;
@@ -20,7 +19,12 @@ namespace KoreanPatchFix
     {
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(UiPools).GetMethod("Init");
+            return typeof(UiPools).GetMethod(
+                nameof(UiPools.Init),
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                Type.EmptyTypes,
+                null);
         }
 
         [PatchPostfix]
@@ -28,15 +32,9 @@ namespace KoreanPatchFix
         {
             try
             {
-                // 설정에서 현재 언어 가져오기
-                Type settingsManagerType = PatchConstants.EftTypes.Single((Type x) => x.GetMethod("ClearSettings") != null);
-                Type settingsSingletonType = typeof(Singleton<>).MakeGenericType(new Type[] { settingsManagerType });
-                object settingsManagerInstance = settingsSingletonType.GetProperty("Instance").GetValue(settingsManagerType);
-                object gameThingInstance = settingsManagerInstance.GetType().GetField("Game").GetValue(settingsManagerInstance);
-                object settingsInstance = gameThingInstance.GetType().GetField("Settings").GetValue(gameThingInstance);
-                string language = (GameSetting<string>)settingsInstance.GetType().GetField("Language").GetValue(settingsInstance);
-
                 await __result;
+
+                string language = Singleton<SettingsManager>.Instance.Game.Settings.Language.Value;
 
                 // 한국어일 때만 UI 조정
                 if (language == "kr")
@@ -87,17 +85,20 @@ namespace KoreanPatchFix
         // ItemView의 Caption 영역 조정
         private static void AdjustItemViewCaption(ItemView itemView)
         {
-            var captionTransform = itemView.GetComponentsInChildren<Transform>()
+            var captionTransform = itemView.GetComponentsInChildren<Transform>(true)
                 .FirstOrDefault(t => t.name == "Caption" || t.name == "Name");
 
             if (captionTransform != null)
             {
                 var rectTransform = captionTransform.GetComponent<RectTransform>();
                 // 텍스트가 잘리지 않도록 여백 조정
-                rectTransform.offsetMax = new Vector2(-3f, -1f); // 오른쪽과 위쪽 여백
-                rectTransform.offsetMin = new Vector2(1f, -17f); // 왼쪽과 아래쪽 여백
+                if (rectTransform != null)
+                {
+                    rectTransform.offsetMax = new Vector2(-3f, -1f); // 오른쪽과 위쪽 여백
+                    rectTransform.offsetMin = new Vector2(1f, -17f); // 왼쪽과 아래쪽 여백
+                }
 
-                var tmpText = captionTransform.GetComponent<TextMeshProUGUI>();
+                var tmpText = captionTransform.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (tmpText != null)
                 {
                     SetAutoSizingText(tmpText);
@@ -108,27 +109,30 @@ namespace KoreanPatchFix
         // InfoWindow의 Caption 영역 조정
         private static void AdjustInfoWindowCaption(InfoWindow infoWindow)
         {
-            var captionTransform = infoWindow.GetComponentsInChildren<Transform>()
+            var captionTransform = infoWindow.GetComponentsInChildren<Transform>(true)
                 .FirstOrDefault(t => t.name == "Caption");
 
             if (captionTransform != null)
             {
                 var rectTransform = captionTransform.GetComponent<RectTransform>();
                 // InfoWindow의 Caption 여백 조정
-                rectTransform.offsetMax = new Vector2(-25f, 2f);
-                rectTransform.offsetMin = new Vector2(25f, -2f);
+                if (rectTransform != null)
+                {
+                    rectTransform.offsetMax = new Vector2(-25f, 2f);
+                    rectTransform.offsetMin = new Vector2(25f, -2f);
+                }
             }
         }
 
         // GridWindow의 Caption 텍스트 조정
         private static void AdjustGridWindowCaption(GridWindow gridWindow)
         {
-            var captionTransform = gridWindow.GetComponentsInChildren<Transform>()
+            var captionTransform = gridWindow.GetComponentsInChildren<Transform>(true)
                 .FirstOrDefault(t => t.name == "Caption");
 
             if (captionTransform != null)
             {
-                var tmpText = captionTransform.GetComponent<TextMeshProUGUI>();
+                var tmpText = captionTransform.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (tmpText != null)
                 {
                     tmpText.overflowMode = TextOverflowModes.Overflow;
