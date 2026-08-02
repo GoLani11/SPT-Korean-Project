@@ -47,11 +47,10 @@ SPT_Korean_Localization.KR.EN._G.M.zip
 SPT_Korean_Localization.KR._G.M.zip
 ```
 
-Inside each zip, the server mod folder name matches the zip base name:
+Inside both zip variants, the server mod folder name is fixed:
 
 ```text
-SPT_Runtime\user\mods\SPT_Korean_Localization.KR.EN._G.M
-SPT_Runtime\user\mods\SPT_Korean_Localization.KR._G.M
+SPT_Runtime\user\mods\SPT_Korean_Localization
 ```
 
 The `KR.EN` zip must contain an exact copy of `src\ServerLocaleMod\locale\kr.json`. The `KR` zip must contain an exact copy of `src\ServerLocaleMod\locale\kr-only.json`. Release packaging must compare each packaged locale against its source SHA-256 hash.
