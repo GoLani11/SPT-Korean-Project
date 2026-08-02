@@ -4,7 +4,7 @@ param(
     [string]$ReleaseRoot,
     [string]$BilingualPackageName = "SPT_Korean_Localization.KR.EN._G.M",
     [string]$KoreanOnlyPackageName = "SPT_Korean_Localization.KR._G.M",
-    [switch]$RemoveDescriptionEnglishHeader,
+    [string]$KoreanOnlyLocalePath,
     [switch]$KeepWorkFolders
 )
 
@@ -98,7 +98,8 @@ function Rename-ModFolder {
 function Test-VariantPackage {
     param(
         [Parameter(Mandatory = $true)][string]$PackageRoot,
-        [Parameter(Mandatory = $true)][string]$PackageName
+        [Parameter(Mandatory = $true)][string]$PackageName,
+        [Parameter(Mandatory = $true)][string]$ExpectedLocalePath
     )
 
     $ModRoot = Join-Path $PackageRoot "SPT_Runtime\user\mods\$PackageName"
@@ -113,6 +114,12 @@ function Test-VariantPackage {
     }
 
     $null = Get-Content -LiteralPath $LocalePath -Raw | ConvertFrom-Json -AsHashtable
+
+    $ExpectedLocaleHash = (Get-FileHash -LiteralPath $ExpectedLocalePath -Algorithm SHA256).Hash
+    $PackagedLocaleHash = (Get-FileHash -LiteralPath $LocalePath -Algorithm SHA256).Hash
+    if (-not $PackagedLocaleHash.Equals($ExpectedLocaleHash, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Variant locale does not match its source JSON: $LocalePath"
+    }
 }
 
 function New-ZipFromDirectoryContents {
@@ -165,6 +172,21 @@ function Test-ZipPackageLayout {
 }
 
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
+$BilingualLocalePath = Join-Path $ProjectRoot "src\ServerLocaleMod\locale\kr.json"
+if ([string]::IsNullOrWhiteSpace($KoreanOnlyLocalePath)) {
+    $KoreanOnlyLocalePath = Join-Path $ProjectRoot "src\ServerLocaleMod\locale\kr-only.json"
+}
+
+$BilingualLocaleFull = Get-FullPath $BilingualLocalePath
+$KoreanOnlyLocaleFull = Get-FullPath $KoreanOnlyLocalePath
+foreach ($LocaleSource in @($BilingualLocaleFull, $KoreanOnlyLocaleFull)) {
+    if (-not (Test-Path -LiteralPath $LocaleSource)) {
+        throw "Release locale source is missing: $LocaleSource"
+    }
+
+    $null = Get-Content -LiteralPath $LocaleSource -Raw | ConvertFrom-Json -AsHashtable
+}
+
 if ([string]::IsNullOrWhiteSpace($ReleaseRoot)) {
     $ReleaseRoot = Join-Path $ProjectRoot "artifacts\release"
 }
@@ -193,18 +215,10 @@ try {
     $KoreanOnlyModRoot = Rename-ModFolder -PackageRoot $KoreanOnlyRoot -PackageName $KoreanOnlyPackageName
 
     $KoreanOnlyLocale = Join-Path $KoreanOnlyModRoot "locale\kr.json"
-    $ConverterScript = Join-Path $PSScriptRoot "convert-locale-to-korean-only.ps1"
-    $ConverterArgs = @{
-        InputPath = $KoreanOnlyLocale
-        OutputPath = $KoreanOnlyLocale
-    }
-    if ($RemoveDescriptionEnglishHeader) {
-        $ConverterArgs.RemoveDescriptionEnglishHeader = $true
-    }
-    & $ConverterScript @ConverterArgs
+    Copy-Item -LiteralPath $KoreanOnlyLocaleFull -Destination $KoreanOnlyLocale -Force
 
-    Test-VariantPackage -PackageRoot $BilingualRoot -PackageName $BilingualPackageName
-    Test-VariantPackage -PackageRoot $KoreanOnlyRoot -PackageName $KoreanOnlyPackageName
+    Test-VariantPackage -PackageRoot $BilingualRoot -PackageName $BilingualPackageName -ExpectedLocalePath $BilingualLocaleFull
+    Test-VariantPackage -PackageRoot $KoreanOnlyRoot -PackageName $KoreanOnlyPackageName -ExpectedLocalePath $KoreanOnlyLocaleFull
 
     $BilingualZipFull = New-ZipFromDirectoryContents -SourceRoot $BilingualRoot -ZipPath $BilingualZip -ReleaseRoot $ReleaseRootFull
     $KoreanOnlyZipFull = New-ZipFromDirectoryContents -SourceRoot $KoreanOnlyRoot -ZipPath $KoreanOnlyZip -ReleaseRoot $ReleaseRootFull

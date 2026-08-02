@@ -28,7 +28,7 @@
 
     <!-- Copy locale data beside the server mod DLL. -->
     <ItemGroup>
-        <None Include="locale\**\*" Exclude="locale\**\AGENTS.md;locale\**\CLAUDE.md" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="locale\**\*" Exclude="locale\**\AGENTS.md;locale\**\CLAUDE.md;locale\kr-only.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
 </Project>

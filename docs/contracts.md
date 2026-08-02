@@ -20,7 +20,7 @@ Korean Patch Fix
 
 ## Runtime Data Contract
 
-`src\ServerLocaleMod\locale\kr.json` must deserialize into a `Dictionary<string, string>`. Keys are SPT locale keys. Values are Korean locale strings or preserved source strings.
+Both `src\ServerLocaleMod\locale\kr.json` (bilingual) and `src\ServerLocaleMod\locale\kr-only.json` (Korean-only) must deserialize into a `Dictionary<string, string>` with identical key sets and key order.
 
 ## Package Contract
 
@@ -54,7 +54,7 @@ SPT_Runtime\user\mods\SPT_Korean_Localization.KR.EN._G.M
 SPT_Runtime\user\mods\SPT_Korean_Localization.KR._G.M
 ```
 
-The `KR.EN` zip keeps the source bilingual locale. The `KR` zip is derived from the same package output and removes trailing English helper lines that occupy the final line of a value, such as `\n(English item name)`.
+The `KR.EN` zip must contain an exact copy of `src\ServerLocaleMod\locale\kr.json`. The `KR` zip must contain an exact copy of `src\ServerLocaleMod\locale\kr-only.json`. Release packaging must compare each packaged locale against its source SHA-256 hash.
 
 ## Installer Contract
 

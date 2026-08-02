@@ -44,7 +44,7 @@ artifacts\release\SPT_Korean_Localization.KR.EN._G.M.zip
 artifacts\release\SPT_Korean_Localization.KR._G.M.zip
 ```
 
-The `KR.EN` zip keeps the bilingual locale. The `KR` zip is generated from the same package output and strips trailing English helper lines from locale values. Use `-RemoveDescriptionEnglishHeader` only when the release should also remove leading `[English name]` description headers.
+The `KR.EN` zip uses `src\ServerLocaleMod\locale\kr.json`, and the `KR` zip uses `src\ServerLocaleMod\locale\kr-only.json`. The package workflow validates both JSON files and requires each staged locale to match its source SHA-256 hash.
 
 ## Install
 

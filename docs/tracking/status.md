@@ -24,6 +24,7 @@ The repository is an integrated SPT Korean package with two runtime outputs: a s
 - Release output was generated under the SPT 4.1 `SPT_Runtime` layout and its locale JSON was validated independently after PowerShell 5 could not perform the script's PowerShell 7-only `ConvertFrom-Json -AsHashtable` check.
 - Release ZIP creation now verifies the `SPT_Runtime` and `BepInEx` roots and rejects the obsolete `SPT` root.
 - Release packaging now stops immediately when `dotnet restore` or `dotnet build` fails instead of reusing stale build output.
+- Korean-only and bilingual release ZIPs now use separate authoritative JSON sources instead of deriving the Korean-only locale with a partial regex conversion.
 - The validated release files were installed to `D:\SPT` and matched their source SHA-256 hashes.
 - Packaged `locale\kr.json` parsed as JSON.
 - Server output exists under `artifacts\release\SPT_Runtime\user\mods\SPT_Korean_Localization`.

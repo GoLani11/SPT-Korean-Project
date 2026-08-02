@@ -81,7 +81,7 @@ artifacts\release\SPT_Korean_Localization.KR.EN._G.M.zip
 artifacts\release\SPT_Korean_Localization.KR._G.M.zip
 ```
 
-The `KR.EN` zip keeps the bilingual locale. The `KR` zip is generated from the same build output and removes trailing English helper lines such as `\n(English item name)` from locale values.
+The `KR.EN` zip copies `src\ServerLocaleMod\locale\kr.json`, the bilingual locale. The `KR` zip copies the dedicated Korean-only source at `src\ServerLocaleMod\locale\kr-only.json`; it is not derived by stripping text from the bilingual file.
 
 ### Source layout
 
@@ -177,7 +177,7 @@ artifacts\release\SPT_Korean_Localization.KR.EN._G.M.zip
 artifacts\release\SPT_Korean_Localization.KR._G.M.zip
 ```
 
-`KR.EN` zip은 한영 병기 로케일을 유지합니다. `KR` zip은 같은 빌드 결과에서 자동 생성하며, `\n(영어 아이템명)`처럼 값 끝에 붙은 영어 보조 줄을 제거합니다.
+`KR.EN` ZIP은 한영 병기 원본인 `src\ServerLocaleMod\locale\kr.json`을 사용합니다. `KR` ZIP은 별도 한글 전용 원본인 `src\ServerLocaleMod\locale\kr-only.json`을 그대로 사용하며, 한영 병기 파일에서 일부 문구만 제거해 만들지 않습니다.
 
 ### 소스 구조
 
