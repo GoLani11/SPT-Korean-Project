@@ -4,6 +4,11 @@ bin/
 obj/
 release/
 
+# Local build and release tooling
+/Directory.Build.props
+/make-release-packages.bat
+/tools/
+
 # Visual Studio 관련
 .vs/
 *.user
