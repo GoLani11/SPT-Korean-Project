@@ -41,7 +41,14 @@ if (-not $PackageClientPluginFull.StartsWith($OutputPrefix, [StringComparison]::
 }
 
 dotnet restore $SolutionPath -p:SptRoot=$SptRoot -v:minimal
+if ($LASTEXITCODE -ne 0) {
+    throw "dotnet restore failed with exit code $LASTEXITCODE"
+}
+
 dotnet build $SolutionPath -c $Configuration --no-restore -p:SptRoot=$SptRoot -v:minimal
+if ($LASTEXITCODE -ne 0) {
+    throw "dotnet build failed with exit code $LASTEXITCODE"
+}
 
 if (-not (Test-Path -LiteralPath (Join-Path $ServerBuildOutput "SPT_Korean_Localization.dll"))) {
     throw "Build output is missing SPT_Korean_Localization.dll: $ServerBuildOutput"

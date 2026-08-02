@@ -136,6 +136,34 @@ function New-ZipFromDirectoryContents {
     return $ZipFull
 }
 
+function Test-ZipPackageLayout {
+    param(
+        [Parameter(Mandatory = $true)][string]$ZipPath,
+        [Parameter(Mandatory = $true)][string]$PackageName
+    )
+
+    $Archive = [IO.Compression.ZipFile]::OpenRead($ZipPath)
+    try {
+        $Entries = @($Archive.Entries | ForEach-Object { $_.FullName.Replace("\", "/") })
+        $ExpectedModPrefix = "SPT_Runtime/user/mods/$PackageName/"
+
+        if (-not ($Entries | Where-Object { $_.StartsWith($ExpectedModPrefix, [StringComparison]::OrdinalIgnoreCase) })) {
+            throw "Zip package is missing the SPT_Runtime mod folder: $ExpectedModPrefix"
+        }
+
+        if (-not ($Entries | Where-Object { $_.StartsWith("BepInEx/", [StringComparison]::OrdinalIgnoreCase) })) {
+            throw "Zip package is missing the BepInEx root folder: $ZipPath"
+        }
+
+        if ($Entries | Where-Object { $_.StartsWith("SPT/", [StringComparison]::OrdinalIgnoreCase) }) {
+            throw "Zip package contains the obsolete SPT root folder instead of SPT_Runtime: $ZipPath"
+        }
+    }
+    finally {
+        $Archive.Dispose()
+    }
+}
+
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 if ([string]::IsNullOrWhiteSpace($ReleaseRoot)) {
     $ReleaseRoot = Join-Path $ProjectRoot "artifacts\release"
@@ -180,6 +208,9 @@ try {
 
     $BilingualZipFull = New-ZipFromDirectoryContents -SourceRoot $BilingualRoot -ZipPath $BilingualZip -ReleaseRoot $ReleaseRootFull
     $KoreanOnlyZipFull = New-ZipFromDirectoryContents -SourceRoot $KoreanOnlyRoot -ZipPath $KoreanOnlyZip -ReleaseRoot $ReleaseRootFull
+
+    Test-ZipPackageLayout -ZipPath $BilingualZipFull -PackageName $BilingualPackageName
+    Test-ZipPackageLayout -ZipPath $KoreanOnlyZipFull -PackageName $KoreanOnlyPackageName
 
     Write-Output "Release assets created:"
     Write-Output $BilingualZipFull
