@@ -13,9 +13,9 @@ The server locale mod is loaded by the SPT server. The client mod fix plugin is 
 
 ## Server Load Flow
 
-1. SPT discovers `SPT_Korean_Localization.dll` under `SPT\user\mods\SPT_Korean_Localization`.
-2. The dependency injection container creates `KoreanPatcher` with `ISptLogger<KoreanPatcher>` and `DatabaseService`.
-3. `OnLoad()` locates the base `kr` locale from `databaseService.GetLocales().Global`.
+1. SPT discovers `SPT_Korean_Localization.dll` under `SPT_Runtime\user\mods\SPT_Korean_Localization`.
+2. The dependency injection container creates `KoreanPatcher` with `ISptLogger<KoreanPatcher>` and `LocaleTable`.
+3. `OnLoadAsync()` locates the base `kr` locale from `localeTable.Global`.
 4. The mod reads `locale\kr.json` next to the loaded DLL.
 5. The parsed patch dictionary is attached with `koreanLocale.AddTransformer(...)`.
 6. When SPT resolves the lazy locale data, each patch key overwrites or adds a value in the `kr` locale dictionary.
@@ -29,14 +29,14 @@ The server locale mod is loaded by the SPT server. The client mod fix plugin is 
 ## Release Layout
 
 ```text
-artifacts\release\SPT\user\mods\SPT_Korean_Localization
+artifacts\release\SPT_Runtime\user\mods\SPT_Korean_Localization
 artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-The release output mirrors the SPT install root so users can copy `SPT` and `BepInEx` into the target install.
+The release output mirrors the SPT install root so users can copy `SPT_Runtime` and `BepInEx` into the target install.
 
 ## Dependency Shape
 
-The server mod references `SPTarkov.Common`, `SPTarkov.DI`, and `SPTarkov.Server.Core` package version `4.0.13`.
+The server mod references `SPTarkov.Common`, `SPTarkov.DI`, and `SPTarkov.Server.Core` package version `4.1.0`.
 
 The client plugin targets `.NET Framework 4.8` and references DLLs from the active SPT install through the `SptRoot` MSBuild property. The default `SptRoot` is `D:\SPT`.

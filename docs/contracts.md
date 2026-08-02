@@ -27,15 +27,15 @@ Korean Patch Fix
 The release package root must contain:
 
 ```text
-SPT\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
-SPT\user\mods\SPT_Korean_Localization\locale\kr.json
+SPT_Runtime\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
+SPT_Runtime\user\mods\SPT_Korean_Localization\locale\kr.json
 BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
 The server package may include:
 
 ```text
-SPT\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.deps.json
+SPT_Runtime\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.deps.json
 ```
 
 ## GitHub Release Asset Contract
@@ -50,17 +50,17 @@ SPT_Korean_Localization.KR._G.M.zip
 Inside each zip, the server mod folder name matches the zip base name:
 
 ```text
-SPT\user\mods\SPT_Korean_Localization.KR.EN._G.M
-SPT\user\mods\SPT_Korean_Localization.KR._G.M
+SPT_Runtime\user\mods\SPT_Korean_Localization.KR.EN._G.M
+SPT_Runtime\user\mods\SPT_Korean_Localization.KR._G.M
 ```
 
 The `KR.EN` zip keeps the source bilingual locale. The `KR` zip is derived from the same package output and removes trailing English helper lines that occupy the final line of a value, such as `\n(English item name)`.
 
 ## Installer Contract
 
-The installer accepts an SPT root, not the inner server folder. For the default local install, the input is `D:\SPT`, and the server executable must exist at `D:\SPT\SPT\SPT.Server.exe`.
+The installer accepts an SPT root, not the inner runtime folder. For the default local install, the input is `D:\SPT`, and the server executable must exist at `D:\SPT\SPT_Runtime\SPT.Server.exe`.
 
-The installer must reject non-SPT paths and SPT versions outside `4.0.x`.
+The installer must reject non-SPT paths and SPT versions outside `4.1.x`.
 
 The installer must replace only the Korean server mod folder and the Korean client plugin DLL.
 

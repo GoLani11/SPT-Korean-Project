@@ -1,41 +1,42 @@
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Spt.Mod;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Models.Spt.Tables;
 using System.Text.Json;
 
 namespace SPT_Korean_Localization;
 
-public record ModMetadata : AbstractModMetadata
+public record ModMetadata : IModMetadata
 {
-    public override string ModGuid { get; init; } = "com.golani.makina.korean";
-    public override string Name { get; init; } = "SPT_Korean_Localization_(G&M)";
-    public override string Author { get; init; } = "Golani, Makina";
-    public override List<string>? Contributors { get; init; }
-    public override SemanticVersioning.Version Version { get; init; } = new("1.5.0");
-    public override SemanticVersioning.Range SptVersion { get; init; } = new("~4.0.0");
-    public override List<string>? Incompatibilities { get; init; } = null;
-    public override Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; } = null;
-    public override string? Url { get; init; } = null;
-    public override bool? IsBundleMod { get; init; } = null;
-    public override string License { get; init; } = "MIT";
+    public string ModGuid { get; init; } = "com.golani.makina.korean";
+    public string Name { get; init; } = "SPT_Korean_Localization_(G&M)";
+    public string Author { get; init; } = "Golani, Makina";
+    public List<string>? Contributors { get; init; }
+    public SemanticVersioning.Version Version { get; init; } = new("1.5.0");
+    public SemanticVersioning.Range SptVersion { get; init; } = new("~4.1.0");
+    public bool HasPrepatcher { get; init; } = false;
+    public List<string>? Incompatibilities { get; init; } = null;
+    public Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; } = null;
+    public string? Url { get; init; } = null;
+    public string License { get; init; } = "MIT";
 }
 
-[Injectable(TypePriority = OnLoadOrder.PostSptModLoader + 1)]
+[Injectable(TypePriority = OnLoadOrder.PostLoad + 1)]
 public class KoreanPatcher(
     ISptLogger<KoreanPatcher> logger,
-    DatabaseService databaseService)
+    LocaleTable localeTable)
     : IOnLoad
 {
-    public Task OnLoad()
+    public Task OnLoadAsync(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var startTime = DateTime.Now;
 
         try
         {
             // 한국어 로케일 데이터 가져오기
-            if (!databaseService.GetLocales().Global.TryGetValue("kr", out var koreanLocale))
+            if (!localeTable.Global.TryGetValue("kr", out var koreanLocale))
             {
                 logger.Error("기존 한국어 언어파일을 찾을 수 없습니다. .../SPT_Data/database/locales/global/kr.json 이 있는지 확인하세요.");
                 return Task.CompletedTask;

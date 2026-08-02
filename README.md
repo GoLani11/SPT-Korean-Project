@@ -10,14 +10,14 @@ There are still mistranslations, so I would appreciate testing and reports.
 
 ### Supported SPT version
 
-This repository currently targets SPT `4.0.x`, verified against SPT `4.0.13`.
+This repository currently targets SPT `4.1.x`, verified against SPT `4.1.0`.
 
 ### What this package contains
 
 This repository now builds two runtime components:
 
 ```text
-Server locale mod:      SPT\user\mods\SPT_Korean_Localization
+Server locale mod:      SPT_Runtime\user\mods\SPT_Korean_Localization
 Client UI fix plugin:   BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
@@ -34,8 +34,8 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\install-to-spt.ps1
 The installed layout should include:
 
 ```text
-D:\SPT\SPT\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
-D:\SPT\SPT\user\mods\SPT_Korean_Localization\locale\kr.json
+D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
+D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization\locale\kr.json
 D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
@@ -54,11 +54,11 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps
 The package is created under:
 
 ```text
-artifacts\release\SPT\user\mods\SPT_Korean_Localization
+artifacts\release\SPT_Runtime\user\mods\SPT_Korean_Localization
 artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-Copy the `SPT` and `BepInEx` folders from `artifacts\release` into the SPT install root if installing manually.
+Copy the `SPT_Runtime` and `BepInEx` folders from `artifacts\release` into the SPT install root if installing manually.
 
 ### GitHub release asset build
 
@@ -106,14 +106,14 @@ You can use the source code freely if you leave a comment and source address.
 
 ### 지원 SPT 버전
 
-현재 이 저장소는 SPT `4.0.x`를 대상으로 하며, SPT `4.0.13`에서 확인했습니다.
+현재 이 저장소는 SPT `4.1.x`를 대상으로 하며, SPT `4.1.0`에서 확인했습니다.
 
 ### 포함된 구성
 
 이 저장소는 이제 두 가지 구성물을 함께 빌드합니다.
 
 ```text
-서버 로케일 모드:       SPT\user\mods\SPT_Korean_Localization
+서버 로케일 모드:       SPT_Runtime\user\mods\SPT_Korean_Localization
 클라이언트 UI 보정 플러그인: BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
@@ -130,8 +130,8 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\install-to-spt.ps1
 설치 후 경로는 아래처럼 되어야 합니다.
 
 ```text
-D:\SPT\SPT\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
-D:\SPT\SPT\user\mods\SPT_Korean_Localization\locale\kr.json
+D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
+D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization\locale\kr.json
 D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
@@ -150,11 +150,11 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps
 패키지는 아래 폴더에 생성됩니다.
 
 ```text
-artifacts\release\SPT\user\mods\SPT_Korean_Localization
+artifacts\release\SPT_Runtime\user\mods\SPT_Korean_Localization
 artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 
-수동으로 설치할 때는 `artifacts\release` 안의 `SPT` 폴더와 `BepInEx` 폴더를 SPT 설치 루트에 복사하세요.
+수동으로 설치할 때는 `artifacts\release` 안의 `SPT_Runtime` 폴더와 `BepInEx` 폴더를 SPT 설치 루트에 복사하세요.
 
 ### GitHub 릴리즈 파일 생성
 

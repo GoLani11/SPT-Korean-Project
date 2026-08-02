@@ -83,7 +83,7 @@ function Rename-ModFolder {
         [Parameter(Mandatory = $true)][string]$PackageName
     )
 
-    $ModsRoot = Join-Path $PackageRoot "SPT\user\mods"
+    $ModsRoot = Join-Path $PackageRoot "SPT_Runtime\user\mods"
     $OriginalModRoot = Join-Path $ModsRoot "SPT_Korean_Localization"
     $VariantModRoot = Join-Path $ModsRoot $PackageName
 
@@ -101,7 +101,7 @@ function Test-VariantPackage {
         [Parameter(Mandatory = $true)][string]$PackageName
     )
 
-    $ModRoot = Join-Path $PackageRoot "SPT\user\mods\$PackageName"
+    $ModRoot = Join-Path $PackageRoot "SPT_Runtime\user\mods\$PackageName"
     $LocalePath = Join-Path $ModRoot "locale\kr.json"
     $ServerDllPath = Join-Path $ModRoot "SPT_Korean_Localization.dll"
     $ClientPluginPath = Join-Path $PackageRoot "BepInEx\plugins\GoLani.KoreanModFix.dll"

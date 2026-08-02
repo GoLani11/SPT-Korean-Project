@@ -22,7 +22,7 @@ src\ClientModFixPlugin
 Build and package two runtime outputs:
 
 ```text
-SPT\user\mods\SPT_Korean_Localization
+SPT_Runtime\user\mods\SPT_Korean_Localization
 BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 

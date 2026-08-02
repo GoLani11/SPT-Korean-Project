@@ -15,14 +15,14 @@ Existing Korean translations are project data. Do not refresh, rewrite, normaliz
 
 ## Compatibility Target
 
-The current supported family is SPT 4.0.x. The verified local target is SPT 4.0.13.
+The current supported family is SPT 4.1.x. The verified local target is SPT 4.1.0.
 
 ## Install Locations
 
 The canonical install paths for the local target are:
 
 ```text
-D:\SPT\SPT\user\mods\SPT_Korean_Localization
+D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization
 D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 

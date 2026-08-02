@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Reflection;
 using EFT.UI;
+using EFT.UI.Insurance;
 using HarmonyLib;
 using EFT.InventoryLogic;
 using EFT;
@@ -23,7 +24,7 @@ namespace KoreanPatchFix
 
                 // InventoryScreenQuickAccessPanel의 Show 메서드에 대한 Postfix 패치 적용
                 MethodInfo original = typeof(InventoryScreenQuickAccessPanel).GetMethod("Show",
-                    new Type[] { typeof(InventoryController), typeof(ItemUiContext), typeof(GamePlayerOwner), typeof(InsuranceCompanyClass) });
+                    new Type[] { typeof(InventoryController), typeof(ItemUiContext), typeof(GamePlayerOwner), typeof(InsuranceCompany) });
 
                 MethodInfo postfix = typeof(QuickAccessPanelFix).GetMethod(nameof(AfterShow),
                     BindingFlags.Static | BindingFlags.NonPublic);

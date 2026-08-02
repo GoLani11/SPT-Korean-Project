@@ -52,16 +52,16 @@ The `KR.EN` zip keeps the bilingual locale. The `KR` zip is generated from the s
 pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\install-to-spt.ps1 -TargetSptRoot D:\SPT
 ```
 
-The script requires `D:\SPT\SPT\SPT.Server.exe`, checks that the server version is in the `4.0.x` family, packages the solution, replaces only `D:\SPT\SPT\user\mods\SPT_Korean_Localization`, and copies `GoLani.KoreanModFix.dll` into `D:\SPT\BepInEx\plugins`.
+The script requires `D:\SPT\SPT_Runtime\SPT.Server.exe`, checks that the server version is in the `4.1.x` family, packages the solution, replaces only `D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization`, and copies `GoLani.KoreanModFix.dll` into `D:\SPT\BepInEx\plugins`.
 
 Use `-SkipClientPlugin` when only the server locale mod should be installed.
 
 ## Runtime Check
 
-Start `D:\SPT\SPT\SPT.Server.exe` and inspect the latest log under:
+Start `D:\SPT\SPT_Runtime\SPT.Server.exe` and inspect the latest log under:
 
 ```text
-D:\SPT\SPT\user\logs\spt
+D:\SPT\SPT_Runtime\user\logs\spt
 ```
 
 Expected server evidence includes:

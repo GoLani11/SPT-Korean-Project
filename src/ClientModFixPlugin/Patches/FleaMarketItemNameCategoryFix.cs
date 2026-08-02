@@ -13,21 +13,19 @@ namespace KoreanPatchFix
     {
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(SubcategoryView).GetMethod("method_4", BindingFlags.Public | BindingFlags.Instance);
+            return typeof(SubcategoryView).GetMethod(nameof(SubcategoryView.SetExpandedStatus), BindingFlags.Public | BindingFlags.Instance);
         }
 
         [PatchPostfix]
-        static void PatchPostfix(SubcategoryView __instance, EntityNodeClass node)
+        static void PatchPostfix(SubcategoryView __instance)
         {
-            AdjustSubcategoryView(__instance, node);
+            AdjustSubcategoryView(__instance);
         }
 
-        private static void AdjustSubcategoryView(SubcategoryView subcategoryView, EntityNodeClass node)
+        private static void AdjustSubcategoryView(SubcategoryView subcategoryView)
         {
-            bool isParentOrHasChildren = node.Parent == null || node.Children.Count > 0;
-
             // 높이 조정
-            var mainLayoutElementField = typeof(SubcategoryView).GetField("_mainLayoutElement", BindingFlags.NonPublic | BindingFlags.Instance);
+            var mainLayoutElementField = typeof(SubcategoryView).GetField("_mainLayoutElement", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (mainLayoutElementField != null)
             {
                 var mainLayoutElement = mainLayoutElementField.GetValue(subcategoryView) as LayoutElement;
@@ -59,7 +57,7 @@ namespace KoreanPatchFix
 
         private static void AdjustTextComponent(SubcategoryView subcategoryView, string fieldName)
         {
-            var field = typeof(NodeBaseView).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+            var field = typeof(NodeBaseView).GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (field != null)
             {
                 var textComponent = field.GetValue(subcategoryView) as TextMeshProUGUI;

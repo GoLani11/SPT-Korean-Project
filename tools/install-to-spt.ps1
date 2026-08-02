@@ -16,21 +16,21 @@ $env:PYTHONIOENCODING = "utf-8"
 
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $TargetRootPath = [IO.Path]::GetFullPath($TargetSptRoot)
-$ServerExe = Join-Path $TargetRootPath "SPT\SPT.Server.exe"
+$ServerExe = Join-Path $TargetRootPath "SPT_Runtime\SPT.Server.exe"
 
 if (-not (Test-Path -LiteralPath $ServerExe)) {
     throw "Target does not look like an SPT install. Missing: $ServerExe"
 }
 
 $ServerVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo($ServerExe).ProductVersion
-if ([string]::IsNullOrWhiteSpace($ServerVersion) -or $ServerVersion -notmatch "^4\.0(\.|-|$)") {
-    throw "Target SPT version must be 4.0.x. Found: $ServerVersion"
+if ([string]::IsNullOrWhiteSpace($ServerVersion) -or $ServerVersion -notmatch "^4\.1(\.|-|$)") {
+    throw "Target SPT version must be 4.1.x. Found: $ServerVersion"
 }
 
 $PackageScript = Join-Path $PSScriptRoot "package-release.ps1"
 & $PackageScript -Configuration $Configuration -SptRoot $TargetRootPath
 
-$SourceModRoot = Join-Path $ProjectRoot "artifacts\release\SPT\user\mods\SPT_Korean_Localization"
+$SourceModRoot = Join-Path $ProjectRoot "artifacts\release\SPT_Runtime\user\mods\SPT_Korean_Localization"
 if (-not (Test-Path -LiteralPath $SourceModRoot)) {
     throw "Package output is missing: $SourceModRoot"
 }
@@ -40,7 +40,7 @@ if (-not $SkipClientPlugin -and -not (Test-Path -LiteralPath $SourceClientPlugin
     throw "Package output is missing: $SourceClientPlugin"
 }
 
-$ModsRoot = Join-Path $TargetRootPath "SPT\user\mods"
+$ModsRoot = Join-Path $TargetRootPath "SPT_Runtime\user\mods"
 New-Item -ItemType Directory -Path $ModsRoot -Force | Out-Null
 
 $ModsRootFull = [IO.Path]::GetFullPath((Resolve-Path -LiteralPath $ModsRoot).Path)
