@@ -17,6 +17,7 @@ namespace KoreanPatchFix
             "반응",
             "접촉",
             "적 발견",
+            "교전 상황",
             "팀 현황"
         };
 
