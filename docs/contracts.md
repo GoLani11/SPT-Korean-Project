@@ -11,7 +11,7 @@ SPT_Korean_Localization.SPT-<version>.KR.GM.zip
 SPT_Korean_Localization.SPT-<version>.KR-EN.GM.zip
 ```
 
-Exactly 12 archives are produced for the six supported versions. `KR` copies `kr.generated.json`; `KR-EN` copies `kr-en.generated.json`.
+Exactly 12 archives are produced for the six supported versions. `KR` copies `kr.generated.json`; `KR-EN` copies `kr-en.generated.json`. The `KR` source still preserves reference-formatted quest titles, objectives, exceptional quest headers, item-description English headers, and verified raid-exfil names.
 
 ## Archive Layouts
 
