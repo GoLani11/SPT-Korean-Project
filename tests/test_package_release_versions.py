@@ -1,4 +1,5 @@
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -45,6 +46,53 @@ class ReleaseContractTests(unittest.TestCase):
                 release.validate_locale_pair(english, reordered)
             with self.assertRaisesRegex(TypeError, "non-string values"):
                 release.validate_locale_pair(english, invalid_value)
+
+    def test_gesture_patch_covers_every_supported_client_enum_name(self):
+        source = (
+            PROJECT_ROOT
+            / "src"
+            / "ClientModFixPlugin"
+            / "Patches"
+            / "GesturesMenuFixFix.cs"
+        ).read_text(encoding="utf-8")
+
+        def read_map(field_name):
+            body = source.split(f"{field_name} =", 1)[1].split("};", 1)[0]
+            return dict(re.findall(r'\{ "([^"]+)", "([^"]+)" \}', body))
+
+        self.assertEqual(
+            read_map("PhraseLabels"),
+            {
+                "Look": "주의!",
+                "Ready": "준비됐어!",
+                "DontKnow": "모르겠어!",
+            },
+        )
+        self.assertEqual(
+            read_map("GestureLabels"),
+            {
+                "ThatDirection": "저기",
+                "ThereGesture": "저기",
+                "Stop": "멈춰!",
+                "HoldGesture": "대기",
+                "Hello": "인사",
+                "FriendlyGesture": "인사",
+                "FuckYou": "가운뎃손가락",
+                "GetOffGesture": "가운뎃손가락",
+                "Good": "엄지 척",
+                "OkGesture": "엄지 척",
+                "Bad": "엄지 내리기",
+                "NoGesture": "엄지 내리기",
+                "ComeToMe": "따라와",
+                "ComeWithMeGesture": "따라와",
+                "RockGesture": "바위",
+                "ScissorGesture": "가위",
+                "PaperGesture": "보",
+                "AllRightGesture": "오케이",
+            },
+        )
+        self.assertIn("GameLanguageDetector.IsKorean()", source)
+        self.assertIn("PreserveBilingualSuffix(translated, text.text)", source)
 
 
 if __name__ == "__main__":

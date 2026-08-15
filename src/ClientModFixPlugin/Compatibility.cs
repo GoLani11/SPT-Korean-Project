@@ -130,6 +130,58 @@ namespace KoreanPatchFix
         }
     }
 
+    internal static class GameLanguageDetector
+    {
+        private static bool _warningLogged;
+
+        internal static bool IsKorean()
+        {
+            try
+            {
+                var singletonType = ReflectionTools.FindType("Comfort.Common.Singleton`1");
+                var settingsManagerType = ReflectionTools.FindType("EFT.Settings.SettingsManager");
+                if (singletonType == null || settingsManagerType == null)
+                {
+                    WarnOnce("Could not resolve the game language; applying Korean UI adjustments as a fallback.");
+                    return true;
+                }
+
+                var closedSingleton = singletonType.MakeGenericType(settingsManagerType);
+                var instance = closedSingleton.GetProperty(
+                    "Instance",
+                    BindingFlags.Public | BindingFlags.Static)?.GetValue(null, null);
+                var game = ReflectionTools.ReadMember(instance, "Game");
+                var settings = ReflectionTools.ReadMember(game, "Settings");
+                var language = ReflectionTools.ReadMember(settings, "Language");
+                var value = ReflectionTools.ReadMember(language, "Value") as string;
+
+                if (value == null)
+                {
+                    WarnOnce("Could not read the game language; applying Korean UI adjustments as a fallback.");
+                    return true;
+                }
+
+                return string.Equals(value, "kr", StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception ex)
+            {
+                WarnOnce($"Could not detect the game language; applying Korean UI adjustments: {ex.Message}");
+                return true;
+            }
+        }
+
+        private static void WarnOnce(string message)
+        {
+            if (_warningLogged)
+            {
+                return;
+            }
+
+            _warningLogged = true;
+            PluginLog.Warning(message);
+        }
+    }
+
     internal static class ReflectionTools
     {
         private const BindingFlags InstanceMembers =

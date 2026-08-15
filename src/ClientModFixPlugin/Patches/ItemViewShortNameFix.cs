@@ -58,7 +58,7 @@ namespace KoreanPatchFix
                     await __result;
                 }
 
-                if (!IsKoreanLanguage())
+                if (!GameLanguageDetector.IsKorean())
                 {
                     return;
                 }
@@ -81,40 +81,6 @@ namespace KoreanPatchFix
             catch (Exception ex)
             {
                 PluginLog.Error($"Item short-name adjustment failed: {ex}");
-            }
-        }
-
-        private static bool IsKoreanLanguage()
-        {
-            try
-            {
-                var singletonType = ReflectionTools.FindType("Comfort.Common.Singleton`1");
-                var settingsManagerType = ReflectionTools.FindType("EFT.Settings.SettingsManager");
-                if (singletonType == null || settingsManagerType == null)
-                {
-                    PluginLog.Warning("Could not resolve the game language; applying Korean item-name layout as a fallback.");
-                    return true;
-                }
-
-                var closedSingleton = singletonType.MakeGenericType(settingsManagerType);
-                var instance = closedSingleton.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)?.GetValue(null, null);
-                var game = ReflectionTools.ReadMember(instance, "Game");
-                var settings = ReflectionTools.ReadMember(game, "Settings");
-                var language = ReflectionTools.ReadMember(settings, "Language");
-                var value = ReflectionTools.ReadMember(language, "Value") as string;
-
-                if (value == null)
-                {
-                    PluginLog.Warning("Could not read the game language; applying Korean item-name layout as a fallback.");
-                    return true;
-                }
-
-                return string.Equals(value, "kr", StringComparison.OrdinalIgnoreCase);
-            }
-            catch (Exception ex)
-            {
-                PluginLog.Warning($"Could not detect the game language; applying Korean item-name layout: {ex.Message}");
-                return true;
             }
         }
 
