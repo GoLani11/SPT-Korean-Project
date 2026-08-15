@@ -1,68 +1,26 @@
 # Contracts
 
-## Server Mod Metadata Contract
+## Stable Identities
 
-`ModMetadata` must provide a stable GUID, display name, author list, version, SPT version range, and license. The current GUID is:
+The server mod GUID remains `com.golani.makina.korean`. The BepInEx identity remains `com.GoLani.koreanpatchfix` / `Korean Patch Fix`. Both components use package version `2.0.0`.
 
-```text
-com.golani.makina.korean
-```
-
-## Client Plugin Metadata Contract
-
-The BepInEx plugin identity must remain stable unless the user intentionally creates a new plugin lineage:
+## Package Names
 
 ```text
-com.GoLani.koreanpatchfix
-Korean Patch Fix
-1.4.0
+SPT_Korean_Localization.SPT-<version>.KR.GM.zip
+SPT_Korean_Localization.SPT-<version>.KR-EN.GM.zip
 ```
 
-## Runtime Data Contract
+Exactly 12 archives are produced for the six supported versions. `KR` copies `kr.generated.json`; `KR-EN` copies `kr-en.generated.json`.
 
-Both `src\ServerLocaleMod\locale\kr.json` (bilingual) and `src\ServerLocaleMod\locale\kr-only.json` (Korean-only) must deserialize into a `Dictionary<string, string>` with identical key sets and key order.
-
-## Package Contract
-
-The release package root must contain:
+## Archive Layouts
 
 ```text
-SPT_Runtime\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.dll
-SPT_Runtime\user\mods\SPT_Korean_Localization\locale\kr.json
-BepInEx\plugins\GoLani.KoreanModFix.dll
+SPT 3.x:    BepInEx/plugins + user/mods/spt_korean_localization_G&M
+SPT 4.0.13: BepInEx/plugins + SPT/user/mods/SPT_Korean_Localization
+SPT 4.1.0:  BepInEx/plugins + SPT_Runtime/user/mods/SPT_Korean_Localization
 ```
 
-The server package may include:
+Each archive contains exactly one `locale/kr.json`. The client payload is always `BepInEx/plugins/GoLani.KoreanModFix.dll`. A 3.x `package.json` contains only the exact loader field for that release: `akiVersion` for 3.8.3 and `sptVersion` for 3.9.8–3.11.4.
 
-```text
-SPT_Runtime\user\mods\SPT_Korean_Localization\SPT_Korean_Localization.deps.json
-```
-
-## GitHub Release Asset Contract
-
-The release asset workflow must create these zip files under `artifacts\release`:
-
-```text
-SPT_Korean_Localization.KR.EN._G.M.zip
-SPT_Korean_Localization.KR._G.M.zip
-```
-
-Inside both zip variants, the server mod folder name is fixed:
-
-```text
-SPT_Runtime\user\mods\SPT_Korean_Localization
-```
-
-The `KR.EN` zip must contain an exact copy of `src\ServerLocaleMod\locale\kr.json`. The `KR` zip must contain an exact copy of `src\ServerLocaleMod\locale\kr-only.json`. Release packaging must compare each packaged locale against its source SHA-256 hash.
-
-## Installer Contract
-
-The installer accepts an SPT root, not the inner runtime folder. For the default local install, the input is `D:\SPT`, and the server executable must exist at `D:\SPT\SPT_Runtime\SPT.Server.exe`.
-
-The installer must reject non-SPT paths and SPT versions outside `4.1.x`.
-
-The installer must replace only the Korean server mod folder and the Korean client plugin DLL.
-
-## README Contract
-
-README install instructions must match the actual script parameters, default target, output layout, and dual-runtime package shape.
+Archive entries must be relative, remain under the two expected root folders, and contain no `.bat`, `.cmd`, or `.exe` file.

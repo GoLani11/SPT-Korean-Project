@@ -1,51 +1,63 @@
-# SPT-Korean-Project / SPT-한글화-프로젝트
+# SPT Korean Localization / SPT 한글화 프로젝트
 
-## English
-Hello! Welcome to SPT-Korean-Project.
+SPT 서버 한글 번역과 한국어 UI 표시 보정을 함께 제공해요. Golani와 Makina가 제작하고 Gomeng이 배포에 도움을 주셨어요.
 
-My name is Golani, and I led this project.
-I am deeply grateful to Makina for working on the project with me.
-Also, thanks to Gomeng for actively providing this mod to me.
+## 다운로드 파일 선택
 
-There are still a lot of mistranslations, so I would appreciate it if you could test them and report them.
-Thank you for reading.
+설치된 SPT와 **버전이 정확히 같은 ZIP 하나**를 받으세요. `KR`은 한글판, `KR-EN`은 한영 병기판이에요.
 
-### How to apply it?
+| SPT | 한글판 | 한영 병기판 |
+| --- | --- | --- |
+| 3.8.3 | `SPT_Korean_Localization.SPT-3.8.3.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.8.3.KR-EN.GM.zip` |
+| 3.9.8 | `SPT_Korean_Localization.SPT-3.9.8.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.9.8.KR-EN.GM.zip` |
+| 3.10.5 | `SPT_Korean_Localization.SPT-3.10.5.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.10.5.KR-EN.GM.zip` |
+| 3.11.4 | `SPT_Korean_Localization.SPT-3.11.4.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.11.4.KR-EN.GM.zip` |
+| 4.0.13 | `SPT_Korean_Localization.SPT-4.0.13.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.0.13.KR-EN.GM.zip` |
+| 4.1.0 | `SPT_Korean_Localization.SPT-4.1.0.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.1.0.KR-EN.GM.zip` |
 
-SPT / user / mods / spt_korean_localization_G&M
+## 설치
 
-SPT / BepInEx / plugins / GoLani.KoreanModFix.dll
+1. 실행 중인 SPT 서버와 게임을 종료하세요.
+2. 선택한 ZIP을 **SPT 설치 최상위 폴더**에 바로 압축 해제하세요.
+3. 기존 파일을 바꿀지 물으면 덮어쓰세요.
+4. 서버를 실행하고 게임 언어를 한국어로 선택하세요.
 
-Please apply it so that it becomes a path like this.
-The order of mode priority is still being tested, but please raise it to the first priority, that is, the top.
+ZIP에는 해당 SPT 버전의 파일만 들어 있어 다른 버전용 폴더가 남지 않아요. 설치용 BAT나 EXE도 포함하지 않아요.
 
-### Plugin source code
-https://github.com/GoLani11/GoLani.KoreanModFix
+기존 `spt_korean_localization_G&M` 또는 `SPT_Korean_Localization` 정식 버전은 같은 경로에 덮어쓸 수 있어요. 아주 오래된 alpha 버전을 사용했다면 설치 전에 아래 폴더를 직접 삭제하세요.
 
-You can use the source code freely if you just leave a comment and an address.
+```text
+user\mods\spt_korean_localization_alpha_test_gm
+```
 
-## 한국어
-안녕하세요! SPT-한글화-프로젝트에 오신 것을 환영합니다.
+## 버전별 설치 결과
 
-저는 이 프로젝트를 주도하고 있는 고라니(Golani)입니다.
-저와 함께 프로젝트에 처음부터 참여해주고 많은 도움을 주신 마키나(Makina)님께 깊은 감사의 말씀드립니다.
-또한 이 모드를 적극적으로 제공해 주신 고맹(Gomeng)님께도 감사드립니다.
+```text
+SPT 3.8.3–3.11.4
+├─ BepInEx\plugins\GoLani.KoreanModFix.dll
+└─ user\mods\spt_korean_localization_G&M
 
-아직 오역이 많으니 테스트해 주시고 제보해 주시면 감사하겠습니다.
-읽어주셔서 감사합니다.
+SPT 4.0.13
+├─ BepInEx\plugins\GoLani.KoreanModFix.dll
+└─ SPT\user\mods\SPT_Korean_Localization
 
-### 모드 적용 방법
+SPT 4.1.0
+├─ BepInEx\plugins\GoLani.KoreanModFix.dll
+└─ SPT_Runtime\user\mods\SPT_Korean_Localization
+```
 
-SPT 설치 파일 / user / mods / spt_korean_localization_G&M
+다른 SPT 버전에는 설치하지 마세요. 서버 모드는 정확한 버전만 허용하고, 클라이언트 플러그인은 미지원 버전에서 패치를 비활성화해요.
 
-SPT 설치 파일 / BepInEx / plugins / GoLani.KoreanModFix.dll
+## 개발용 릴리스 빌드
 
-이렇게 경로가 되도록 적용해주세요.
-모드 우선 순위는 아직 테스트중이지만 제일 1순위 즉, 맨 위로 올려주세요.
+빌드에는 .NET 10 SDK, `D:\SPT3.8.3` 클라이언트 참조 파일, 그리고 같은 상위 폴더의 `spt-korean-translate` 저장소가 필요해요.
 
-### 플러그인 소스 코드
-https://github.com/GoLani11/GoLani.KoreanModFix
+```powershell
+..\spt-korean-translate\.venv\Scripts\python.exe .\tools\package_release_versions.py
+```
 
-댓글과 출처만 남겨주시면 자유롭게 소스 코드 활용하셔도 됩니다.
+또는 `make-release-packages.bat`을 실행하면 돼요. 생성된 12개 ZIP과 검증 요약은 `artifacts\release`에 저장되며 Git에는 포함되지 않아요.
 
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FGoLani11%2FSPT-Korean-Project-Alpha_Test&count_bg=%2346D3CF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=%EB%B0%A9%EB%AC%B8%EC%9E%90+%EC%88%98&edge_flat=false)](https://hits.seeyoufarm.com)
+## License
+
+소스 코드는 [MIT License](LICENSE.md)를 따라요. 클라이언트 플러그인 코드를 재사용할 때는 프로젝트 이름과 저장소 주소를 남겨 주세요.

@@ -1,92 +1,63 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System;
 using System.Reflection;
-using UnityEngine;
-using SPT.Reflection.Patching;
 using TMPro;
 
 namespace KoreanPatchFix
 {
-    public class RewardNamePatch : ModulePatch
+    internal static class RewardNameFix
     {
-        private Type prestigeRewardViewType;
-
-        protected override MethodBase GetTargetMethod()
+        internal static PatchResult Enable(Harmony harmony)
         {
-            // 리플렉션으로 PrestigeRewardView 타입 찾기
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            var target = ResolveTarget();
+            if (target == null)
             {
-                Type type = assembly.GetType("EFT.UI.Prestige.PrestigeRewardView");
-                if (type != null)
-                {
-                    prestigeRewardViewType = type;
-                    return type.GetMethod("Show", BindingFlags.Public | BindingFlags.Instance);
-                }
+                return PatchResult.Unavailable("prestige rewards do not exist in this client");
             }
 
-            // 타입을 찾지 못한 경우
-            Logger.LogError("PrestigeRewardView 타입을 찾을 수 없습니다");
-            return null;
+            var postfix = typeof(RewardNameFix).GetMethod(
+                nameof(AfterRewardShown),
+                BindingFlags.Static | BindingFlags.NonPublic);
+
+            harmony.Patch(target, postfix: new HarmonyMethod(postfix));
+            return PatchResult.Applied(target);
         }
 
-        [PatchPostfix]
-        static void PatchPostfix(object __instance)
+        internal static PatchResult Probe()
+        {
+            var target = ResolveTarget();
+            return target == null
+                ? PatchResult.Unavailable("prestige rewards do not exist in this client")
+                : PatchResult.Applied(target);
+        }
+
+        private static MethodInfo ResolveTarget()
+        {
+            var type = ReflectionTools.FindType("EFT.UI.Prestige.PrestigeRewardView");
+            return type == null
+                ? null
+                : ReflectionTools.FindMethod(type, "Show")
+                    ?? throw new MissingMethodException(type.FullName, "Show");
+        }
+
+        private static void AfterRewardShown(object __instance)
         {
             try
             {
-                // 리플렉션을 통해 _rewardName 필드에 접근
-                var rewardNameField = __instance.GetType().GetField(
-                    "_rewardName",
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                if (rewardNameField != null)
+                var field = ReflectionTools.FindField(__instance.GetType(), "_rewardName");
+                if (!(field?.GetValue(__instance) is TMP_Text text) || string.IsNullOrEmpty(text.text))
                 {
-                    var rewardNameText = rewardNameField.GetValue(__instance) as TMP_Text;
-                    if (rewardNameText != null)
-                    {
-                        AdjustTextSizeByLength(rewardNameText);
-                    }
+                    return;
                 }
+
+                text.enableWordWrapping = true;
+                text.overflowMode = TextOverflowModes.Overflow;
+                text.fontSize = text.text.Length <= 18 ? 10 : 8;
             }
             catch (Exception ex)
             {
-                Logger.LogError($"RewardNamePatch에서 오류 발생: {ex.Message}");
+                PluginLog.Error($"Prestige reward-name adjustment failed: {ex}");
             }
-        }
-
-        private static void AdjustTextSizeByLength(TMP_Text text)
-        {
-            // 텍스트가 null이 아닌지 확인
-            if (string.IsNullOrEmpty(text.text))
-                return;
-
-            // 기본 설정
-            text.enableWordWrapping = true;
-            text.overflowMode = TextOverflowModes.Overflow;
-
-            // 텍스트 길이에 따른 폰트 크기 조정
-            int length = text.text.Length;
-
-            if (length <= 18)
-            {
-                text.fontSize = 10;
-            }
-            else
-            {
-                text.fontSize = 8;
-            }
-        }
-    }
-
-    public class RewardNameFix : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return null;
-        }
-
-        public new static void Enable()
-        {
-            new RewardNamePatch().Enable();
         }
     }
 }

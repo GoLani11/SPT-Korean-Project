@@ -1,42 +1,24 @@
 # Architecture
 
-## Runtime Shape
+## Runtime Components
 
-The repository builds two independent runtime components from one solution:
-
-```text
-src\ServerLocaleMod       -> SPT_Korean_Localization.dll
-src\ClientModFixPlugin    -> GoLani.KoreanModFix.dll
-```
-
-The server locale mod is loaded by the SPT server. The client mod fix plugin is loaded by BepInEx inside the EFT client.
-
-## Server Load Flow
-
-1. SPT discovers `SPT_Korean_Localization.dll` under `SPT_Runtime\user\mods\SPT_Korean_Localization`.
-2. The dependency injection container creates `KoreanPatcher` with `ISptLogger<KoreanPatcher>` and `LocaleTable`.
-3. `OnLoadAsync()` locates the base `kr` locale from `localeTable.Global`.
-4. The mod reads `locale\kr.json` next to the loaded DLL.
-5. The parsed patch dictionary is attached with `koreanLocale.AddTransformer(...)`.
-6. When SPT resolves the lazy locale data, each patch key overwrites or adds a value in the `kr` locale dictionary.
-
-## Client Load Flow
-
-1. BepInEx discovers `GoLani.KoreanModFix.dll` under `BepInEx\plugins`.
-2. `Plugin.Awake()` enables the UI fix patches.
-3. Harmony and SPT reflection patches adjust Korean text display in affected client UI screens.
-
-## Release Layout
+The release contains one client plugin and one server locale mod selected for the target SPT version.
 
 ```text
-artifacts\release\SPT_Runtime\user\mods\SPT_Korean_Localization
-artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll
+src/ClientModFixPlugin -> universal net48 BepInEx plugin
+src/ServerLocaleMod3   -> SPT 3.x CommonJS server mod
+src/ServerLocaleMod40  -> SPT 4.0.13 net9 server mod
+src/ServerLocaleMod    -> SPT 4.1.0 net10 server mod
 ```
 
-The release output mirrors the SPT install root so users can copy `SPT_Runtime` and `BepInEx` into the target install.
+The client project references only the BepInEx, Harmony, Unity, and TextMeshPro assemblies shared by all six supported installs. EFT and SPT client types are resolved by name at runtime. Public method names are preferred, older clients fall back to stable `Show` entry points, and unavailable features such as pre-3.11 prestige rewards are skipped.
 
-## Dependency Shape
+## Locale Flow
 
-The server mod references `SPTarkov.Common`, `SPTarkov.DI`, and `SPTarkov.Server.Core` package version `4.1.0`.
+The sibling `spt-korean-translate` repository is the only release locale source. For each version, packaging validates that both generated variants have the exact key set, key order, and string value types of `versions/<version>/input/en.json`.
 
-The client plugin targets `.NET Framework 4.8` and references DLLs from the active SPT install through the `SptRoot` MSBuild property. The default `SptRoot` is `D:\SPT`.
+SPT 3.x applies the selected JSON during `postDBLoad`. SPT 4.0.13 and 4.1.0 attach a transformer to the built-in Korean global locale. No package edits SPT's original locale files.
+
+## Release Flow
+
+`tools/package_release_versions.py` builds the three binary projects once, stages only the target version's server mod and locale, adds the universal client DLL, and creates 12 deterministic ZIP files. Every archive is reopened and checked for safe paths, exact root folders, the locale source hash, exact 3.x manifest compatibility, and forbidden installer files.

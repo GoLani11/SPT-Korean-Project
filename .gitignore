@@ -3,11 +3,8 @@ artifacts/
 bin/
 obj/
 release/
-
-# Local build and release tooling
-/Directory.Build.props
-/make-release-packages.bat
-/tools/
+__pycache__/
+*.py[cod]
 
 # Visual Studio 관련
 .vs/

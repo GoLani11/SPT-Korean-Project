@@ -1,31 +1,21 @@
 # Findings
 
-## Confirmed
+## Confirmed Compatibility Facts
 
-- The repository now contains two runtime components, not one.
-- `SPT_Korean_Localization.dll` is a C# SPT server mod.
-- `GoLani.KoreanModFix.dll` is a BepInEx client plugin.
-- The correct default install root is `D:\SPT`.
-- The server mod install path is `D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization`.
-- The client plugin install path is `D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll`.
-- The local SPT target reports a 4.1.x server version compatible with the guarded installer.
-- SPT 4.1.0 provides the reference DLL surfaces needed for the client plugin build: `BepInEx\core`, `BepInEx\plugins\spt`, and `EscapeFromTarkov_Data\Managed`.
-- The bilingual overlay has 31,084 keys; against the SPT 4.1.0 base locale it has 468 missing base keys and 2 extra legacy keys.
-- BepInEx loaded Korean Patch Fix 1.3.0, but no custom `Enabled patch` entries followed because the first patch still targeted the removed `OfferItemDescription.method_1` method.
+- SPT 3.8.3 uses `akiVersion`; SPT 3.9.8–3.11.4 use `sptVersion` in server mod metadata.
+- SPT 3.x loads from `user\mods`, SPT 4.0.13 from `SPT\user\mods`, and SPT 4.1.0 from `SPT_Runtime\user\mods`.
+- All six clients use Harmony 2.9 and BepInEx 5.4.22 or 5.4.23.
+- `OfferItemDescription.SetItemName` and `SubcategoryView.SetExpandedStatus` are 4.1 targets; older clients expose compatible `Show` entry points.
+- `PrestigeRewardView` begins with the 3.11 client family.
+- Version key counts are 22,561; 23,931; 26,944; 28,659; 31,084; and 31,550 respectively.
 
 ## Repaired
 
-- Package references were aligned with SPT 4.1.0.
-- A user-facing error mentioned an outdated base locale path.
-- One patch key had a real newline in the key name instead of the escaped sequence used by the base locale.
-- The server transformer callback had a nullable warning path.
-- The client plugin source was moved from a separate repository into the integrated project and builds cleanly against the local SPT reference set.
-- SPT 4.1 renamed the flea-market handbook node and insurance company types; the client patches now target the current public types and method names.
-- Korean Patch Fix 1.4.0 targets `OfferItemDescription.SetItemName`, handles the current public TMP fields and `UiPools.Init` overload, loads after SPT.Core, and isolates patch-group failures so one incompatible screen does not disable all later fixes.
+- Removed stale 4.1-only locale copies and SPT reflection package coupling.
+- Split the incompatible 4.0 and 4.1 server APIs into separate builds.
+- Added exact-version manifests and archive structure validation.
+- Added safe unsupported-version behavior and per-patch enabled/unavailable/failed client logging.
 
-## Residual Risks
+## Residual Risk
 
-- Server verification confirms build/package/install and previous server locale behavior, not every in-game screen.
-- The 468 SPT 4.1 base keys absent from the bilingual overlay remain on the built-in Korean strings until the translation source is refreshed for the 4.1 key set.
-- Client plugin verification currently confirms build/package/install only; actual UI behavior requires launching the SPT client.
-- If SPT or EFT changes client UI method names, private fields, or SPT reflection APIs, client patches can fail even when the project compiles.
+Client patches still depend on game UI object names, private fields, and prefab structure. Static target discovery and a clean build do not replace visual testing in each supported client.

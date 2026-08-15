@@ -1,106 +1,103 @@
-﻿using System;
+using HarmonyLib;
+using System;
 using System.Reflection;
-using EFT.UI;
-using UnityEngine;
-using SPT.Reflection.Patching;
-using EFT.UI.Ragfair;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace KoreanPatchFix
 {
-    public class SubcategoryViewPatch : ModulePatch
+    internal static class FleaMarketItemCategoryFix
     {
-        protected override MethodBase GetTargetMethod()
+        internal static PatchResult Enable(Harmony harmony)
         {
-            return typeof(SubcategoryView).GetMethod(nameof(SubcategoryView.SetExpandedStatus), BindingFlags.Public | BindingFlags.Instance);
+            var target = ResolveTarget();
+            var postfix = typeof(FleaMarketItemCategoryFix).GetMethod(
+                nameof(AfterCategoryUpdated),
+                BindingFlags.Static | BindingFlags.NonPublic);
+
+            harmony.Patch(target, postfix: new HarmonyMethod(postfix));
+            return PatchResult.Applied(target);
         }
 
-        [PatchPostfix]
-        static void PatchPostfix(SubcategoryView __instance)
+        internal static PatchResult Probe()
         {
-            AdjustSubcategoryView(__instance);
+            return PatchResult.Applied(ResolveTarget());
         }
 
-        private static void AdjustSubcategoryView(SubcategoryView subcategoryView)
+        private static MethodInfo ResolveTarget()
         {
-            // 높이 조정
-            var mainLayoutElementField = typeof(SubcategoryView).GetField("_mainLayoutElement", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (mainLayoutElementField != null)
+            var type = ReflectionTools.FindType("EFT.UI.Ragfair.SubcategoryView")
+                ?? throw new TypeLoadException("EFT.UI.Ragfair.SubcategoryView was not found.");
+            return ReflectionTools.FindMethod(type, "SetExpandedStatus")
+                ?? ReflectionTools.FindMethod(type, "Show")
+                ?? throw new MissingMethodException(type.FullName, "SetExpandedStatus/Show");
+        }
+
+        private static void AfterCategoryUpdated(object __instance)
+        {
+            try
             {
-                var mainLayoutElement = mainLayoutElementField.GetValue(subcategoryView) as LayoutElement;
-                if (mainLayoutElement != null)
+                var mainLayoutField = ReflectionTools.FindField(__instance.GetType(), "_mainLayoutElement");
+                if (mainLayoutField?.GetValue(__instance) is LayoutElement mainLayout)
                 {
-                    mainLayoutElement.preferredHeight = 45; // 모든 항목의 높이를 40으로 통일
+                    mainLayout.preferredHeight = 45;
+                }
+
+                AdjustText(__instance, "CategoryElementName");
+                AdjustText(__instance, "CategoryChildCount");
+
+                var component = __instance as Component;
+                if (component == null)
+                {
+                    return;
+                }
+
+                var layout = component.GetComponent<LayoutElement>()
+                    ?? component.gameObject.AddComponent<LayoutElement>();
+                layout.minHeight = 45;
+
+                var rectTransform = component.GetComponent<RectTransform>();
+                if (rectTransform != null)
+                {
+                    rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 45);
                 }
             }
-
-            // 텍스트 컴포넌트 조정
-            AdjustTextComponent(subcategoryView, "CategoryElementName");
-            AdjustTextComponent(subcategoryView, "CategoryChildCount");
-
-            // LayoutElement 추가 또는 조정
-            var layoutElement = subcategoryView.GetComponent<LayoutElement>();
-            if (layoutElement == null)
+            catch (Exception ex)
             {
-                layoutElement = subcategoryView.gameObject.AddComponent<LayoutElement>();
-            }
-            layoutElement.minHeight = 45;
-
-            // RectTransform 조정
-            var rectTransform = subcategoryView.GetComponent<RectTransform>();
-            if (rectTransform != null)
-            {
-                rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 45);
+                PluginLog.Error($"Flea-market category adjustment failed: {ex}");
             }
         }
 
-        private static void AdjustTextComponent(SubcategoryView subcategoryView, string fieldName)
+        private static void AdjustText(object instance, string fieldName)
         {
-            var field = typeof(NodeBaseView).GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (field != null)
+            var field = ReflectionTools.FindField(instance.GetType(), fieldName);
+            if (!(field?.GetValue(instance) is TMP_Text text))
             {
-                var textComponent = field.GetValue(subcategoryView) as TextMeshProUGUI;
-                if (textComponent != null)
-                {
-                    SetCommonTextProperties(textComponent);
-                }
+                return;
             }
-        }
 
-        private static void SetCommonTextProperties(TextMeshProUGUI text)
-        {
-            text.fontSize = 16;
             text.enableWordWrapping = true;
             text.overflowMode = TextOverflowModes.Overflow;
             text.alignment = TextAlignmentOptions.Left;
 
-            // 텍스트 길이에 따른 폰트 크기 조정
-            if (text.text.Length >= 65 && text.text.Length < 95)
-            {
-                text.fontSize = 14;
-            }
-            else if (text.text.Length >= 95 && text.text.Length < 110)
-            {
-                text.fontSize = 12;
-            }
-            else if (text.text.Length >= 110)
+            var length = text.text?.Length ?? 0;
+            if (length >= 110)
             {
                 text.fontSize = 10;
             }
-        }
-    }
-
-    public class FleaMarketItemCategoryFix : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return null;
-        }
-
-        public new static void Enable()
-        {
-            new SubcategoryViewPatch().Enable();
+            else if (length >= 95)
+            {
+                text.fontSize = 12;
+            }
+            else if (length >= 65)
+            {
+                text.fontSize = 14;
+            }
+            else
+            {
+                text.fontSize = 16;
+            }
         }
     }
 }

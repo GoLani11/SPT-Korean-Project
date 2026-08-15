@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerLocaleMod", "src\ServerLocaleMod\SPT_Korean_Localization.csproj", "{A1B2C3D4-E5F6-4A5B-8C9D-0E1F2A3B4C5D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerLocaleMod40", "src\ServerLocaleMod40\SPT_Korean_Localization.4.0.csproj", "{D7A24B95-9D46-4E8D-8B6F-3BA34E704013}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientModFixPlugin", "src\ClientModFixPlugin\GoLani.KoreanModFix.csproj", "{C8F35EA6-6C2D-4A9C-A92E-9A8122A7E3E1}"
 EndProject
 Global
@@ -17,6 +19,10 @@ Global
 		{A1B2C3D4-E5F6-4A5B-8C9D-0E1F2A3B4C5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1B2C3D4-E5F6-4A5B-8C9D-0E1F2A3B4C5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1B2C3D4-E5F6-4A5B-8C9D-0E1F2A3B4C5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7A24B95-9D46-4E8D-8B6F-3BA34E704013}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7A24B95-9D46-4E8D-8B6F-3BA34E704013}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7A24B95-9D46-4E8D-8B6F-3BA34E704013}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7A24B95-9D46-4E8D-8B6F-3BA34E704013}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C8F35EA6-6C2D-4A9C-A92E-9A8122A7E3E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C8F35EA6-6C2D-4A9C-A92E-9A8122A7E3E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8F35EA6-6C2D-4A9C-A92E-9A8122A7E3E1}.Release|Any CPU.ActiveCfg = Release|Any CPU

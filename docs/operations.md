@@ -1,87 +1,28 @@
 # Operations
 
-## Build
+## Prerequisites
+
+- .NET 10 SDK capable of building net9, net10, and net48 projects
+- SPT 3.8.3 installed at `D:\SPT3.8.3` for shared client references
+- `spt-korean-translate` checked out beside this repository with its Python virtual environment
+- Generated translation outputs for all six supported versions
+
+## Build And Package
 
 ```powershell
-dotnet restore .\SPT-Korean-Project.sln -p:SptRoot=D:\SPT
-dotnet build .\SPT-Korean-Project.sln -c Release --no-restore -p:SptRoot=D:\SPT
+..\spt-korean-translate\.venv\Scripts\python.exe .\tools\package_release_versions.py
 ```
 
-Expected build outputs:
+Use `--client-reference-spt-root` when the 3.8.3 install is elsewhere. Use `--dotnet` to select a non-default .NET 10 SDK. `make-release-packages.bat` invokes the same Python entry point.
 
-```text
-artifacts\build\Release\ServerLocaleMod\SPT_Korean_Localization.dll
-artifacts\build\Release\ServerLocaleMod\locale\kr.json
-artifacts\build\Release\ClientModFixPlugin\GoLani.KoreanModFix.dll
-```
+The command restores and builds the solution, validates all locale key contracts, creates 12 ZIP files under `artifacts\release`, reopens every archive for layout and hash checks, and writes `release-summary.json`.
 
-## Package
+## Runtime Verification
 
-```powershell
-pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps1 -SptRoot D:\SPT
-```
+Extract each ZIP into its matching clean SPT install. The server log must report `SPT_Korean_Localization_(G&M)` and the version's expected locale key count. The BepInEx log must report the detected SPT version and a final enabled/unavailable/failed patch summary. Prestige reward adjustment is normally unavailable on SPT 3.8.3–3.10.5.
 
-The script restores, builds, packages the server mod, packages the client plugin, and validates the packaged locale JSON.
+Before a release, resolve the common client DLL's patch targets against the actual `Assembly-CSharp.dll` from every supported install, then visually smoke-test the adjusted UI through the normal SPT launcher. A reflection target check confirms structural compatibility but does not replace rendered UI verification.
 
-## GitHub Release Assets
+For a negative check, place a server package in a different supported SPT version and confirm that the loader reports a version mismatch without loading the mod. Do not continue using the mismatched installation.
 
-Double-click:
-
-```text
-make-release-packages.bat
-```
-
-Or run:
-
-```powershell
-pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release-variants.ps1 -SptRoot D:\SPT
-```
-
-Expected zip outputs:
-
-```text
-artifacts\release\SPT_Korean_Localization.KR.EN._G.M.zip
-artifacts\release\SPT_Korean_Localization.KR._G.M.zip
-```
-
-The `KR.EN` zip uses `src\ServerLocaleMod\locale\kr.json`, and the `KR` zip uses `src\ServerLocaleMod\locale\kr-only.json`. The package workflow validates both JSON files and requires each staged locale to match its source SHA-256 hash.
-Both zip variants use the same internal server mod path: `SPT_Runtime\user\mods\SPT_Korean_Localization`.
-
-## Install
-
-```powershell
-pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\tools\install-to-spt.ps1 -TargetSptRoot D:\SPT
-```
-
-The script requires `D:\SPT\SPT_Runtime\SPT.Server.exe`, checks that the server version is in the `4.1.x` family, packages the solution, replaces only `D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization`, and copies `GoLani.KoreanModFix.dll` into `D:\SPT\BepInEx\plugins`.
-
-Use `-SkipClientPlugin` when only the server locale mod should be installed.
-
-## Runtime Check
-
-Start `D:\SPT\SPT_Runtime\SPT.Server.exe` and inspect the latest log under:
-
-```text
-D:\SPT\SPT_Runtime\user\logs\spt
-```
-
-Expected server evidence includes:
-
-```text
-SPT_Korean_Localization_(G&M)
-31084
-/client/locale/kr
-```
-
-Client plugin runtime evidence requires launching the SPT client and checking the BepInEx log plus the affected UI screens.
-
-## Cleanup
-
-Generated folders may be removed after verification:
-
-```text
-artifacts
-bin
-obj
-release
-```
+Generated `artifacts`, `bin`, and `obj` content is disposable and must not be committed.

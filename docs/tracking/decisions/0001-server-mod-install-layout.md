@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by `0003-version-specific-release-layout`
 
 ## Context
 
@@ -24,6 +24,6 @@ Do not install `SPT_Korean_Localization.dll` under:
 
 ## Consequences
 
-Server packaging mirrors the SPT server mod layout. The installer accepts the outer SPT root, verifies `SPT_Runtime\SPT.Server.exe`, rejects servers outside the `4.1.x` family, and replaces only this server mod folder.
+This was the 4.1-only server layout. Current releases use the version-specific paths in decision 0003 and have no installer.
 
-Runtime verification should use server startup logs and the SPT locale endpoint rather than BepInEx client logs.
+Server runtime verification uses server startup logs; client UI verification uses BepInEx logs and in-game inspection.

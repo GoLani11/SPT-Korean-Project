@@ -2,38 +2,29 @@
 
 ## Current State
 
-Date: 2026-08-02
+Date: 2026-08-15
 
-The repository is an integrated SPT Korean package with two runtime outputs: a server locale mod and a BepInEx client UI fix plugin. The current verified target is local SPT 4.1.0 at `D:\SPT`.
+The repository builds exact-version Korean localization packages for SPT 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.0. Each version has Korean-only and Korean-English variants.
 
 ## Completed
 
-- Server locale mod moved under `src\ServerLocaleMod`.
-- Client UI fix plugin source merged under `src\ClientModFixPlugin`.
-- Solution renamed to `SPT-Korean-Project.sln`.
-- Client plugin project added with references resolved from `D:\SPT`.
-- Release package now contains both `SPT_Runtime\user\mods\SPT_Korean_Localization` and `BepInEx\plugins\GoLani.KoreanModFix.dll`.
-- Installer now installs both outputs by default and supports `-SkipClientPlugin`.
-- Local install applied to `D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization` and `D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll`.
-- Server and client sources were updated for the SPT 4.1 API and runtime layout.
-- Korean Patch Fix 1.4.0 repairs silent client patch registration failures and reports each patch group in the BepInEx log.
+- Added SPT 3.x CommonJS, SPT 4.0.13 net9, and SPT 4.1.0 net10 server implementations.
+- Replaced compile-time EFT/SPT client dependencies with runtime capability detection.
+- Preserved the existing server GUID, client plugin GUID, and historical 3.x mod folder.
+- Made `spt-korean-translate` generated outputs the only release locale source.
+- Added deterministic generation and internal validation for 12 version-specific ZIP files.
+- Removed installer-based distribution and unrelated-version payloads from archives.
 
-## Verified Evidence
+## Verification State
 
-- `dotnet build .\SPT-Korean-Project.sln -c Release -p:SptRoot=D:\SPT` succeeded with zero warnings and zero errors using .NET SDK 10.0.302.
-- Release output was generated under the SPT 4.1 `SPT_Runtime` layout and its locale JSON was validated independently after PowerShell 5 could not perform the script's PowerShell 7-only `ConvertFrom-Json -AsHashtable` check.
-- Release ZIP creation now verifies the `SPT_Runtime` and `BepInEx` roots and rejects the obsolete `SPT` root.
-- Release packaging now stops immediately when `dotnet restore` or `dotnet build` fails instead of reusing stale build output.
-- Korean-only and bilingual release ZIPs now use separate authoritative JSON sources instead of deriving the Korean-only locale with a partial regex conversion.
-- The validated release files were installed to `D:\SPT` and matched their source SHA-256 hashes.
-- Packaged `locale\kr.json` parsed as JSON.
-- Server output exists under `artifacts\release\SPT_Runtime\user\mods\SPT_Korean_Localization`.
-- Client output exists under `artifacts\release\BepInEx\plugins\GoLani.KoreanModFix.dll`.
-- Hidden SPT 4.1.0 server startup loaded the server mod, applied 31,084 entries, started the web server, and the verification server process was stopped.
-- Fake non-SPT install target was rejected before any package/install write.
+- The full solution builds with zero warnings and zero errors.
+- All 12 locale variants match their exact English key set, order, and string types.
+- All 12 ZIP files pass root-layout, safe-path, forbidden-file, manifest-version, and locale-hash checks.
+- Both variants were extracted and server-started on all six matching local SPT installations; each applied the expected locale key count.
+- A deliberately mismatched SPT 3.x package stayed inactive, logged the expected/actual versions, and allowed the server to keep running.
+- The common client DLL resolved every supported patch target against each installed version's real `Assembly-CSharp.dll`: five enabled and prestige unavailable on 3.8.3–3.10.5, six enabled on 3.11.4–4.1.0, and zero failures.
 
 ## Open Work
 
-- Full in-game visual QA for `GoLani.KoreanModFix.dll` has not been performed.
-- Translation quality remains outside the compatibility repair scope.
-- Future SPT releases outside 4.1.x require a fresh API, locale-key, and client patch-target comparison.
+- Future SPT versions require explicit server API, translation, patch-target, and in-game verification before a new ZIP is added.
+- Release smoke testing should still visually confirm the adjusted UI inside a launcher-started game; the automated client check proves target compatibility but does not render game screens.

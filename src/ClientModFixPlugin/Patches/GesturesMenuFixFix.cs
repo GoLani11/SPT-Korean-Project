@@ -1,58 +1,70 @@
-﻿using HarmonyLib;
-using System.Reflection;
-using EFT.UI.Gestures;
-using UnityEngine;
-using TMPro;
-using SPT.Reflection.Patching;
+using HarmonyLib;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
+using TMPro;
+using UnityEngine;
 
 namespace KoreanPatchFix
 {
-    public class GesturesMenuPatch : ModulePatch
+    internal static class GesturesMenuFix
     {
-        protected override MethodBase GetTargetMethod()
+        private static readonly HashSet<string> GroupHeadings = new HashSet<string>
         {
-            return typeof(GesturesMenu).GetMethod("InitPhraseGroups", BindingFlags.Public | BindingFlags.Instance);
+            "지원 요청",
+            "지휘",
+            "건강 상태",
+            "반응",
+            "접촉",
+            "적 발견",
+            "팀 현황"
+        };
+
+        internal static PatchResult Enable(Harmony harmony)
+        {
+            var target = ResolveTarget();
+            var postfix = typeof(GesturesMenuFix).GetMethod(
+                nameof(AfterPhraseGroupsInitialized),
+                BindingFlags.Static | BindingFlags.NonPublic);
+
+            harmony.Patch(target, postfix: new HarmonyMethod(postfix));
+            return PatchResult.Applied(target);
         }
 
-        [PatchPostfix]
-        static void PatchPostfix(GesturesMenu __instance)
+        internal static PatchResult Probe()
         {
-            AdjustGestureTextSize(__instance);
+            return PatchResult.Applied(ResolveTarget());
         }
 
-        private static void AdjustGestureTextSize(GesturesMenu menu)
+        private static MethodInfo ResolveTarget()
         {
-            var textComponents = menu.GetComponentsInChildren<TextMeshProUGUI>(true);
-            HashSet<string> largerTextSet = new HashSet<string>
-            {
-                "지원 요청", "지휘", "건강 상태", "반응", "접촉", "적 발견", "팀 현황"
-            };
+            var type = ReflectionTools.FindType("EFT.UI.Gestures.GesturesMenu")
+                ?? throw new TypeLoadException("EFT.UI.Gestures.GesturesMenu was not found.");
+            return ReflectionTools.FindMethod(
+                type,
+                "InitPhraseGroups",
+                method => method.GetParameters().Length == 0)
+                ?? throw new MissingMethodException(type.FullName, "InitPhraseGroups");
+        }
 
-            foreach (var textComponent in textComponents)
+        private static void AfterPhraseGroupsInitialized(object __instance)
+        {
+            try
             {
-                if (largerTextSet.Contains(textComponent.text))
+                if (!(__instance is Component component))
                 {
-                    textComponent.fontSize = 18;
+                    return;
                 }
-                else
+
+                foreach (var text in component.GetComponentsInChildren<TextMeshProUGUI>(true))
                 {
-                    textComponent.fontSize = 10;
+                    text.fontSize = GroupHeadings.Contains(text.text) ? 18 : 10;
                 }
             }
-        }
-    }
-
-    public class GesturesMenuFix : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return null;
-        }
-
-        public new static void Enable()
-        {
-            new GesturesMenuPatch().Enable();
+            catch (Exception ex)
+            {
+                PluginLog.Error($"Gesture-menu adjustment failed: {ex}");
+            }
         }
     }
 }

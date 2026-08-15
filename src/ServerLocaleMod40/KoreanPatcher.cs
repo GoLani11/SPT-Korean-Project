@@ -1,48 +1,45 @@
-using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Spt.Mod;
-using SPTarkov.Server.Core.Models.Spt.Tables;
+using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Server.Core.Services;
 using System.Text.Json;
 
 namespace SPT_Korean_Localization;
 
-public record ModMetadata : IModMetadata
+public record ModMetadata : AbstractModMetadata
 {
-    public string ModGuid { get; init; } = "com.golani.makina.korean";
-    public string Name { get; init; } = "SPT_Korean_Localization_(G&M)";
-    public string Author { get; init; } = "Golani, Makina";
-    public List<string>? Contributors { get; init; }
-    public SemanticVersioning.Version Version { get; init; } = new("2.0.0");
-    public SemanticVersioning.Range SptVersion { get; init; } = new("4.1.0");
-    public bool HasPrepatcher { get; init; } = false;
-    public List<string>? Incompatibilities { get; init; } = null;
-    public Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; } = null;
-    public string? Url { get; init; } = null;
-    public string License { get; init; } = "MIT";
+    public override string ModGuid { get; init; } = "com.golani.makina.korean";
+    public override string Name { get; init; } = "SPT_Korean_Localization_(G&M)";
+    public override string Author { get; init; } = "Golani, Makina";
+    public override List<string>? Contributors { get; init; }
+    public override SemanticVersioning.Version Version { get; init; } = new("2.0.0");
+    public override SemanticVersioning.Range SptVersion { get; init; } = new("4.0.13");
+    public override List<string>? Incompatibilities { get; init; } = null;
+    public override Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; } = null;
+    public override string? Url { get; init; } = null;
+    public override bool? IsBundleMod { get; init; } = null;
+    public override string License { get; init; } = "MIT";
 }
 
-[Injectable(TypePriority = OnLoadOrder.PostLoad + 1)]
+[Injectable(TypePriority = OnLoadOrder.PostSptModLoader + 1)]
 public class KoreanPatcher(
     ISptLogger<KoreanPatcher> logger,
-    LocaleTable localeTable)
+    DatabaseService databaseService)
     : IOnLoad
 {
-    public Task OnLoadAsync(CancellationToken cancellationToken)
+    public Task OnLoad()
     {
-        cancellationToken.ThrowIfCancellationRequested();
         var startTime = DateTime.Now;
 
         try
         {
-            // 한국어 로케일 데이터 가져오기
-            if (!localeTable.Global.TryGetValue("kr", out var koreanLocale))
+            if (!databaseService.GetLocales().Global.TryGetValue("kr", out var koreanLocale))
             {
-                logger.Error("기존 한국어 언어파일을 찾을 수 없습니다. SPT_Runtime/SPT_Data/database/locales/global/kr.json을 확인하세요.");
+                logger.Error("기존 한국어 언어파일을 찾을 수 없습니다. SPT/SPT_Data/database/locales/global/kr.json을 확인하세요.");
                 return Task.CompletedTask;
             }
 
-            // locale/kr.json 파일 경로 - 현재 DLL이 있는 위치 기준
             var assemblyLocation = Path.GetDirectoryName(typeof(KoreanPatcher).Assembly.Location);
             if (assemblyLocation == null)
             {
@@ -51,24 +48,20 @@ public class KoreanPatcher(
             }
 
             var localePath = Path.Combine(assemblyLocation, "locale", "kr.json");
-
             if (!File.Exists(localePath))
             {
                 logger.Error($"한글 패치 파일을 찾을 수 없습니다: {localePath}");
                 return Task.CompletedTask;
             }
 
-            // JSON 파일 읽기
             var jsonContent = File.ReadAllText(localePath);
             var koreanPatch = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
-
             if (koreanPatch == null || koreanPatch.Count == 0)
             {
                 logger.Warning("한글 패치 파일이 비어있습니다.");
                 return Task.CompletedTask;
             }
 
-            // Lazy loaded 로케일에 변환기 추가
             koreanLocale.AddTransformer(localeData =>
             {
                 if (localeData == null)
@@ -77,18 +70,16 @@ public class KoreanPatcher(
                     return localeData;
                 }
 
-                // 기존 로케일에 패치 적용
-                foreach (var kvp in koreanPatch)
+                foreach (var entry in koreanPatch)
                 {
-                    localeData[kvp.Key] = kvp.Value;
+                    localeData[entry.Key] = entry.Value;
                 }
+
                 return localeData;
             });
 
-            var endTime = DateTime.Now;
-            var elapsed = (endTime - startTime).TotalMilliseconds;
-
-            logger.Success($"고라니 SPT 한글화 프로젝트가 정상적으로 적용되었습니다. 재밌는 SPT되세요!");
+            var elapsed = (DateTime.Now - startTime).TotalMilliseconds;
+            logger.Success("고라니 SPT 한글화 프로젝트가 정상적으로 적용되었습니다. 재밌는 SPT되세요!");
             logger.Info($"적용된 항목 줄 수: {koreanPatch.Count} (처리 시간: {elapsed:F2}ms)");
         }
         catch (Exception ex)

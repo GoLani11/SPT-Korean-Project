@@ -8,21 +8,23 @@ Accepted
 
 The project historically shipped a server-side Korean locale mod and a separate BepInEx client plugin for Korean UI display fixes. The user wants those files managed together in this repository while preserving the ability to install both into the correct SPT locations.
 
-The two components run in different processes and use different dependency sets. The server mod uses SPT server packages. The client plugin uses BepInEx, Harmony, Unity, EFT client assemblies, and SPT client support DLLs.
+The two components run in different processes and use different dependency sets. The server mod uses SPT server packages. The client plugin builds only against the BepInEx, Harmony, Unity, and TextMeshPro surface shared by all supported clients; EFT and SPT types are resolved at runtime.
 
 ## Decision
 
-Use one repository and one solution, but keep two source projects:
+Use one repository and one solution, while keeping client and server runtime boundaries separate. Server source is split where the SPT loader API differs:
 
 ```text
+src\ServerLocaleMod3
+src\ServerLocaleMod40
 src\ServerLocaleMod
 src\ClientModFixPlugin
 ```
 
-Build and package two runtime outputs:
+Each release asset contains two runtime outputs at the paths required by its target version:
 
 ```text
-SPT_Runtime\user\mods\SPT_Korean_Localization
+<version-specific server mod path>
 BepInEx\plugins\GoLani.KoreanModFix.dll
 ```
 

@@ -1,33 +1,17 @@
 # Business Rules
 
-## Package Scope
+## Supported Releases
 
-The project provides a Korean SPT package with two pieces:
+The exact supported SPT versions are 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.0. Compatibility ranges and unverified future-version fallback are not release promises.
 
-- A server locale mod that applies Korean locale strings.
-- A BepInEx client plugin that adjusts Korean UI display issues.
+Each version has a Korean-only and a Korean-English ZIP. A universal ZIP is intentionally not published because it would leave unused server-mod folders in the installation.
 
-It is not a gameplay mod, launcher mod, asset bundle, anti-cheat workaround, or account/profile migration tool.
+## Translation Ownership
 
-## Translation Preservation
+Release locale files come only from the generated outputs in the sibling `spt-korean-translate` repository. This repository must not keep or hand-edit duplicate locale snapshots.
 
-Existing Korean translations are project data. Do not refresh, rewrite, normalize, or machine-translate the whole locale file during compatibility work. Small data fixes are acceptable only when they repair a compatibility mismatch, JSON validity issue, or known broken key.
+## Installation Promise
 
-## Compatibility Target
+Users select the ZIP matching their exact SPT version and extract it once at the SPT install root. Archives have no wrapper directory, installer, script, executable, or payload for another SPT version.
 
-The current supported family is SPT 4.1.x. The verified local target is SPT 4.1.0.
-
-## Install Locations
-
-The canonical install paths for the local target are:
-
-```text
-D:\SPT\SPT_Runtime\user\mods\SPT_Korean_Localization
-D:\SPT\BepInEx\plugins\GoLani.KoreanModFix.dll
-```
-
-Equivalent installs under another SPT root must preserve the same server and BepInEx layout.
-
-## User-Facing Promise
-
-The README command should remain the simplest supported path for non-technical users. If scripts, source layout, or output layout change, README instructions must change in the same work.
+The server mod overlays the built-in Korean locale at runtime. The universal client plugin adjusts only UI presentation and safely skips features missing from an older client.

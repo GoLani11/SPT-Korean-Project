@@ -1,129 +1,109 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using EFT;
-using System.Runtime.CompilerServices;
-using EFT.UI;
-using UnityEngine;
-using SPT.Core.Patches;
-using SPT.Reflection.Patching;
-using EFT.UI.Ragfair;
-using UnityEngine.UI;
 using TMPro;
-
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace KoreanPatchFix
 {
-    // 플리마켓 아이템 이름이 갱신된 뒤 텍스트와 레이아웃을 조정하는 패치
-    public class OfferItemDescriptionPatch : ModulePatch
+    internal static class FleaMarketItemNameFix
     {
-        // 패치할 대상 메서드를 지정
-        protected override MethodBase GetTargetMethod()
+        internal static PatchResult Enable(Harmony harmony)
         {
-            return typeof(OfferItemDescription).GetMethod(
-                nameof(OfferItemDescription.SetItemName),
-                BindingFlags.Public | BindingFlags.Instance);
+            var target = ResolveTarget();
+            var postfix = typeof(FleaMarketItemNameFix).GetMethod(
+                nameof(AfterItemNameUpdated),
+                BindingFlags.Static | BindingFlags.NonPublic);
+
+            harmony.Patch(target, postfix: new HarmonyMethod(postfix));
+            return PatchResult.Applied(target);
         }
 
-        // 원본 메서드 실행 후 실행될 패치 메서드
-        [PatchPostfix]
-        static void PatchPostfix(OfferItemDescription __instance)
+        internal static PatchResult Probe()
         {
-            AdjustText(__instance);
-            AdjustLayout(__instance);
+            return PatchResult.Applied(ResolveTarget());
         }
 
-        // OfferItemDescription 인스턴스의 모든 TextMeshProUGUI 컴포넌트를 조정
-        private static void AdjustText(OfferItemDescription instance)
+        private static MethodInfo ResolveTarget()
         {
-            var fields = typeof(OfferItemDescription).GetFields(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            TextMeshProUGUI categoryText = null;
+            var type = ReflectionTools.FindType("EFT.UI.Ragfair.OfferItemDescription")
+                ?? throw new TypeLoadException("EFT.UI.Ragfair.OfferItemDescription was not found.");
+            return ReflectionTools.FindMethod(type, "SetItemName", method => method.GetParameters().Length == 0)
+                ?? ReflectionTools.FindMethod(type, "Show")
+                ?? throw new MissingMethodException(type.FullName, "SetItemName/Show");
+        }
 
-            foreach (var field in fields)
+        private static void AfterItemNameUpdated(object __instance)
+        {
+            try
             {
-                if (field.FieldType == typeof(TextMeshProUGUI))
+                TMP_Text categoryText = null;
+                foreach (var field in ReflectionTools.GetInstanceFields(__instance.GetType()))
                 {
-                    var textComponent = field.GetValue(instance) as TextMeshProUGUI;
-                    if (textComponent != null)
+                    if (!typeof(TMP_Text).IsAssignableFrom(field.FieldType))
                     {
-                        SetCommonTextProperties(textComponent);
+                        continue;
+                    }
 
-                        if (field.Name == "_itemCategory")
-                        {
-                            categoryText = textComponent;
-                        }
+                    var text = field.GetValue(__instance) as TMP_Text;
+                    if (text == null)
+                    {
+                        continue;
+                    }
+
+                    SetCommonTextProperties(text);
+                    if (field.Name == "_itemCategory")
+                    {
+                        categoryText = text;
                     }
                 }
-            }
 
-            // 카테고리 텍스트에 대한 추가 조정
-            if (categoryText != null)
+                if (categoryText != null)
+                {
+                    categoryText.fontSize = categoryText.text?.Length >= 40 ? 12 : 14;
+                }
+
+                var component = __instance as Component;
+                if (component == null)
+                {
+                    return;
+                }
+
+                var layout = component.GetComponent<LayoutElement>()
+                    ?? component.gameObject.AddComponent<LayoutElement>();
+                layout.minHeight = 100;
+            }
+            catch (Exception ex)
             {
-                AdjustCategoryText(categoryText);
+                PluginLog.Error($"Flea-market item name adjustment failed: {ex}");
             }
         }
 
-        private static void SetCommonTextProperties(TextMeshProUGUI text)
+        private static void SetCommonTextProperties(TMP_Text text)
         {
-            text.fontSize = 16;
             text.enableWordWrapping = true;
             text.overflowMode = TextOverflowModes.Overflow;
             text.lineSpacing = -30;
             text.alignment = TextAlignmentOptions.Left;
-            text.fontSize = 16;
-            // 텍스트 길이에 따른 폰트 크기 조정
-            if (text.text.Length >= 75 && text.text.Length < 95)
-            {
-                text.fontSize = 14;
-            }
-            else if (text.text.Length >= 95 && text.text.Length < 110)
-            {
-                text.fontSize = 12;
-            }
-            else if (text.text.Length >= 110)
+
+            var length = text.text?.Length ?? 0;
+            if (length >= 110)
             {
                 text.fontSize = 10;
             }
-        }
-
-        private static void AdjustCategoryText(TextMeshProUGUI categoryText)
-        {
-            categoryText.fontSize = 14;
-            if (categoryText.text.Length >= 40)
+            else if (length >= 95)
             {
-                categoryText.fontSize = 12;
+                text.fontSize = 12;
             }
-        }
-
-        // LayoutElement 조정
-        private static void AdjustLayout(OfferItemDescription instance)
-        {
-            var layoutElement = instance.GetComponent<LayoutElement>();
-            if (layoutElement == null)
+            else if (length >= 75)
             {
-                layoutElement = instance.gameObject.AddComponent<LayoutElement>();
+                text.fontSize = 14;
             }
-            layoutElement.minHeight = 100;
-        }
-    }
-
-    // 패치 플러그인 클래스
-    public class FleaMarketItemNameFix : ModulePatch
-    {
-        // 이 클래스는 직접적인 패치 대상이 없으므로 null 반환
-        protected override MethodBase GetTargetMethod()
-        {
-            return null;
-        }
-
-        // 패치 활성화 메서드
-        public new static void Enable()
-        {
-            new OfferItemDescriptionPatch().Enable();
+            else
+            {
+                text.fontSize = 16;
+            }
         }
     }
 }
