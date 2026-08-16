@@ -7,7 +7,7 @@
         <OutputType>Library</OutputType>
         <LangVersion>latest</LangVersion>
         <Nullable>disable</Nullable>
-        <Version>2.0.0</Version>
+        <Version>2.0.1</Version>
         <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ClientModFixPlugin\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>

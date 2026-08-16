@@ -16,10 +16,11 @@ class ReleaseContractTests(unittest.TestCase):
     def test_release_matrix_contains_exactly_twelve_assets(self):
         self.assertEqual(
             [spec.version for spec in release.SUPPORTED_VERSIONS],
-            ["3.8.3", "3.9.8", "3.10.5", "3.11.4", "4.0.13", "4.1.0"],
+            ["3.8.3", "3.9.8", "3.10.5", "3.11.4", "4.0.13", "4.1.2"],
         )
         self.assertEqual(set(release.VARIANTS), {"KR", "KR-EN"})
         self.assertEqual(len(release.SUPPORTED_VERSIONS) * len(release.VARIANTS), 12)
+        self.assertEqual(release.SUPPORTED_VERSIONS[-1].locale_source_version, "4.1.0")
 
     def test_node_manifests_target_only_the_exact_loader_version(self):
         for spec in release.SUPPORTED_VERSIONS[:4]:
@@ -93,6 +94,12 @@ class ReleaseContractTests(unittest.TestCase):
         )
         self.assertIn("GameLanguageDetector.IsKorean()", source)
         self.assertIn("PreserveBilingualSuffix(translated, text.text)", source)
+
+        compatibility_source = (
+            PROJECT_ROOT / "src" / "ClientModFixPlugin" / "Compatibility.cs"
+        ).read_text(encoding="utf-8")
+        self.assertIn('"4.1.2"', compatibility_source)
+        self.assertNotIn('"4.1.0"', compatibility_source)
 
 
 if __name__ == "__main__":

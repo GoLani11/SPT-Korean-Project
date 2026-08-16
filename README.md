@@ -15,7 +15,7 @@ SPT 서버 한글 번역과 한국어 UI 표시 보정을 함께 제공해요. G
 | 3.10.5 | `SPT_Korean_Localization.SPT-3.10.5.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.10.5.KR-EN.GM.zip` |
 | 3.11.4 | `SPT_Korean_Localization.SPT-3.11.4.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.11.4.KR-EN.GM.zip` |
 | 4.0.13 | `SPT_Korean_Localization.SPT-4.0.13.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.0.13.KR-EN.GM.zip` |
-| 4.1.0 | `SPT_Korean_Localization.SPT-4.1.0.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.1.0.KR-EN.GM.zip` |
+| 4.1.2 | `SPT_Korean_Localization.SPT-4.1.2.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.1.2.KR-EN.GM.zip` |
 
 ## 설치
 
@@ -43,7 +43,7 @@ SPT 4.0.13
 ├─ BepInEx\plugins\GoLani.KoreanModFix.dll
 └─ SPT\user\mods\SPT_Korean_Localization
 
-SPT 4.1.0
+SPT 4.1.2
 ├─ BepInEx\plugins\GoLani.KoreanModFix.dll
 └─ SPT_Runtime\user\mods\SPT_Korean_Localization
 ```

@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
 
-PACKAGE_VERSION = "2.0.0"
+PACKAGE_VERSION = "2.0.1"
 CLIENT_DLL_NAME = "GoLani.KoreanModFix.dll"
 SERVER_DLL_NAME = "SPT_Korean_Localization.dll"
 THREE_X_MOD_FOLDER = "spt_korean_localization_G&M"
@@ -26,10 +26,15 @@ class VersionSpec:
     server_kind: str
     server_mod_root: PurePosixPath
     manifest_version_field: str | None = None
+    translation_version: str | None = None
 
     @property
     def allowed_roots(self) -> set[str]:
         return {"BepInEx", self.server_mod_root.parts[0]}
+
+    @property
+    def locale_source_version(self) -> str:
+        return self.translation_version or self.version
 
 
 SUPPORTED_VERSIONS = (
@@ -63,9 +68,10 @@ SUPPORTED_VERSIONS = (
         PurePosixPath("SPT/user/mods") / FOUR_X_MOD_FOLDER,
     ),
     VersionSpec(
-        "4.1.0",
+        "4.1.2",
         "dotnet41",
         PurePosixPath("SPT_Runtime/user/mods") / FOUR_X_MOD_FOLDER,
+        translation_version="4.1.0",
     ),
 )
 
@@ -381,15 +387,20 @@ def package_all(
     summary: list[dict[str, Any]] = []
 
     for spec in SUPPORTED_VERSIONS:
-        english_path = translation_root / "versions" / spec.version / "input" / "en.json"
+        locale_version = spec.locale_source_version
+        english_path = translation_root / "versions" / locale_version / "input" / "en.json"
         if not english_path.is_file():
-            raise FileNotFoundError(f"English source is missing for SPT {spec.version}: {english_path}")
+            raise FileNotFoundError(
+                f"English source is missing for SPT {spec.version} "
+                f"(locale source {locale_version}): {english_path}"
+            )
 
         for variant, locale_filename in VARIANTS.items():
-            locale_source = translation_root / "output" / spec.version / locale_filename
+            locale_source = translation_root / "output" / locale_version / locale_filename
             if not locale_source.is_file():
                 raise FileNotFoundError(
-                    f"generated locale is missing for SPT {spec.version} {variant}: {locale_source}"
+                    f"generated locale is missing for SPT {spec.version} {variant} "
+                    f"(locale source {locale_version}): {locale_source}"
                 )
 
             key_count = validate_locale_pair(english_path, locale_source)

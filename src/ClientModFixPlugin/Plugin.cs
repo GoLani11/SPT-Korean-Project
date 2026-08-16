@@ -12,7 +12,7 @@ namespace KoreanPatchFix
     {
         public const string PluginGuid = "com.GoLani.koreanpatchfix";
         public const string PluginName = "Korean Patch Fix";
-        public const string PluginVersion = "2.0.0";
+        public const string PluginVersion = "2.0.1";
 
         private void Awake()
         {
@@ -23,7 +23,7 @@ namespace KoreanPatchFix
             {
                 Logger.LogError(
                     $"Unsupported SPT version '{detectedVersion ?? "unknown"}'. " +
-                    "Korean Patch Fix supports 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.0 only.");
+                    "Korean Patch Fix supports 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.2 only.");
                 return;
             }
 
