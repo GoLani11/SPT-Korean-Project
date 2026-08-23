@@ -8,7 +8,7 @@ The release contains one client plugin and one server locale mod selected for th
 src/ClientModFixPlugin -> universal net48 BepInEx plugin
 src/ServerLocaleMod3   -> SPT 3.x CommonJS server mod
 src/ServerLocaleMod40  -> SPT 4.0.13 net9 server mod
-src/ServerLocaleMod    -> SPT 4.1.3 net10 server mod
+src/ServerLocaleMod    -> stable SPT 4.1.2+ (4.1.x) net10 server mod
 ```
 
 The client project references only the BepInEx, Harmony, Unity, and TextMeshPro assemblies shared by all six supported installs. EFT and SPT client types are resolved by name at runtime. Public method names are preferred, older clients fall back to stable `Show` entry points, and unavailable features such as pre-3.11 prestige rewards are skipped.
@@ -17,7 +17,7 @@ The client project references only the BepInEx, Harmony, Unity, and TextMeshPro 
 
 The sibling `spt-korean-translate` repository is the only release locale source. For each release, packaging validates that both generated variants have the exact key set, key order, and string value types of the declared locale source. SPT 4.1.3 uses its own generated output, whose source global locale files are byte-identical to 4.1.2.
 
-SPT 3.x applies the selected JSON during `postDBLoad`. SPT 4.0.13 and 4.1.3 attach a transformer to the built-in Korean global locale. No package edits SPT's original locale files.
+SPT 3.x applies the selected JSON during `postDBLoad`. SPT 4.0.13 and the stable 4.1.2+ server mod attach a transformer to the built-in Korean global locale. No package edits SPT's original locale files.
 
 ## Release Flow
 

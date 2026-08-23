@@ -4,11 +4,11 @@
 
 Date: 2026-08-23
 
-The repository builds exact-version Korean localization packages for SPT 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.3. Each version has Korean-only and Korean-English variants.
+The repository builds exact-version Korean localization packages for SPT 3.8.3, 3.9.8, 3.10.5, 3.11.4, and 4.0.13. Its latest 4.1 archive admits stable releases from SPT 4.1.2 through the rest of 4.1.x; 4.1.2 and 4.1.3 are currently verified. Each archive has Korean-only and Korean-English variants.
 
 ## Completed
 
-- Added SPT 3.x CommonJS, SPT 4.0.13 net9, and SPT 4.1.3 net10 server implementations.
+- Added SPT 3.x CommonJS, SPT 4.0.13 net9, and stable SPT 4.1.2+ net10 server implementations.
 - Replaced compile-time EFT/SPT client dependencies with runtime capability detection.
 - Preserved the existing server GUID, client plugin GUID, and historical 3.x mod folder.
 - Made `spt-korean-translate` generated outputs the only release locale source.
@@ -20,12 +20,14 @@ The repository builds exact-version Korean localization packages for SPT 3.8.3, 
 - The full solution builds with zero warnings and zero errors.
 - All 12 locale variants match their exact English key set, order, and string types.
 - All 12 ZIP files pass root-layout, safe-path, forbidden-file, manifest-version, and locale-hash checks.
+- The release build executes the shared server/client compatibility matrix and cannot reuse skipped stale binaries.
 - Runtime checks completed for the previously supported packages through SPT 4.1.2; the 4.1.3 package was installed without starting the server or game.
+- Every SPT API reference used by the 4.1 server DLL resolves against both the backed-up 4.1.2 assemblies and the installed 4.1.3 assemblies (15 checked, zero failures).
 - A deliberately mismatched SPT 3.x package stayed inactive, logged the expected/actual versions, and allowed the server to keep running.
 - The common client DLL resolved all six patch targets against the installed SPT 4.1.3 client assemblies with zero failures; earlier compatibility results remain recorded for older releases.
 
 ## Open Work
 
-- Future SPT versions require explicit server API, translation, patch-target, and in-game verification before a new ZIP is added.
+- Later stable 4.1.x patches are admitted by the bounded compatibility rule but still require static and in-game verification when available. Prereleases are rejected. SPT 4.2 or later requires explicit server API, translation, patch-target, and packaging review before support is added.
 - SPT 4.1.3 still needs a later runtime server-log and in-game UI/texture smoke test when launching the game is allowed.
 - Release smoke testing should still visually confirm the adjusted UI inside a launcher-started game; the automated client check proves target compatibility but does not render game screens.

@@ -95,11 +95,49 @@ class ReleaseContractTests(unittest.TestCase):
         self.assertIn("GameLanguageDetector.IsKorean()", source)
         self.assertIn("PreserveBilingualSuffix(translated, text.text)", source)
 
+    def test_four_one_compatibility_is_bounded_from_4_1_2(self):
+        policy_source = (
+            PROJECT_ROOT / "src" / "Shared" / "SptCompatibilityPolicy.cs"
+        ).read_text(encoding="utf-8")
+        self.assertIn('FourOneServerRange = "~4.1.2"', policy_source)
+        self.assertIn("Version.TryParse(version, out var parsed)", policy_source)
+        self.assertIn("parsed.Major == 4", policy_source)
+        self.assertIn("parsed.Minor == 1", policy_source)
+        self.assertIn("parsed.Build >= 2", policy_source)
+
         compatibility_source = (
             PROJECT_ROOT / "src" / "ClientModFixPlugin" / "Compatibility.cs"
         ).read_text(encoding="utf-8")
-        self.assertIn('"4.1.3"', compatibility_source)
-        self.assertNotIn('"4.1.0"', compatibility_source)
+        self.assertIn("SptCompatibilityPolicy.IsSupportedStableRelease(version)", compatibility_source)
+
+        server_source = (
+            PROJECT_ROOT / "src" / "ServerLocaleMod" / "KoreanPatcher.cs"
+        ).read_text(encoding="utf-8")
+        self.assertIn("SptCompatibilityPolicy.FourOneServerRange", server_source)
+
+        server_project = (
+            PROJECT_ROOT / "src" / "ServerLocaleMod" / "SPT_Korean_Localization.csproj"
+        ).read_text(encoding="utf-8-sig")
+        self.assertIn("SptCompatibilityPolicy.cs", server_project)
+        for package in ("SPTarkov.Common", "SPTarkov.DI", "SPTarkov.Server.Core"):
+            self.assertIn(f'Include="{package}" Version="4.1.2"', server_project)
+
+        client_project = (
+            PROJECT_ROOT / "src" / "ClientModFixPlugin" / "GoLani.KoreanModFix.csproj"
+        ).read_text(encoding="utf-8")
+        self.assertIn("SptCompatibilityPolicy.cs", client_project)
+
+        contract_source = (
+            PROJECT_ROOT / "tests" / "CompatibilityContract" / "Program.cs"
+        ).read_text(encoding="utf-8")
+        for case in ('("4.1.0", false)', '("4.1.2", true)', '("4.1.99", true)', '("4.2.0", false)'):
+            self.assertIn(case, contract_source)
+
+        packaging_source = (PROJECT_ROOT / "tools" / "package_release_versions.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("run_compatibility_contract", packaging_source)
+        self.assertNotIn("--skip-build", packaging_source)
 
 
 if __name__ == "__main__":

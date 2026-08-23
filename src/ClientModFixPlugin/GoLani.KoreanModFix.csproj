@@ -25,6 +25,7 @@
       every supported client. All EFT/SPT types are discovered at runtime.
     -->
     <ItemGroup>
+        <Compile Include="..\Shared\SptCompatibilityPolicy.cs" Link="SptCompatibilityPolicy.cs" />
         <Reference Include="0Harmony">
             <HintPath>$(BepInExCore)\0Harmony.dll</HintPath>
             <Private>false</Private>

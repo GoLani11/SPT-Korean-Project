@@ -196,6 +196,24 @@ def build_solution(
     )
 
 
+def run_compatibility_contract(
+    project_root: Path,
+    configuration: str,
+    dotnet: str,
+) -> None:
+    contract = (
+        project_root
+        / "artifacts"
+        / "build"
+        / configuration
+        / "CompatibilityContract"
+        / "CompatibilityContract.dll"
+    )
+    if not contract.is_file():
+        raise FileNotFoundError(f"compatibility contract executable is missing: {contract}")
+    run_command([dotnet, str(contract)], project_root)
+
+
 def required_build_outputs(project_root: Path, configuration: str) -> dict[str, Path]:
     build_root = project_root / "artifacts" / "build" / configuration
     outputs = {
@@ -441,7 +459,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--configuration", default="Release")
     parser.add_argument("--output-root", type=Path, default=project_root / "artifacts" / "release")
     parser.add_argument("--dotnet")
-    parser.add_argument("--skip-build", action="store_true")
     return parser.parse_args(argv)
 
 
@@ -466,13 +483,14 @@ def main(argv: list[str] | None = None) -> int:
     output_root.mkdir(parents=True, exist_ok=True)
     work_root.mkdir(parents=True, exist_ok=True)
 
-    if not args.skip_build:
-        build_solution(
-            project_root,
-            args.configuration,
-            args.client_reference_spt_root.resolve(),
-            resolve_dotnet(args.dotnet, project_root),
-        )
+    dotnet = resolve_dotnet(args.dotnet, project_root)
+    build_solution(
+        project_root,
+        args.configuration,
+        args.client_reference_spt_root.resolve(),
+        dotnet,
+    )
+    run_compatibility_contract(project_root, args.configuration, dotnet)
 
     build_outputs = required_build_outputs(project_root, args.configuration)
     summary = package_all(

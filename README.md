@@ -4,9 +4,11 @@ SPT 서버 한글 번역과 한국어 UI 표시 보정을 함께 제공해요. G
 
 ## 다운로드 파일 선택
 
-설치된 SPT와 **버전이 정확히 같은 ZIP 하나**를 받으세요. `KR`은 한글판,
-`KR-EN`은 전체 한영 병기판이에요. `KR`도 기존 사용 방식에 맞춰 퀘스트
-제목·목표, 아이템 설명 영문 머리말과 레이드 탈출구 병기는 유지해요.
+SPT 3.x와 4.0은 설치 버전과 **정확히 같은 ZIP 하나**를 받으세요. SPT 4.1은
+4.1.2 이상 안정판에서 최신 4.1 ZIP을 함께 사용할 수 있어요. 현재 정적 검증이
+끝난 버전은 4.1.2와 4.1.3이에요. `KR`은 한글판, `KR-EN`은 전체 한영
+병기판이에요. `KR`도 기존 사용 방식에 맞춰 퀘스트 제목·목표, 아이템 설명
+영문 머리말과 레이드 탈출구 병기는 유지해요.
 
 | SPT | 한글판 | 한영 병기판 |
 | --- | --- | --- |
@@ -15,7 +17,7 @@ SPT 서버 한글 번역과 한국어 UI 표시 보정을 함께 제공해요. G
 | 3.10.5 | `SPT_Korean_Localization.SPT-3.10.5.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.10.5.KR-EN.GM.zip` |
 | 3.11.4 | `SPT_Korean_Localization.SPT-3.11.4.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.11.4.KR-EN.GM.zip` |
 | 4.0.13 | `SPT_Korean_Localization.SPT-4.0.13.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.0.13.KR-EN.GM.zip` |
-| 4.1.3 | `SPT_Korean_Localization.SPT-4.1.3.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.1.3.KR-EN.GM.zip` |
+| 4.1.2 이상 안정판 4.1.x | `SPT_Korean_Localization.SPT-4.1.3.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.1.3.KR-EN.GM.zip` |
 
 ## 설치
 
@@ -43,12 +45,15 @@ SPT 4.0.13
 ├─ BepInEx\plugins\GoLani.KoreanModFix.dll
 └─ SPT\user\mods\SPT_Korean_Localization
 
-SPT 4.1.3
+SPT 4.1.2 이상 안정판 4.1.x
 ├─ BepInEx\plugins\GoLani.KoreanModFix.dll
 └─ SPT_Runtime\user\mods\SPT_Korean_Localization
 ```
 
-다른 SPT 버전에는 설치하지 마세요. 서버 모드는 정확한 버전만 허용하고, 클라이언트 플러그인은 미지원 버전에서 패치를 비활성화해요.
+SPT 4.1.0과 4.1.1은 호환되지 않으며 기존처럼 별도 모드를 사용해야 해요. 4.1용
+서버 모드는 `~4.1.2` 범위만 허용하고 클라이언트 플러그인도 같은 범위를
+검사하므로, 4.2 이상이나 시험판에서는 적용되지 않아요. 이후 4.1.x 안정판은
+자동 허용되지만 새 SPT의 API·UI·로케일이 바뀌면 추가 검증이나 수정이 필요해요.
 
 ## 개발용 릴리스 빌드
 

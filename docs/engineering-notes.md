@@ -2,7 +2,7 @@
 
 ## Server Compatibility
 
-SPT 3.x uses the historical CommonJS `postDBLoad` contract and exact loader metadata. SPT 4.0.13 and 4.1.3 use different DI and locale APIs, so they intentionally have separate source projects and target frameworks.
+SPT 3.x uses the historical CommonJS `postDBLoad` contract and exact loader metadata. SPT 4.0.13 and SPT 4.1 use different DI and locale APIs, so they intentionally have separate source projects and target frameworks. The 4.1 server mod compiles against the lowest admitted 4.1.2 assemblies and declares `~4.1.2`, allowing stable later 4.1.x patches without admitting the incompatible 4.1.0/4.1.1, prereleases, or a future 4.2 API. Admission is not a substitute for release-specific static and in-game verification.
 
 ## Client Compatibility
 

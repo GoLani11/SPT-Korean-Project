@@ -18,7 +18,7 @@ Exactly 12 archives are produced for the six supported versions. `KR` copies `kr
 ```text
 SPT 3.x:    BepInEx/plugins + user/mods/spt_korean_localization_G&M
 SPT 4.0.13: BepInEx/plugins + SPT/user/mods/SPT_Korean_Localization
-SPT 4.1.3:  BepInEx/plugins + SPT_Runtime/user/mods/SPT_Korean_Localization
+Stable SPT 4.1.2+ (4.1.x): BepInEx/plugins + SPT_Runtime/user/mods/SPT_Korean_Localization
 ```
 
 Each archive contains exactly one `locale/kr.json`. The client payload is always `BepInEx/plugins/GoLani.KoreanModFix.dll`. A 3.x `package.json` contains only the exact loader field for that release: `akiVersion` for 3.8.3 and `sptVersion` for 3.9.8–3.11.4.

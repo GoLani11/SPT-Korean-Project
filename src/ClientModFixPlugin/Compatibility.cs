@@ -32,18 +32,16 @@ namespace KoreanPatchFix
 
     internal static class SptVersionDetector
     {
-        private static readonly HashSet<string> SupportedVersions = new HashSet<string>(StringComparer.Ordinal)
-        {
-            "3.8.3",
-            "3.9.8",
-            "3.10.5",
-            "3.11.4",
-            "4.0.13",
-            "4.1.3"
-        };
-
         private static readonly Regex JsonVersionPattern = new Regex(
             "\\\"(?:akiVersion|sptVersion)\\\"\\s*:\\s*\\\"(?<version>\\d+\\.\\d+\\.\\d+)\\\"",
+            RegexOptions.CultureInvariant);
+
+        private static readonly Regex StableProductVersionPattern = new Regex(
+            "^\\s*(?<version>\\d+\\.\\d+\\.\\d+)(?:\\.\\d+)?(?:-RELEASE)?(?:\\+[0-9A-Za-z.-]+)?\\s*$",
+            RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+        private static readonly Regex NumericProductVersionPattern = new Regex(
+            "^\\s*\\d+\\.\\d+\\.\\d+",
             RegexOptions.CultureInvariant);
 
         private static readonly Regex SemanticVersionPattern = new Regex(
@@ -86,7 +84,7 @@ namespace KoreanPatchFix
 
         internal static bool IsSupported(string version)
         {
-            return version != null && SupportedVersions.Contains(version);
+            return SptCompatibilityPolicy.IsSupportedStableRelease(version);
         }
 
         private static string ReadJsonVersion(string path)
@@ -118,6 +116,16 @@ namespace KoreanPatchFix
             try
             {
                 var info = FileVersionInfo.GetVersionInfo(path);
+
+                if (!string.IsNullOrWhiteSpace(info.ProductVersion)
+                    && NumericProductVersionPattern.IsMatch(info.ProductVersion))
+                {
+                    var stableProductMatch = StableProductVersionPattern.Match(info.ProductVersion);
+                    return stableProductMatch.Success
+                        ? stableProductMatch.Groups["version"].Value
+                        : null;
+                }
+
                 var candidate = string.IsNullOrWhiteSpace(info.FileVersion) ? info.ProductVersion : info.FileVersion;
                 var match = SemanticVersionPattern.Match(candidate ?? string.Empty);
                 return match.Success ? match.Groups["version"].Value : null;
