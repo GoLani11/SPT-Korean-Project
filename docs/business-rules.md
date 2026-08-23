@@ -2,7 +2,7 @@
 
 ## Supported Releases
 
-The exact supported SPT versions are 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.2. Compatibility ranges and unverified future-version fallback are not release promises.
+The exact supported SPT versions are 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.3. Compatibility ranges and unverified future-version fallback are not release promises.
 
 Each version has a Korean-only and a Korean-English ZIP. A universal ZIP is intentionally not published because it would leave unused server-mod folders in the installation.
 
@@ -10,7 +10,7 @@ Each version has a Korean-only and a Korean-English ZIP. A universal ZIP is inte
 
 Release locale files come only from the generated outputs in the sibling `spt-korean-translate` repository. This repository must not keep or hand-edit duplicate locale snapshots.
 
-SPT 4.1.2 reuses the generated 4.1.0 locale output because the 4.1.2 English and official Korean global locale files are byte-identical to 4.1.0. The server and client binaries still target 4.1.2 exactly.
+SPT 4.1.3 uses its own generated locale output. Its English and official Korean global locale files are byte-identical to 4.1.2, while the server and client binaries target 4.1.3 exactly.
 
 ## Installation Promise
 

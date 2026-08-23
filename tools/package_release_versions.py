@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
 
-PACKAGE_VERSION = "2.0.1"
+PACKAGE_VERSION = "2.0.2"
 CLIENT_DLL_NAME = "GoLani.KoreanModFix.dll"
 SERVER_DLL_NAME = "SPT_Korean_Localization.dll"
 THREE_X_MOD_FOLDER = "spt_korean_localization_G&M"
@@ -68,10 +68,9 @@ SUPPORTED_VERSIONS = (
         PurePosixPath("SPT/user/mods") / FOUR_X_MOD_FOLDER,
     ),
     VersionSpec(
-        "4.1.2",
+        "4.1.3",
         "dotnet41",
         PurePosixPath("SPT_Runtime/user/mods") / FOUR_X_MOD_FOLDER,
-        translation_version="4.1.0",
     ),
 )
 

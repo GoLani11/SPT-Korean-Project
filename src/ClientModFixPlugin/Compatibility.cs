@@ -39,7 +39,7 @@ namespace KoreanPatchFix
             "3.10.5",
             "3.11.4",
             "4.0.13",
-            "4.1.2"
+            "4.1.3"
         };
 
         private static readonly Regex JsonVersionPattern = new Regex(
