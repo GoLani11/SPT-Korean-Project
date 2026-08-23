@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
 
-PACKAGE_VERSION = "2.0.2"
+PACKAGE_VERSION = "2.0.1"
 CLIENT_DLL_NAME = "GoLani.KoreanModFix.dll"
 SERVER_DLL_NAME = "SPT_Korean_Localization.dll"
 THREE_X_MOD_FOLDER = "spt_korean_localization_G&M"

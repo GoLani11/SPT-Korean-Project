@@ -2,7 +2,7 @@
 
 ## Stable Identities
 
-The server mod GUID remains `com.golani.makina.korean`. The BepInEx identity remains `com.GoLani.koreanpatchfix` / `Korean Patch Fix`. Both components use package version `2.0.2`.
+The server mod GUID remains `com.golani.makina.korean`. The BepInEx identity remains `com.GoLani.koreanpatchfix` / `Korean Patch Fix`. Both components use package version `2.0.1`.
 
 ## Package Names
 
