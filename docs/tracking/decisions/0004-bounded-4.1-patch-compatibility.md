@@ -14,9 +14,9 @@ An unbounded compatibility declaration would also admit prereleases, SPT 4.2, an
 
 Build the SPT 4.1 server DLL against the lowest admitted 4.1.2 packages and declare `~4.1.2`. The client uses the equivalent stable-release rule: `4.1.x` with a patch number of at least 2. Both sides reject 4.1.0, 4.1.1, prereleases, and 4.2 or later.
 
-The latest version-labelled 4.1 archive is shared by the admitted patch family. SPT 4.1.2 and 4.1.3 are verified now. A future stable 4.1.x patch may load automatically but is marked verified only after its server API references, client patch targets, locale data, and runtime behavior are checked.
+The `4.1.2-4.1.3`-labelled archive is shared by the two verified patches. A future stable 4.1.x patch may satisfy the binary gate but does not become a release target until its server API references, client patch targets, locale data, and runtime behavior are checked and the release label is updated.
 
-The release workflow always rebuilds and executes one compatibility contract against both the client predicate and the server semantic-version range before packaging. Skipping the build is not supported.
+The release workflow always rebuilds and executes compatibility contracts for the exact 4.1.0 target and the bounded 4.1.2+ target against both the client predicate and server semantic-version range before packaging. Skipping the build is not supported.
 
 ## Consequences
 

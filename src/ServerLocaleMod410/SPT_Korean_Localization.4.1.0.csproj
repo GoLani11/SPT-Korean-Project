@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <RootNamespace>SPT_Korean_Localization</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <OutputType>Library</OutputType>
+        <Version>2.0.1</Version>
+        <AssemblyName>SPT_Korean_Localization</AssemblyName>
+        <DefineConstants>$(DefineConstants);SPT_410</DefineConstants>
+        <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ServerLocaleMod410\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
+        <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\ServerLocaleMod\KoreanPatcher.cs" Link="KoreanPatcher.cs" />
+        <Compile Include="..\ServerLocaleMod\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
+        <Compile Include="..\Shared\SptCompatibilityPolicy.cs" Link="SptCompatibilityPolicy.cs" />
+        <PackageReference Include="SPTarkov.Common" Version="4.1.0" />
+        <PackageReference Include="SPTarkov.DI" Version="4.1.0" />
+        <PackageReference Include="SPTarkov.Server.Core" Version="4.1.0" />
+    </ItemGroup>
+
+</Project>

@@ -23,8 +23,7 @@ namespace KoreanPatchFix
             {
                 Logger.LogError(
                     $"Unsupported SPT version '{detectedVersion ?? "unknown"}'. " +
-                    "Korean Patch Fix supports 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, " +
-                    "and stable SPT 4.1.2 or newer 4.1.x releases only.");
+                    $"Korean Patch Fix supports {SptCompatibilityPolicy.SupportedVersionsDescription}.");
                 return;
             }
 

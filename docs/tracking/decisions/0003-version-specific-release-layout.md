@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; the exact-version rule is superseded for SPT 4.1 patch releases by decision 0004.
+Accepted; the exact-version rule is superseded for SPT 4.1 patch releases by decision 0004, and the asset count and names are revised by decision 0005.
 
 ## Context
 
@@ -16,4 +16,4 @@ Users install by extracting one matching ZIP at the SPT root. No installer or cl
 
 ## Consequences
 
-The release has 12 ZIP assets instead of two. Installations remain clean, versions outside each exact or bounded declaration are rejected by server metadata, and every archive can be validated independently against its declared English key order and generated locale source.
+The original matrix had 12 ZIP assets instead of two. Decision 0005 expands it to 14 by restoring an exact SPT 4.1.0 pair while combining 4.1.2–4.1.3. Installations remain clean, versions outside each exact or bounded declaration are rejected by server metadata, and every archive can be validated independently against its declared English key order and generated locale source.

@@ -8,11 +8,19 @@ var clientCases = new (string? Version, bool Expected)[]
     ("3.10.5", true),
     ("3.11.4", true),
     ("4.0.13", true),
+#if SPT_410
+    ("4.1.0", true),
+    ("4.1.1", false),
+    ("4.1.2", false),
+    ("4.1.3", false),
+    ("4.1.99", false),
+#else
     ("4.1.0", false),
     ("4.1.1", false),
     ("4.1.2", true),
     ("4.1.3", true),
     ("4.1.99", true),
+#endif
     ("4.1.3-pre", false),
     ("4.2.0", false),
 };
@@ -31,11 +39,19 @@ foreach (var (version, expected) in clientCases)
 var serverRange = new SemanticVersioning.Range(SptCompatibilityPolicy.FourOneServerRange);
 var serverCases = new (string Version, bool Expected)[]
 {
+#if SPT_410
+    ("4.1.0", true),
+    ("4.1.1", false),
+    ("4.1.2", false),
+    ("4.1.3", false),
+    ("4.1.99", false),
+#else
     ("4.1.0", false),
     ("4.1.1", false),
     ("4.1.2", true),
     ("4.1.3", true),
     ("4.1.99", true),
+#endif
     ("4.1.3-pre", false),
     ("4.2.0", false),
 };

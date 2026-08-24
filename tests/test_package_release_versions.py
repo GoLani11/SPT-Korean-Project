@@ -13,14 +13,56 @@ import package_release_versions as release  # noqa: E402
 
 
 class ReleaseContractTests(unittest.TestCase):
-    def test_release_matrix_contains_exactly_twelve_assets(self):
+    def test_release_matrix_contains_exactly_fourteen_assets(self):
         self.assertEqual(
             [spec.version for spec in release.SUPPORTED_VERSIONS],
-            ["3.8.3", "3.9.8", "3.10.5", "3.11.4", "4.0.13", "4.1.3"],
+            [
+                "3.8.3",
+                "3.9.8",
+                "3.10.5",
+                "3.11.4",
+                "4.0.13",
+                "4.1.0",
+                "4.1.2-4.1.3",
+            ],
         )
         self.assertEqual(set(release.VARIANTS), {"KR", "KR-EN"})
-        self.assertEqual(len(release.SUPPORTED_VERSIONS) * len(release.VARIANTS), 12)
+        self.assertEqual(release.EXPECTED_RELEASE_ARCHIVES, 14)
+        self.assertEqual(
+            len(release.SUPPORTED_VERSIONS) * len(release.VARIANTS),
+            release.EXPECTED_RELEASE_ARCHIVES,
+        )
+        self.assertEqual(release.SUPPORTED_VERSIONS[-2].server_kind, "dotnet410")
+        self.assertEqual(release.SUPPORTED_VERSIONS[-2].client_kind, "client410")
         self.assertEqual(release.SUPPORTED_VERSIONS[-1].locale_source_version, "4.1.3")
+        self.assertEqual(
+            release.SUPPORTED_VERSIONS[-1].compatible_translation_versions,
+            ("4.1.2",),
+        )
+
+        self.assertEqual(
+            [
+                release.release_package_name(spec, variant) + ".zip"
+                for spec in release.SUPPORTED_VERSIONS
+                for variant in release.VARIANTS
+            ],
+            [
+                "SPT-KR-3.8.3.zip",
+                "SPT-KR-EN-3.8.3.zip",
+                "SPT-KR-3.9.8.zip",
+                "SPT-KR-EN-3.9.8.zip",
+                "SPT-KR-3.10.5.zip",
+                "SPT-KR-EN-3.10.5.zip",
+                "SPT-KR-3.11.4.zip",
+                "SPT-KR-EN-3.11.4.zip",
+                "SPT-KR-4.0.13.zip",
+                "SPT-KR-EN-4.0.13.zip",
+                "SPT-KR-4.1.0.zip",
+                "SPT-KR-EN-4.1.0.zip",
+                "SPT-KR-4.1.2-4.1.3.zip",
+                "SPT-KR-EN-4.1.2-4.1.3.zip",
+            ],
+        )
 
     def test_node_manifests_target_only_the_exact_loader_version(self):
         for spec in release.SUPPORTED_VERSIONS[:4]:
@@ -47,6 +89,25 @@ class ReleaseContractTests(unittest.TestCase):
                 release.validate_locale_pair(english, reordered)
             with self.assertRaisesRegex(TypeError, "non-string values"):
                 release.validate_locale_pair(english, invalid_value)
+
+    def test_shared_package_sources_require_equal_values_and_order(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            reference = root / "reference.json"
+            matching = root / "matching.json"
+            changed = root / "changed.json"
+            reordered = root / "reordered.json"
+
+            reference.write_text(json.dumps({"first": "A", "second": "B"}), encoding="utf-8")
+            matching.write_text(json.dumps({"first": "A", "second": "B"}), encoding="utf-8")
+            changed.write_text(json.dumps({"first": "A", "second": "C"}), encoding="utf-8")
+            reordered.write_text(json.dumps({"second": "B", "first": "A"}), encoding="utf-8")
+
+            release.validate_equivalent_json(reference, matching, "test payload")
+            with self.assertRaisesRegex(ValueError, "differs between shared package sources"):
+                release.validate_equivalent_json(reference, changed, "test payload")
+            with self.assertRaisesRegex(ValueError, "differs between shared package sources"):
+                release.validate_equivalent_json(reference, reordered, "test payload")
 
     def test_gesture_patch_covers_every_supported_client_enum_name(self):
         source = (
@@ -95,11 +156,14 @@ class ReleaseContractTests(unittest.TestCase):
         self.assertIn("GameLanguageDetector.IsKorean()", source)
         self.assertIn("PreserveBilingualSuffix(translated, text.text)", source)
 
-    def test_four_one_compatibility_is_bounded_from_4_1_2(self):
+    def test_four_one_compatibility_has_separate_4_1_0_and_shared_targets(self):
         policy_source = (
             PROJECT_ROOT / "src" / "Shared" / "SptCompatibilityPolicy.cs"
         ).read_text(encoding="utf-8")
+        self.assertIn("#if SPT_410", policy_source)
+        self.assertIn('FourOneServerRange = "4.1.0"', policy_source)
         self.assertIn('FourOneServerRange = "~4.1.2"', policy_source)
+        self.assertIn('string.Equals(version, "4.1.0"', policy_source)
         self.assertIn("Version.TryParse(version, out var parsed)", policy_source)
         self.assertIn("parsed.Major == 4", policy_source)
         self.assertIn("parsed.Minor == 1", policy_source)
@@ -122,21 +186,49 @@ class ReleaseContractTests(unittest.TestCase):
         for package in ("SPTarkov.Common", "SPTarkov.DI", "SPTarkov.Server.Core"):
             self.assertIn(f'Include="{package}" Version="4.1.2"', server_project)
 
+        server_410_project = (
+            PROJECT_ROOT
+            / "src"
+            / "ServerLocaleMod410"
+            / "SPT_Korean_Localization.4.1.0.csproj"
+        ).read_text(encoding="utf-8")
+        self.assertIn("SPT_410", server_410_project)
+        for package in ("SPTarkov.Common", "SPTarkov.DI", "SPTarkov.Server.Core"):
+            self.assertIn(f'Include="{package}" Version="4.1.0"', server_410_project)
+
         client_project = (
             PROJECT_ROOT / "src" / "ClientModFixPlugin" / "GoLani.KoreanModFix.csproj"
         ).read_text(encoding="utf-8")
         self.assertIn("SptCompatibilityPolicy.cs", client_project)
 
+        client_410_project = (
+            PROJECT_ROOT
+            / "src"
+            / "ClientModFixPlugin410"
+            / "GoLani.KoreanModFix.4.1.0.csproj"
+        ).read_text(encoding="utf-8")
+        self.assertIn("SPT_410", client_410_project)
+        self.assertIn("ClientModFixPlugin\\*.cs", client_410_project)
+
         contract_source = (
             PROJECT_ROOT / "tests" / "CompatibilityContract" / "Program.cs"
         ).read_text(encoding="utf-8")
-        for case in ('("4.1.0", false)', '("4.1.2", true)', '("4.1.99", true)', '("4.2.0", false)'):
+        for case in ('("4.1.0", true)', '("4.1.2", false)', '("4.1.2", true)', '("4.2.0", false)'):
             self.assertIn(case, contract_source)
+
+        contract_410_project = (
+            PROJECT_ROOT
+            / "tests"
+            / "CompatibilityContract410"
+            / "CompatibilityContract410.csproj"
+        ).read_text(encoding="utf-8")
+        self.assertIn("SPT_410", contract_410_project)
 
         packaging_source = (PROJECT_ROOT / "tools" / "package_release_versions.py").read_text(
             encoding="utf-8"
         )
         self.assertIn("run_compatibility_contract", packaging_source)
+        self.assertIn('("CompatibilityContract", "CompatibilityContract410")', packaging_source)
         self.assertNotIn("--skip-build", packaging_source)
 
 

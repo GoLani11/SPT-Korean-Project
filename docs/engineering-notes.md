@@ -2,11 +2,11 @@
 
 ## Server Compatibility
 
-SPT 3.x uses the historical CommonJS `postDBLoad` contract and exact loader metadata. SPT 4.0.13 and SPT 4.1 use different DI and locale APIs, so they intentionally have separate source projects and target frameworks. The 4.1 server mod compiles against the lowest admitted 4.1.2 assemblies and declares `~4.1.2`, allowing stable later 4.1.x patches without admitting the incompatible 4.1.0/4.1.1, prereleases, or a future 4.2 API. Admission is not a substitute for release-specific static and in-game verification.
+SPT 3.x uses the historical CommonJS `postDBLoad` contract and exact loader metadata. SPT 4.0.13 and SPT 4.1 use different DI and locale APIs, so they intentionally have separate source projects and target frameworks. The exact SPT 4.1.0 server target compiles against 4.1.0 packages and declares `4.1.0`. The shared SPT 4.1.2–4.1.3 target compiles against 4.1.2 packages and declares `~4.1.2`; its release label remains limited to the two verified patches.
 
 ## Client Compatibility
 
-All supported clients use Harmony 2.9 and BepInEx 5.4.22 or 5.4.23. The universal plugin is compiled against the oldest supported common API surface and has soft ordering hints for both `com.spt-aki.core` and `com.SPT.core`.
+All supported clients use Harmony 2.9 and BepInEx 5.4.22 or 5.4.23. Both client builds compile against the shared API surface and have soft ordering hints for `com.spt-aki.core` and `com.SPT.core`. Their patch implementation is shared, while compile-time compatibility gates keep 4.1.0 separate from 4.1.2–4.1.3.
 
 The following target differences are handled at runtime:
 

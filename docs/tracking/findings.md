@@ -3,11 +3,11 @@
 ## Confirmed Compatibility Facts
 
 - SPT 3.8.3 uses `akiVersion`; SPT 3.9.8–3.11.4 use `sptVersion` in server mod metadata.
-- SPT 3.x loads from `user\mods`, SPT 4.0.13 from `SPT\user\mods`, and stable SPT 4.1.2+ from `SPT_Runtime\user\mods`.
-- All six clients use Harmony 2.9 and BepInEx 5.4.22 or 5.4.23.
+- SPT 3.x loads from `user\mods`, SPT 4.0.13 from `SPT\user\mods`, and SPT 4.1.0/4.1.2/4.1.3 from `SPT_Runtime\user\mods`.
+- The supported client builds use Harmony 2.9 and BepInEx 5.4.22 or 5.4.23.
 - `OfferItemDescription.SetItemName` and `SubcategoryView.SetExpandedStatus` are 4.1 targets; older clients expose compatible `Show` entry points.
 - `PrestigeRewardView` begins with the 3.11 client family.
-- Version key counts are 22,561; 23,931; 26,944; 28,659; 31,084; and 31,550 respectively.
+- Version key counts are 22,561; 23,931; 26,944; 28,659; 31,084; and 31,550 for each supported 4.1 translation source.
 
 ## Repaired
 

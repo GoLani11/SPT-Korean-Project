@@ -4,20 +4,21 @@ SPT 서버 한글 번역과 한국어 UI 표시 보정을 함께 제공해요. G
 
 ## 다운로드 파일 선택
 
-SPT 3.x와 4.0은 설치 버전과 **정확히 같은 ZIP 하나**를 받으세요. SPT 4.1은
-4.1.2 이상 안정판에서 최신 4.1 ZIP을 함께 사용할 수 있어요. 현재 정적 검증이
-끝난 버전은 4.1.2와 4.1.3이에요. `KR`은 한글판, `KR-EN`은 전체 한영
-병기판이에요. `KR`도 기존 사용 방식에 맞춰 퀘스트 제목·목표, 아이템 설명
-영문 머리말과 레이드 탈출구 병기는 유지해요.
+SPT 3.x, 4.0, 4.1.0은 설치 버전과 **정확히 같은 ZIP 하나**를 받으세요.
+SPT 4.1.2와 4.1.3은 두 버전이 함께 표시된 공용 ZIP을 사용하세요. 4.1.1은
+지원하지 않아요. `KR`은 한글판, `KR-EN`은 전체 한영 병기판이에요. `KR`도
+기존 사용 방식에 맞춰 퀘스트 제목·목표, 아이템 설명 영문 머리말과 레이드
+탈출구 병기는 유지해요.
 
 | SPT | 한글판 | 한영 병기판 |
 | --- | --- | --- |
-| 3.8.3 | `SPT_Korean_Localization.SPT-3.8.3.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.8.3.KR-EN.GM.zip` |
-| 3.9.8 | `SPT_Korean_Localization.SPT-3.9.8.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.9.8.KR-EN.GM.zip` |
-| 3.10.5 | `SPT_Korean_Localization.SPT-3.10.5.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.10.5.KR-EN.GM.zip` |
-| 3.11.4 | `SPT_Korean_Localization.SPT-3.11.4.KR.GM.zip` | `SPT_Korean_Localization.SPT-3.11.4.KR-EN.GM.zip` |
-| 4.0.13 | `SPT_Korean_Localization.SPT-4.0.13.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.0.13.KR-EN.GM.zip` |
-| 4.1.2 이상 안정판 4.1.x | `SPT_Korean_Localization.SPT-4.1.3.KR.GM.zip` | `SPT_Korean_Localization.SPT-4.1.3.KR-EN.GM.zip` |
+| 3.8.3 | `SPT-KR-3.8.3.zip` | `SPT-KR-EN-3.8.3.zip` |
+| 3.9.8 | `SPT-KR-3.9.8.zip` | `SPT-KR-EN-3.9.8.zip` |
+| 3.10.5 | `SPT-KR-3.10.5.zip` | `SPT-KR-EN-3.10.5.zip` |
+| 3.11.4 | `SPT-KR-3.11.4.zip` | `SPT-KR-EN-3.11.4.zip` |
+| 4.0.13 | `SPT-KR-4.0.13.zip` | `SPT-KR-EN-4.0.13.zip` |
+| 4.1.0 | `SPT-KR-4.1.0.zip` | `SPT-KR-EN-4.1.0.zip` |
+| 4.1.2–4.1.3 | `SPT-KR-4.1.2-4.1.3.zip` | `SPT-KR-EN-4.1.2-4.1.3.zip` |
 
 ## 설치
 
@@ -45,25 +46,25 @@ SPT 4.0.13
 ├─ BepInEx\plugins\GoLani.KoreanModFix.dll
 └─ SPT\user\mods\SPT_Korean_Localization
 
-SPT 4.1.2 이상 안정판 4.1.x
+SPT 4.1.0 / 4.1.2–4.1.3
 ├─ BepInEx\plugins\GoLani.KoreanModFix.dll
 └─ SPT_Runtime\user\mods\SPT_Korean_Localization
 ```
 
-SPT 4.1.0과 4.1.1은 호환되지 않으며 기존처럼 별도 모드를 사용해야 해요. 4.1용
-서버 모드는 `~4.1.2` 범위만 허용하고 클라이언트 플러그인도 같은 범위를
-검사하므로, 4.2 이상이나 시험판에서는 적용되지 않아요. 이후 4.1.x 안정판은
-자동 허용되지만 새 SPT의 API·UI·로케일이 바뀌면 추가 검증이나 수정이 필요해요.
+SPT 4.1.0 ZIP에는 4.1.0 전용 서버 모드와 클라이언트 플러그인이 들어 있어요.
+4.1.2–4.1.3 ZIP은 두 버전에서 공용으로 검증한 바이너리와 번역을 사용해요.
+서로 바꿔 설치하면 안 되며, 4.1.1이나 표시되지 않은 다른 버전에도 설치하지
+마세요.
 
 ## 개발용 릴리스 빌드
 
-빌드에는 .NET 10 SDK, `D:\SPT3.8.3` 클라이언트 참조 파일, 그리고 같은 상위 폴더의 `spt-korean-translate` 저장소가 필요해요.
+빌드에는 .NET 10 SDK, SPT 클라이언트 참조 파일, 그리고 같은 상위 폴더의 `spt-korean-translate` 저장소가 필요해요. `make-release-packages.bat`은 `D:\SPT3.8.3`을 먼저 사용하고, 없으면 `D:\SPT`를 사용해요.
 
 ```powershell
 ..\spt-korean-translate\.venv\Scripts\python.exe .\tools\package_release_versions.py
 ```
 
-또는 `make-release-packages.bat`을 실행하면 돼요. 생성된 12개 ZIP과 검증 요약은 `artifacts\release`에 저장되며 Git에는 포함되지 않아요.
+또는 `make-release-packages.bat`을 실행하면 돼요. 생성된 14개 ZIP과 검증 요약은 `artifacts\release`에 저장되며 Git에는 포함되지 않아요.
 
 ## License
 

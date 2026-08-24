@@ -18,6 +18,7 @@ CLIENT_DLL_NAME = "GoLani.KoreanModFix.dll"
 SERVER_DLL_NAME = "SPT_Korean_Localization.dll"
 THREE_X_MOD_FOLDER = "spt_korean_localization_G&M"
 FOUR_X_MOD_FOLDER = "SPT_Korean_Localization"
+EXPECTED_RELEASE_ARCHIVES = 14
 
 
 @dataclass(frozen=True)
@@ -27,6 +28,8 @@ class VersionSpec:
     server_mod_root: PurePosixPath
     manifest_version_field: str | None = None
     translation_version: str | None = None
+    client_kind: str = "client"
+    compatible_translation_versions: tuple[str, ...] = ()
 
     @property
     def allowed_roots(self) -> set[str]:
@@ -68,9 +71,17 @@ SUPPORTED_VERSIONS = (
         PurePosixPath("SPT/user/mods") / FOUR_X_MOD_FOLDER,
     ),
     VersionSpec(
-        "4.1.3",
+        "4.1.0",
+        "dotnet410",
+        PurePosixPath("SPT_Runtime/user/mods") / FOUR_X_MOD_FOLDER,
+        client_kind="client410",
+    ),
+    VersionSpec(
+        "4.1.2-4.1.3",
         "dotnet41",
         PurePosixPath("SPT_Runtime/user/mods") / FOUR_X_MOD_FOLDER,
+        translation_version="4.1.3",
+        compatible_translation_versions=("4.1.2",),
     ),
 )
 
@@ -125,6 +136,16 @@ def validate_locale_pair(english_path: Path, locale_path: Path) -> int:
             )
 
     return len(locale)
+
+
+def validate_equivalent_json(reference_path: Path, candidate_path: Path, label: str) -> None:
+    reference = list(load_ordered_json(reference_path).items())
+    candidate = list(load_ordered_json(candidate_path).items())
+    if candidate != reference:
+        raise ValueError(
+            f"{label} differs between shared package sources: "
+            f"{reference_path} and {candidate_path}"
+        )
 
 
 def sha256_bytes(value: bytes) -> str:
@@ -201,24 +222,27 @@ def run_compatibility_contract(
     configuration: str,
     dotnet: str,
 ) -> None:
-    contract = (
-        project_root
-        / "artifacts"
-        / "build"
-        / configuration
-        / "CompatibilityContract"
-        / "CompatibilityContract.dll"
-    )
-    if not contract.is_file():
-        raise FileNotFoundError(f"compatibility contract executable is missing: {contract}")
-    run_command([dotnet, str(contract)], project_root)
+    for contract_name in ("CompatibilityContract", "CompatibilityContract410"):
+        contract = (
+            project_root
+            / "artifacts"
+            / "build"
+            / configuration
+            / contract_name
+            / f"{contract_name}.dll"
+        )
+        if not contract.is_file():
+            raise FileNotFoundError(f"compatibility contract executable is missing: {contract}")
+        run_command([dotnet, str(contract)], project_root)
 
 
 def required_build_outputs(project_root: Path, configuration: str) -> dict[str, Path]:
     build_root = project_root / "artifacts" / "build" / configuration
     outputs = {
         "client": build_root / "ClientModFixPlugin" / CLIENT_DLL_NAME,
+        "client410": build_root / "ClientModFixPlugin410" / CLIENT_DLL_NAME,
         "dotnet40": build_root / "ServerLocaleMod40" / SERVER_DLL_NAME,
+        "dotnet410": build_root / "ServerLocaleMod410" / SERVER_DLL_NAME,
         "dotnet41": build_root / "ServerLocaleMod41" / SERVER_DLL_NAME,
     }
     missing = [str(path) for path in outputs.values() if not path.is_file()]
@@ -255,6 +279,10 @@ def copy_dotnet_server_files(source_dll: Path, destination_root: Path) -> None:
         shutil.copy2(deps_path, destination_root / deps_path.name)
 
 
+def release_package_name(spec: VersionSpec, variant: str) -> str:
+    return f"SPT-{variant}-{spec.version}"
+
+
 def stage_package(
     project_root: Path,
     work_root: Path,
@@ -263,14 +291,14 @@ def stage_package(
     locale_source: Path,
     build_outputs: dict[str, Path],
 ) -> Path:
-    package_name = f"SPT_Korean_Localization.SPT-{spec.version}.{variant}.GM"
+    package_name = release_package_name(spec, variant)
     package_root = work_root / package_name
     if package_root.exists():
         shutil.rmtree(package_root)
 
     client_destination = package_root / "BepInEx" / "plugins" / CLIENT_DLL_NAME
     client_destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(build_outputs["client"], client_destination)
+    shutil.copy2(build_outputs[spec.client_kind], client_destination)
 
     mod_root = package_root.joinpath(*spec.server_mod_root.parts)
     locale_destination = mod_root / "locale" / "kr.json"
@@ -317,7 +345,12 @@ def create_deterministic_zip(source_root: Path, zip_path: Path) -> None:
             archive.writestr(info, source_path.read_bytes(), compresslevel=9)
 
 
-def validate_archive(zip_path: Path, spec: VersionSpec, locale_source: Path) -> None:
+def validate_archive(
+    zip_path: Path,
+    spec: VersionSpec,
+    locale_source: Path,
+    build_outputs: dict[str, Path],
+) -> None:
     expected_mod_prefix = spec.server_mod_root.as_posix() + "/"
     expected_locale_name = expected_mod_prefix + "locale/kr.json"
     expected_client_name = "BepInEx/plugins/" + CLIENT_DLL_NAME
@@ -341,6 +374,9 @@ def validate_archive(zip_path: Path, spec: VersionSpec, locale_source: Path) -> 
 
         if expected_client_name not in names:
             raise ValueError(f"client plugin is missing from {zip_path}")
+        packaged_client = archive.read(expected_client_name)
+        if sha256_bytes(packaged_client) != sha256_file(build_outputs[spec.client_kind]):
+            raise ValueError(f"packaged client DLL does not match its target build: {zip_path}")
         if expected_locale_name not in names:
             raise ValueError(f"version locale is missing from {zip_path}")
         if not any(name.startswith(expected_mod_prefix) for name in names):
@@ -378,6 +414,14 @@ def validate_archive(zip_path: Path, spec: VersionSpec, locale_source: Path) -> 
                 raise ValueError(f"4.x server DLL is missing from {zip_path}")
             if server_deps_name not in names:
                 raise ValueError(f"4.x server dependency manifest is missing from {zip_path}")
+            server_source = build_outputs[spec.server_kind]
+            if sha256_bytes(archive.read(server_dll_name)) != sha256_file(server_source):
+                raise ValueError(f"packaged server DLL does not match its target build: {zip_path}")
+            deps_source = server_source.with_suffix(".deps.json")
+            if sha256_bytes(archive.read(server_deps_name)) != sha256_file(deps_source):
+                raise ValueError(
+                    f"packaged server dependency manifest does not match its target build: {zip_path}"
+                )
             expected_files = {
                 expected_client_name,
                 expected_locale_name,
@@ -412,6 +456,21 @@ def package_all(
                 f"(locale source {locale_version}): {english_path}"
             )
 
+        for compatible_version in spec.compatible_translation_versions:
+            compatible_english_path = (
+                translation_root / "versions" / compatible_version / "input" / "en.json"
+            )
+            if not compatible_english_path.is_file():
+                raise FileNotFoundError(
+                    f"shared English source is missing for SPT {compatible_version}: "
+                    f"{compatible_english_path}"
+                )
+            validate_equivalent_json(
+                english_path,
+                compatible_english_path,
+                "English locale",
+            )
+
         for variant, locale_filename in VARIANTS.items():
             locale_source = translation_root / "output" / locale_version / locale_filename
             if not locale_source.is_file():
@@ -421,6 +480,24 @@ def package_all(
                 )
 
             key_count = validate_locale_pair(english_path, locale_source)
+            for compatible_version in spec.compatible_translation_versions:
+                compatible_english_path = (
+                    translation_root / "versions" / compatible_version / "input" / "en.json"
+                )
+                compatible_locale_source = (
+                    translation_root / "output" / compatible_version / locale_filename
+                )
+                if not compatible_locale_source.is_file():
+                    raise FileNotFoundError(
+                        f"shared generated locale is missing for SPT {compatible_version} {variant}: "
+                        f"{compatible_locale_source}"
+                    )
+                validate_locale_pair(compatible_english_path, compatible_locale_source)
+                validate_equivalent_json(
+                    locale_source,
+                    compatible_locale_source,
+                    f"{variant} locale",
+                )
             package_root = stage_package(
                 project_root,
                 work_root,
@@ -431,7 +508,7 @@ def package_all(
             )
             zip_path = output_root / f"{package_root.name}.zip"
             create_deterministic_zip(package_root, zip_path)
-            validate_archive(zip_path, spec, locale_source)
+            validate_archive(zip_path, spec, locale_source, build_outputs)
             summary.append(
                 {
                     "version": spec.version,
@@ -443,8 +520,10 @@ def package_all(
             )
             print(f"created {zip_path.name} ({key_count} keys)")
 
-    if len(summary) != 12:
-        raise AssertionError(f"expected 12 release archives, created {len(summary)}")
+    if len(summary) != EXPECTED_RELEASE_ARCHIVES:
+        raise AssertionError(
+            f"expected {EXPECTED_RELEASE_ARCHIVES} release archives, created {len(summary)}"
+        )
     return summary
 
 
@@ -452,7 +531,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     project_root = Path(__file__).resolve().parents[1]
     default_translation_root = project_root.parent / "spt-korean-translate"
     parser = argparse.ArgumentParser(
-        description="Build and validate the 12 version-specific SPT Korean localization ZIP files."
+        description=(
+            f"Build and validate the {EXPECTED_RELEASE_ARCHIVES} version-specific "
+            "SPT Korean localization ZIP files."
+        )
     )
     parser.add_argument("--translation-root", type=Path, default=default_translation_root)
     parser.add_argument("--client-reference-spt-root", type=Path, default=Path(r"D:\SPT3.8.3"))
@@ -506,7 +588,7 @@ def main(argv: list[str] | None = None) -> int:
         encoding="utf-8",
     )
     shutil.rmtree(work_root)
-    print(f"validated 12 release archives; summary: {summary_path}")
+    print(f"validated {EXPECTED_RELEASE_ARCHIVES} release archives; summary: {summary_path}")
     return 0
 
 
