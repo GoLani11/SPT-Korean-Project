@@ -5,8 +5,8 @@ const path = require("path");
 
 class KoreanPatcher {
     constructor() {
-        this.patchPath = path.join(__dirname, "..", "locale", "kr.json");
-        this.koreanPatch = require(this.patchPath);
+        this.koreanPatch = require(path.join(__dirname, "..", "locale", "kr.json"));
+        this.bilingualPatch = require(path.join(__dirname, "..", "locale", "kr-en.json"));
         const manifest = require(path.join(__dirname, "..", "package.json"));
         this.expectedVersion = manifest.akiVersion ?? manifest.sptVersion;
     }
@@ -26,20 +26,40 @@ class KoreanPatcher {
 
             const databaseServer = container.resolve("DatabaseServer");
             const tables = databaseServer.getTables();
-            const koreanLocale = tables?.locales?.global?.kr;
+            const locales = tables?.locales;
+            const koreanLocale = locales?.global?.kr;
 
             if (!koreanLocale) {
                 logger.error("기존 한국어 언어파일을 찾을 수 없습니다. Aki_Data 또는 SPT_Data의 한국어 로케일을 확인하세요.");
                 return;
             }
+            if (!locales?.menu?.kr) {
+                logger.error("기존 한국어 메뉴 언어파일을 찾을 수 없습니다.");
+                return;
+            }
 
             const startTime = Date.now();
             Object.assign(koreanLocale, this.koreanPatch);
+            koreanLocale["kr-en"] = "한국어 (한영 병기)";
+
+            for (const locale of Object.values(locales.global)) {
+                locale["kr-en"] = "한국어 (한영 병기)";
+            }
+
+            locales.global["kr-en"] = {
+                ...koreanLocale,
+                ...this.bilingualPatch,
+                "kr-en": "한국어 (한영 병기)"
+            };
+            locales.menu["kr-en"] = { ...locales.menu.kr };
+            locales.languages["kr-en"] = "Korean-English";
+
             const elapsed = Date.now() - startTime;
-            const updateCount = Object.keys(this.koreanPatch).length;
+            const koreanCount = Object.keys(this.koreanPatch).length;
+            const bilingualCount = Object.keys(this.bilingualPatch).length;
 
             logger.info("고라니 SPT 한글화 프로젝트가 정상적으로 적용되었습니다. 재밌는 SPT되세요!");
-            logger.info(`적용된 항목 줄 수: ${updateCount} (처리 시간: ${elapsed}ms)`);
+            logger.info(`적용된 항목 줄 수: 한글판 ${koreanCount}, 한영 병기판 ${bilingualCount} (처리 시간: ${elapsed}ms)`);
         }
         catch (error) {
             logger.error(`고라니 SPT 한글화 프로젝트 적용 중 오류 발생: ${error?.stack ?? error}`);

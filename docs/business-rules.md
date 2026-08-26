@@ -4,7 +4,7 @@
 
 The exact supported SPT versions are 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.0. SPT 4.1.2 and 4.1.3 share one labelled archive whose server metadata uses the bounded `~4.1.2` range. SPT 4.1.1, prereleases, 4.2, and unlabelled later patches are not release targets.
 
-Each version has a Korean-only and a Korean-English ZIP. A universal ZIP is intentionally not published because it would leave unused server-mod folders in the installation.
+Each release label has one ZIP containing both the Korean and Korean-English locale payloads. A universal cross-version ZIP is intentionally not published because it would leave unused server-mod folders in the installation.
 
 ## Translation Ownership
 
@@ -16,4 +16,4 @@ The SPT 4.1.0 archive uses its own generated output and exact-gated server and c
 
 Users select the ZIP matching their exact SPT version; only SPT 4.1.2 and 4.1.3 share the explicitly labelled `4.1.2-4.1.3` archive. Archives have no wrapper directory, installer, script, executable, or payload for another SPT layout family.
 
-The server mod overlays the built-in Korean locale at runtime. The selected client plugin adjusts only UI presentation and safely skips features missing from an older client.
+The server mod overlays the built-in `kr` locale and registers `kr-en` in the native language list at runtime. Users switch between them through the existing interface-language setting without restarting. The selected client plugin supplies the Korean font fallback for both locale IDs, adjusts UI presentation, and safely skips features missing from an older client.

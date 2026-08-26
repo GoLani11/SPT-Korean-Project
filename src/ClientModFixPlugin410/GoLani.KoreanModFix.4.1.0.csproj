@@ -7,7 +7,7 @@
         <OutputType>Library</OutputType>
         <LangVersion>latest</LangVersion>
         <Nullable>disable</Nullable>
-        <Version>2.0.1</Version>
+        <Version>2.1.0</Version>
         <DefineConstants>$(DefineConstants);SPT_410</DefineConstants>
         <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ClientModFixPlugin410\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

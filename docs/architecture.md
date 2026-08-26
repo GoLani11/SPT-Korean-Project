@@ -17,10 +17,10 @@ The client projects reference only the BepInEx, Harmony, Unity, and TextMeshPro 
 
 ## Locale Flow
 
-The sibling `spt-korean-translate` repository is the only release locale source. For each release, packaging validates that both generated variants have the exact key set, key order, and string value types of the declared locale source. The shared SPT 4.1.2–4.1.3 archive uses the 4.1.3 output only after the English, KR, and KR-EN JSON values and order have been proven equivalent to 4.1.2.
+The sibling `spt-korean-translate` repository is the only release locale source. For each release, packaging validates that both generated payloads have the exact key set, key order, and string value types of the declared locale source. The shared SPT 4.1.2–4.1.3 archive uses the 4.1.3 output only after the English, KR, and KR-EN JSON values and order have been proven equivalent to 4.1.2.
 
-SPT 3.x applies the selected JSON during `postDBLoad`. SPT 4.0.13 and both 4.1 server builds attach a transformer to the built-in Korean global locale. No package edits SPT's original locale files.
+Every server mod overlays `kr.json` onto the built-in `kr` locale and registers `kr-en` as a second global locale built from the same Korean base plus `kr-en.json`. The new locale inherits the built-in Korean menu locale and is added to the native language list. The client plugin maps `kr-en` to the Korean font fallback while leaving the selected culture unchanged, so the game's normal language reload and persistence flow handles switching. No package edits SPT's original locale files.
 
 ## Release Flow
 
-`tools/package_release_versions.py` builds all binary targets once, stages only the target version's server mod and locale, selects the matching client DLL, and creates 14 deterministic ZIP files. Every archive is reopened and checked for safe paths, exact root folders, source hashes for the locale and both DLL payloads, exact 3.x manifest compatibility, and forbidden installer files.
+`tools/package_release_versions.py` builds all binary targets once, stages only the target version's server mod with both locale payloads, selects the matching client DLL, and creates seven deterministic ZIP files. Every archive is reopened and checked for safe paths, exact root folders, source hashes for both locales and both DLL payloads, exact 3.x manifest compatibility, and forbidden installer files.

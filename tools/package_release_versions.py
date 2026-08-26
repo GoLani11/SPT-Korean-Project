@@ -13,12 +13,12 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
 
-PACKAGE_VERSION = "2.0.1"
+PACKAGE_VERSION = "2.1.0"
 CLIENT_DLL_NAME = "GoLani.KoreanModFix.dll"
 SERVER_DLL_NAME = "SPT_Korean_Localization.dll"
 THREE_X_MOD_FOLDER = "spt_korean_localization_G&M"
 FOUR_X_MOD_FOLDER = "SPT_Korean_Localization"
-EXPECTED_RELEASE_ARCHIVES = 14
+EXPECTED_RELEASE_ARCHIVES = 7
 
 
 @dataclass(frozen=True)
@@ -85,9 +85,9 @@ SUPPORTED_VERSIONS = (
     ),
 )
 
-VARIANTS = {
-    "KR": "kr.generated.json",
-    "KR-EN": "kr-en.generated.json",
+LOCALE_PAYLOADS = {
+    "kr.json": "kr.generated.json",
+    "kr-en.json": "kr-en.generated.json",
 }
 
 
@@ -279,19 +279,18 @@ def copy_dotnet_server_files(source_dll: Path, destination_root: Path) -> None:
         shutil.copy2(deps_path, destination_root / deps_path.name)
 
 
-def release_package_name(spec: VersionSpec, variant: str) -> str:
-    return f"SPT-{variant}-{spec.version}"
+def release_package_name(spec: VersionSpec) -> str:
+    return f"SPT-KR-{spec.version}"
 
 
 def stage_package(
     project_root: Path,
     work_root: Path,
     spec: VersionSpec,
-    variant: str,
-    locale_source: Path,
+    locale_sources: dict[str, Path],
     build_outputs: dict[str, Path],
 ) -> Path:
-    package_name = release_package_name(spec, variant)
+    package_name = release_package_name(spec)
     package_root = work_root / package_name
     if package_root.exists():
         shutil.rmtree(package_root)
@@ -301,9 +300,10 @@ def stage_package(
     shutil.copy2(build_outputs[spec.client_kind], client_destination)
 
     mod_root = package_root.joinpath(*spec.server_mod_root.parts)
-    locale_destination = mod_root / "locale" / "kr.json"
-    locale_destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(locale_source, locale_destination)
+    locale_root = mod_root / "locale"
+    locale_root.mkdir(parents=True, exist_ok=True)
+    for packaged_name, locale_source in locale_sources.items():
+        shutil.copy2(locale_source, locale_root / packaged_name)
 
     if spec.server_kind == "node":
         source_mod = project_root / "src" / "ServerLocaleMod3" / "src" / "mod.js"
@@ -348,11 +348,14 @@ def create_deterministic_zip(source_root: Path, zip_path: Path) -> None:
 def validate_archive(
     zip_path: Path,
     spec: VersionSpec,
-    locale_source: Path,
+    locale_sources: dict[str, Path],
     build_outputs: dict[str, Path],
 ) -> None:
     expected_mod_prefix = spec.server_mod_root.as_posix() + "/"
-    expected_locale_name = expected_mod_prefix + "locale/kr.json"
+    expected_locale_names = {
+        packaged_name: expected_mod_prefix + "locale/" + packaged_name
+        for packaged_name in locale_sources
+    }
     expected_client_name = "BepInEx/plugins/" + CLIENT_DLL_NAME
 
     with zipfile.ZipFile(zip_path, "r") as archive:
@@ -377,18 +380,25 @@ def validate_archive(
         packaged_client = archive.read(expected_client_name)
         if sha256_bytes(packaged_client) != sha256_file(build_outputs[spec.client_kind]):
             raise ValueError(f"packaged client DLL does not match its target build: {zip_path}")
-        if expected_locale_name not in names:
-            raise ValueError(f"version locale is missing from {zip_path}")
+        missing_locales = [name for name in expected_locale_names.values() if name not in names]
+        if missing_locales:
+            raise ValueError(f"version locales are missing from {zip_path}: {missing_locales}")
         if not any(name.startswith(expected_mod_prefix) for name in names):
             raise ValueError(f"server mod folder is missing from {zip_path}")
 
-        locale_entries = [name for name in names if name.endswith("/locale/kr.json")]
-        if locale_entries != [expected_locale_name]:
-            raise ValueError(f"archive must contain exactly one locale payload: {locale_entries}")
+        locale_prefix = expected_mod_prefix + "locale/"
+        locale_entries = sorted(name for name in names if name.startswith(locale_prefix))
+        if locale_entries != sorted(expected_locale_names.values()):
+            raise ValueError(
+                f"archive must contain exactly the Korean locale payloads: {locale_entries}"
+            )
 
-        packaged_locale = archive.read(expected_locale_name)
-        if sha256_bytes(packaged_locale) != sha256_file(locale_source):
-            raise ValueError(f"packaged locale hash does not match its source: {zip_path}")
+        for packaged_name, locale_source in locale_sources.items():
+            packaged_locale = archive.read(expected_locale_names[packaged_name])
+            if sha256_bytes(packaged_locale) != sha256_file(locale_source):
+                raise ValueError(
+                    f"packaged {packaged_name} hash does not match its source: {zip_path}"
+                )
 
         if spec.server_kind == "node":
             manifest_name = expected_mod_prefix + "package.json"
@@ -403,7 +413,7 @@ def validate_archive(
                 raise ValueError(f"3.x manifest contains an unrelated version field: {zip_path}")
             expected_files = {
                 expected_client_name,
-                expected_locale_name,
+                *expected_locale_names.values(),
                 manifest_name,
                 mod_name,
             }
@@ -424,7 +434,7 @@ def validate_archive(
                 )
             expected_files = {
                 expected_client_name,
-                expected_locale_name,
+                *expected_locale_names.values(),
                 server_dll_name,
                 server_deps_name,
             }
@@ -471,11 +481,13 @@ def package_all(
                 "English locale",
             )
 
-        for variant, locale_filename in VARIANTS.items():
+        locale_sources: dict[str, Path] = {}
+        locale_key_counts: dict[str, int] = {}
+        for packaged_name, locale_filename in LOCALE_PAYLOADS.items():
             locale_source = translation_root / "output" / locale_version / locale_filename
             if not locale_source.is_file():
                 raise FileNotFoundError(
-                    f"generated locale is missing for SPT {spec.version} {variant} "
+                    f"generated locale is missing for SPT {spec.version} {packaged_name} "
                     f"(locale source {locale_version}): {locale_source}"
                 )
 
@@ -489,36 +501,38 @@ def package_all(
                 )
                 if not compatible_locale_source.is_file():
                     raise FileNotFoundError(
-                        f"shared generated locale is missing for SPT {compatible_version} {variant}: "
+                        f"shared generated locale is missing for SPT {compatible_version} "
+                        f"{packaged_name}: "
                         f"{compatible_locale_source}"
                     )
                 validate_locale_pair(compatible_english_path, compatible_locale_source)
                 validate_equivalent_json(
                     locale_source,
                     compatible_locale_source,
-                    f"{variant} locale",
+                    f"{packaged_name} locale",
                 )
-            package_root = stage_package(
-                project_root,
-                work_root,
-                spec,
-                variant,
-                locale_source,
-                build_outputs,
-            )
-            zip_path = output_root / f"{package_root.name}.zip"
-            create_deterministic_zip(package_root, zip_path)
-            validate_archive(zip_path, spec, locale_source, build_outputs)
-            summary.append(
-                {
-                    "version": spec.version,
-                    "variant": variant,
-                    "file": zip_path.name,
-                    "keys": key_count,
-                    "sha256": sha256_file(zip_path),
-                }
-            )
-            print(f"created {zip_path.name} ({key_count} keys)")
+            locale_sources[packaged_name] = locale_source
+            locale_key_counts[Path(packaged_name).stem] = key_count
+
+        package_root = stage_package(
+            project_root,
+            work_root,
+            spec,
+            locale_sources,
+            build_outputs,
+        )
+        zip_path = output_root / f"{package_root.name}.zip"
+        create_deterministic_zip(package_root, zip_path)
+        validate_archive(zip_path, spec, locale_sources, build_outputs)
+        summary.append(
+            {
+                "version": spec.version,
+                "file": zip_path.name,
+                "keys": locale_key_counts,
+                "sha256": sha256_file(zip_path),
+            }
+        )
+        print(f"created {zip_path.name} ({locale_key_counts} keys)")
 
     if len(summary) != EXPECTED_RELEASE_ARCHIVES:
         raise AssertionError(

@@ -13,7 +13,7 @@ import package_release_versions as release  # noqa: E402
 
 
 class ReleaseContractTests(unittest.TestCase):
-    def test_release_matrix_contains_exactly_fourteen_assets(self):
+    def test_release_matrix_contains_exactly_seven_assets(self):
         self.assertEqual(
             [spec.version for spec in release.SUPPORTED_VERSIONS],
             [
@@ -26,12 +26,15 @@ class ReleaseContractTests(unittest.TestCase):
                 "4.1.2-4.1.3",
             ],
         )
-        self.assertEqual(set(release.VARIANTS), {"KR", "KR-EN"})
-        self.assertEqual(release.EXPECTED_RELEASE_ARCHIVES, 14)
         self.assertEqual(
-            len(release.SUPPORTED_VERSIONS) * len(release.VARIANTS),
-            release.EXPECTED_RELEASE_ARCHIVES,
+            release.LOCALE_PAYLOADS,
+            {
+                "kr.json": "kr.generated.json",
+                "kr-en.json": "kr-en.generated.json",
+            },
         )
+        self.assertEqual(release.EXPECTED_RELEASE_ARCHIVES, 7)
+        self.assertEqual(len(release.SUPPORTED_VERSIONS), release.EXPECTED_RELEASE_ARCHIVES)
         self.assertEqual(release.SUPPORTED_VERSIONS[-2].server_kind, "dotnet410")
         self.assertEqual(release.SUPPORTED_VERSIONS[-2].client_kind, "client410")
         self.assertEqual(release.SUPPORTED_VERSIONS[-1].locale_source_version, "4.1.3")
@@ -42,31 +45,24 @@ class ReleaseContractTests(unittest.TestCase):
 
         self.assertEqual(
             [
-                release.release_package_name(spec, variant) + ".zip"
+                release.release_package_name(spec) + ".zip"
                 for spec in release.SUPPORTED_VERSIONS
-                for variant in release.VARIANTS
             ],
             [
                 "SPT-KR-3.8.3.zip",
-                "SPT-KR-EN-3.8.3.zip",
                 "SPT-KR-3.9.8.zip",
-                "SPT-KR-EN-3.9.8.zip",
                 "SPT-KR-3.10.5.zip",
-                "SPT-KR-EN-3.10.5.zip",
                 "SPT-KR-3.11.4.zip",
-                "SPT-KR-EN-3.11.4.zip",
                 "SPT-KR-4.0.13.zip",
-                "SPT-KR-EN-4.0.13.zip",
                 "SPT-KR-4.1.0.zip",
-                "SPT-KR-EN-4.1.0.zip",
                 "SPT-KR-4.1.2-4.1.3.zip",
-                "SPT-KR-EN-4.1.2-4.1.3.zip",
             ],
         )
 
     def test_node_manifests_target_only_the_exact_loader_version(self):
         for spec in release.SUPPORTED_VERSIONS[:4]:
             manifest = release.node_manifest(spec)
+            self.assertEqual(manifest["version"], "2.1.0")
             self.assertEqual(manifest[spec.manifest_version_field], spec.version)
             other_field = "sptVersion" if spec.manifest_version_field == "akiVersion" else "akiVersion"
             self.assertNotIn(other_field, manifest)
@@ -155,6 +151,36 @@ class ReleaseContractTests(unittest.TestCase):
         )
         self.assertIn("GameLanguageDetector.IsKorean()", source)
         self.assertIn("PreserveBilingualSuffix(translated, text.text)", source)
+
+    def test_bilingual_locale_is_registered_across_server_and_client_runtimes(self):
+        server_41 = (
+            PROJECT_ROOT / "src" / "ServerLocaleMod" / "KoreanPatcher.cs"
+        ).read_text(encoding="utf-8-sig")
+        server_40 = (
+            PROJECT_ROOT / "src" / "ServerLocaleMod40" / "KoreanPatcher.cs"
+        ).read_text(encoding="utf-8-sig")
+        server_3 = (
+            PROJECT_ROOT / "src" / "ServerLocaleMod3" / "src" / "mod.js"
+        ).read_text(encoding="utf-8")
+        compatibility = (
+            PROJECT_ROOT / "src" / "ClientModFixPlugin" / "Compatibility.cs"
+        ).read_text(encoding="utf-8")
+        font_fix = (
+            PROJECT_ROOT
+            / "src"
+            / "ClientModFixPlugin"
+            / "Patches"
+            / "KoreanBilingualFontFix.cs"
+        ).read_text(encoding="utf-8")
+
+        for source in (server_41, server_40, server_3):
+            self.assertIn('"kr-en"', source)
+            self.assertIn('"kr-en.json"', source)
+            self.assertIn("한국어 (한영 병기)", source)
+
+        self.assertIn('string.Equals(value, "kr-en"', compatibility)
+        self.assertIn('private const string BilingualLocaleId = "kr-en"', font_fix)
+        self.assertIn('__0 = KoreanLocaleId', font_fix)
 
     def test_four_one_compatibility_has_separate_4_1_0_and_shared_targets(self):
         policy_source = (

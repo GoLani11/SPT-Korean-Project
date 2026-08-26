@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <OutputType>Library</OutputType>
-        <Version>2.0.1</Version>
+        <Version>2.1.0</Version>
         <AssemblyName>SPT_Korean_Localization</AssemblyName>
         <DefineConstants>$(DefineConstants);SPT_410</DefineConstants>
         <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ServerLocaleMod410\</OutputPath>

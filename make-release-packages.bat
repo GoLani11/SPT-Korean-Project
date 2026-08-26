@@ -26,6 +26,6 @@ if not "%EXIT_CODE%"=="0" (
     exit /b %EXIT_CODE%
 )
 
-echo The 14 release ZIP files are ready under:
+echo The 7 release ZIP files are ready under:
 echo %PROJECT_ROOT%artifacts\release
 pause

@@ -1,6 +1,6 @@
 # SPT Korean Localization / SPT 한글화 프로젝트
 
-**현재 배포 버전 / Current release: 2.0.1**
+**현재 배포 버전 / Current release: 2.1.0**
 
 [한국어](#한국어) · [English](#english) · [Releases](../../releases) · [Issues](../../issues)
 
@@ -14,40 +14,42 @@ SPT 서버 한글 번역과 한국어 UI 표시 보정을 하나의 패키지로
 
 번역은 지속적으로 보완 중입니다. 오역이나 미번역을 발견하면 사용 중인 SPT 버전, 표시된 문구와 위치를 [Issues](../../issues)에 남겨 주세요.
 
-### 2.0.1 주요 변경 사항
+### 2.1.0 주요 변경 사항
 
-- 지원하는 모든 SPT 버전의 실제 퀘스트 조건을 의미 단위로 재검수
-- 이름은 같지만 진영이나 요구 조건이 다른 퀘스트 구분
-- 특정 아이템이나 장비를 요구하는 퀘스트 목표의 명칭을 현재 한글 아이템 `Name`과 일치하도록 정비
-- SPT 4.1.0 전용 패키지와 SPT 4.1.2–4.1.3 공용 패키지를 분리하고 별도의 호환성 검사 적용
-- 배포 파일명을 `SPT-KR-<버전>.zip`과 `SPT-KR-EN-<버전>.zip` 형식으로 단축
-- 총 14개 ZIP의 번역 키 순서, 내부 경로, 대상 DLL과 SHA-256 자동 검증
+- 한글판과 한영 병기판을 버전별 ZIP 하나로 통합
+- 게임의 `설정 > 게임 > 인터페이스 언어`에 `한국어 (한영 병기)` 추가
+- 게임이나 서버를 재시작하지 않고 한글판과 한영 병기판 전환
+- 총 7개 ZIP에 포함된 두 로케일의 키 순서, 내부 경로, 대상 DLL과 SHA-256 자동 검증
 
 ### 다운로드 파일 선택
 
 SPT 3.x, 4.0.13, 4.1.0은 설치 버전과 **정확히 같은 ZIP 하나**를 받아 주세요. SPT 4.1.2와 4.1.3은 두 버전이 함께 표시된 공용 ZIP을 사용하면 됩니다. SPT 4.1.1은 지원하지 않습니다.
 
-| SPT 버전 | 한글판 | 전체 한영 병기판 |
-| --- | --- | --- |
-| 3.8.3 | `SPT-KR-3.8.3.zip` | `SPT-KR-EN-3.8.3.zip` |
-| 3.9.8 | `SPT-KR-3.9.8.zip` | `SPT-KR-EN-3.9.8.zip` |
-| 3.10.5 | `SPT-KR-3.10.5.zip` | `SPT-KR-EN-3.10.5.zip` |
-| 3.11.4 | `SPT-KR-3.11.4.zip` | `SPT-KR-EN-3.11.4.zip` |
-| 4.0.13 | `SPT-KR-4.0.13.zip` | `SPT-KR-EN-4.0.13.zip` |
-| 4.1.0 | `SPT-KR-4.1.0.zip` | `SPT-KR-EN-4.1.0.zip` |
-| 4.1.2–4.1.3 | `SPT-KR-4.1.2-4.1.3.zip` | `SPT-KR-EN-4.1.2-4.1.3.zip` |
+| SPT 버전 | 다운로드 파일 |
+| --- | --- |
+| 3.8.3 | `SPT-KR-3.8.3.zip` |
+| 3.9.8 | `SPT-KR-3.9.8.zip` |
+| 3.10.5 | `SPT-KR-3.10.5.zip` |
+| 3.11.4 | `SPT-KR-3.11.4.zip` |
+| 4.0.13 | `SPT-KR-4.0.13.zip` |
+| 4.1.0 | `SPT-KR-4.1.0.zip` |
+| 4.1.2–4.1.3 | `SPT-KR-4.1.2-4.1.3.zip` |
 
-- `KR`: 기본 한글판입니다. 기존 형식에 따라 퀘스트 제목·목표, 아이템 설명의 영문 머리말과 일부 레이드 탈출구에는 영어가 함께 표시될 수 있습니다.
-- `KR-EN`: 전체 한영 병기판입니다.
+각 ZIP에는 두 표시 방식이 모두 들어 있습니다.
 
-두 판을 동시에 설치하지 마세요. 다른 SPT 버전용 ZIP이나 다른 한국어 로케일 모드를 함께 설치하면 충돌할 수 있습니다.
+- `한국어`: 기본 한글판입니다. 기존 형식에 따라 퀘스트 제목·목표, 아이템 설명의 영문 머리말과 일부 레이드 탈출구에는 영어가 함께 표시될 수 있습니다.
+- `한국어 (한영 병기)`: 전체 한영 병기판입니다.
+
+다른 SPT 버전용 ZIP이나 다른 한국어 로케일 모드를 함께 설치하면 충돌할 수 있습니다.
 
 ### 설치 방법
 
 1. 실행 중인 SPT 서버와 게임을 모두 종료하세요.
 2. 선택한 ZIP을 **SPT 설치 최상위 폴더**에 바로 압축 해제하세요.
 3. 기존 파일을 바꿀지 물으면 덮어쓰세요.
-4. 서버를 실행한 뒤 게임 언어를 한국어로 설정하세요.
+4. 서버를 실행한 뒤 `설정 > 게임 > 인터페이스 언어`에서 `한국어` 또는 `한국어 (한영 병기)`를 선택하세요.
+
+두 표시 방식은 게임과 서버를 재시작하지 않고 전환할 수 있으며, 선택값은 게임 설정에 저장됩니다.
 
 ZIP에는 선택한 SPT 버전에 필요한 파일만 들어 있으며, 설치용 BAT나 EXE는 포함하지 않습니다. 기존 `spt_korean_localization_G&M` 또는 `SPT_Korean_Localization` 정식 버전은 같은 경로에 덮어쓸 수 있습니다.
 
@@ -83,7 +85,7 @@ SPT 4.1.0 ZIP에는 해당 버전 전용 서버 모드와 클라이언트 플러
 ..\spt-korean-translate\.venv\Scripts\python.exe .\tools\package_release_versions.py
 ```
 
-또는 `make-release-packages.bat`을 실행하면 됩니다. 생성된 ZIP 14개와 검증 요약은 `artifacts\release`에 저장되며 Git에는 포함되지 않습니다.
+또는 `make-release-packages.bat`을 실행하면 됩니다. 생성된 ZIP 7개와 검증 요약은 `artifacts\release`에 저장되며 Git에는 포함되지 않습니다.
 
 ### 라이선스
 
@@ -99,39 +101,42 @@ This project provides SPT server-side Korean localization and Korean UI display 
 
 The translation is continuously maintained. If you find a mistranslation or untranslated text, please report the SPT version, the displayed text, and where it appears in [Issues](../../issues).
 
-### What's new in 2.0.1
+### What's new in 2.1.0
 
-- Rechecked the actual quest conditions in every supported SPT version by meaning and distinguished quests that share a name but have different factions or requirements.
-- Synchronized quest objectives that require a specific item or piece of equipment with the current Korean item `Name`.
-- Split the exact SPT 4.1.0 package from the shared SPT 4.1.2–4.1.3 package and applied separate compatibility checks to each target.
-- Shortened release filenames to `SPT-KR-<version>.zip` and `SPT-KR-EN-<version>.zip`.
-- Strengthened the release pipeline to validate key order, archive paths, target DLLs, and SHA-256 hashes across all 14 ZIP files.
+- Combined the Korean and full Korean–English editions into one ZIP per supported version.
+- Added `한국어 (한영 병기)` to the existing in-game interface-language setting.
+- Made both display modes switchable without restarting the game or server.
+- Strengthened the release pipeline to validate both locale payloads, archive paths, target DLLs, and SHA-256 hashes across all seven ZIP files.
 
 ### Choose a download
 
 For SPT 3.x, 4.0.13, and 4.1.0, download the **one ZIP that exactly matches your installed version**. SPT 4.1.2 and 4.1.3 use the shared ZIP labelled with both versions. SPT 4.1.1 is not supported.
 
-| SPT version | Korean | Full Korean–English |
-| --- | --- | --- |
-| 3.8.3 | `SPT-KR-3.8.3.zip` | `SPT-KR-EN-3.8.3.zip` |
-| 3.9.8 | `SPT-KR-3.9.8.zip` | `SPT-KR-EN-3.9.8.zip` |
-| 3.10.5 | `SPT-KR-3.10.5.zip` | `SPT-KR-EN-3.10.5.zip` |
-| 3.11.4 | `SPT-KR-3.11.4.zip` | `SPT-KR-EN-3.11.4.zip` |
-| 4.0.13 | `SPT-KR-4.0.13.zip` | `SPT-KR-EN-4.0.13.zip` |
-| 4.1.0 | `SPT-KR-4.1.0.zip` | `SPT-KR-EN-4.1.0.zip` |
-| 4.1.2–4.1.3 | `SPT-KR-4.1.2-4.1.3.zip` | `SPT-KR-EN-4.1.2-4.1.3.zip` |
+| SPT version | Download |
+| --- | --- |
+| 3.8.3 | `SPT-KR-3.8.3.zip` |
+| 3.9.8 | `SPT-KR-3.9.8.zip` |
+| 3.10.5 | `SPT-KR-3.10.5.zip` |
+| 3.11.4 | `SPT-KR-3.11.4.zip` |
+| 4.0.13 | `SPT-KR-4.0.13.zip` |
+| 4.1.0 | `SPT-KR-4.1.0.zip` |
+| 4.1.2–4.1.3 | `SPT-KR-4.1.2-4.1.3.zip` |
 
-- `KR`: Primarily Korean. To preserve the established format, English may still appear alongside quest titles and objectives, as item-description headers, and on some raid extraction names.
-- `KR-EN`: Full Korean–English bilingual edition.
+Each ZIP contains both display modes.
 
-Do not install both editions at the same time. Do not install a ZIP for another SPT version or use it alongside another Korean locale mod.
+- `Korean`: Primarily Korean. To preserve the established format, English may still appear alongside quest titles and objectives, as item-description headers, and on some raid extraction names.
+- `한국어 (한영 병기)`: Full Korean–English bilingual edition.
+
+Do not install a ZIP for another SPT version or use it alongside another Korean locale mod.
 
 ### Installation
 
 1. Close the running SPT server and game.
 2. Extract the selected ZIP directly into the **top-level SPT installation folder**.
 3. Allow existing files to be overwritten when prompted.
-4. Start the server, then set the in-game language to Korean.
+4. Start the server, then choose `Korean` or `한국어 (한영 병기)` under `Settings > Game > Interface Language`.
+
+You can switch between both modes without restarting the game or server. The game saves the selected language normally.
 
 Each ZIP contains only the files required for its target SPT version and contains no BAT or EXE installer. An existing official `spt_korean_localization_G&M` or `SPT_Korean_Localization` installation can be overwritten in place.
 
@@ -167,7 +172,7 @@ Building requires the .NET 10 SDK, SPT client reference files, and the sibling `
 ..\spt-korean-translate\.venv\Scripts\python.exe .\tools\package_release_versions.py
 ```
 
-Alternatively, run `make-release-packages.bat`. The 14 generated ZIP files and their validation summary are written to `artifacts\release` and are not tracked by Git.
+Alternatively, run `make-release-packages.bat`. The seven generated ZIP files and their validation summary are written to `artifacts\release` and are not tracked by Git.
 
 ### License
 

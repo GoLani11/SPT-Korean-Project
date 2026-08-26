@@ -12,7 +12,7 @@ namespace KoreanPatchFix
     {
         public const string PluginGuid = "com.GoLani.koreanpatchfix";
         public const string PluginName = "Korean Patch Fix";
-        public const string PluginVersion = "2.0.1";
+        public const string PluginVersion = "2.1.0";
 
         private void Awake()
         {
@@ -33,6 +33,7 @@ namespace KoreanPatchFix
             var skippedCount = 0;
             var failedCount = 0;
 
+            EnablePatch(nameof(KoreanBilingualFontFix), () => KoreanBilingualFontFix.Enable(harmony), ref enabledCount, ref skippedCount, ref failedCount);
             EnablePatch(nameof(FleaMarketItemNameFix), () => FleaMarketItemNameFix.Enable(harmony), ref enabledCount, ref skippedCount, ref failedCount);
             EnablePatch(nameof(FleaMarketItemCategoryFix), () => FleaMarketItemCategoryFix.Enable(harmony), ref enabledCount, ref skippedCount, ref failedCount);
             EnablePatch(nameof(GesturesMenuFix), () => GesturesMenuFix.Enable(harmony), ref enabledCount, ref skippedCount, ref failedCount);

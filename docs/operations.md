@@ -15,11 +15,11 @@
 
 Use `--client-reference-spt-root` when the 3.8.3 install is elsewhere. Use `--dotnet` to select a non-default .NET 10 SDK. `make-release-packages.bat` invokes the same Python entry point.
 
-The command always restores and builds the solution, executes both 4.1 compatibility contracts, validates all locale key and shared-range equivalence contracts, creates 14 ZIP files under `artifacts\release`, reopens every archive for layout and source-hash checks, and writes `release-summary.json`. A build cannot be skipped because stale compatibility binaries must never be reused for a release.
+The command always restores and builds the solution, executes both 4.1 compatibility contracts, validates both locale payloads and all shared-range equivalence contracts, creates seven ZIP files under `artifacts\release`, reopens every archive for layout and source-hash checks, and writes `release-summary.json`. A build cannot be skipped because stale compatibility binaries must never be reused for a release.
 
 ## Runtime Verification
 
-Extract each ZIP into its matching clean SPT install. The server log must report `SPT_Korean_Localization_(G&M)` and the version's expected locale key count. The BepInEx log must report the detected SPT version and a final enabled/unavailable/failed patch summary. Prestige reward adjustment is normally unavailable on SPT 3.8.3–3.10.5.
+Extract each ZIP into its matching clean SPT install. The server log must report `SPT_Korean_Localization_(G&M)` and the version's expected key counts for both display modes. The native interface-language list must contain `한국어 (한영 병기)`, and switching between it and `한국어` must reload visible locale text without restarting the game or server. The BepInEx log must report the detected SPT version, the bilingual font patch, and a final enabled/unavailable/failed patch summary. Prestige reward adjustment is normally unavailable on SPT 3.8.3–3.10.5.
 
 Before a release, resolve the common client DLL's patch targets against the actual `Assembly-CSharp.dll` from every supported install, then visually smoke-test the adjusted UI through the normal SPT launcher. A reflection target check confirms structural compatibility but does not replace rendered UI verification.
 

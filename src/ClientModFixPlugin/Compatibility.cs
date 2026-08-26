@@ -169,7 +169,8 @@ namespace KoreanPatchFix
                     return true;
                 }
 
-                return string.Equals(value, "kr", StringComparison.OrdinalIgnoreCase);
+                return string.Equals(value, "kr", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(value, "kr-en", StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception ex)
             {

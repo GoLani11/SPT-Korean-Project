@@ -3,6 +3,7 @@ using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Spt.Mod;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Utils.Json;
 using System.Text.Json;
 
 namespace SPT_Korean_Localization;
@@ -13,7 +14,7 @@ public record ModMetadata : AbstractModMetadata
     public override string Name { get; init; } = "SPT_Korean_Localization_(G&M)";
     public override string Author { get; init; } = "Golani, Makina";
     public override List<string>? Contributors { get; init; }
-    public override SemanticVersioning.Version Version { get; init; } = new("2.0.1");
+    public override SemanticVersioning.Version Version { get; init; } = new("2.1.0");
     public override SemanticVersioning.Range SptVersion { get; init; } = new("4.0.13");
     public override List<string>? Incompatibilities { get; init; } = null;
     public override Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; } = null;
@@ -28,15 +29,26 @@ public class KoreanPatcher(
     DatabaseService databaseService)
     : IOnLoad
 {
+    private const string KoreanLocaleId = "kr";
+    private const string BilingualLocaleId = "kr-en";
+    private const string BilingualLocaleName = "한국어 (한영 병기)";
+
     public Task OnLoad()
     {
         var startTime = DateTime.Now;
 
         try
         {
-            if (!databaseService.GetLocales().Global.TryGetValue("kr", out var koreanLocale))
+            var locales = databaseService.GetLocales();
+            if (!locales.Global.TryGetValue(KoreanLocaleId, out var koreanLocale))
             {
                 logger.Error("기존 한국어 언어파일을 찾을 수 없습니다. SPT/SPT_Data/database/locales/global/kr.json을 확인하세요.");
+                return Task.CompletedTask;
+            }
+
+            if (!locales.Menu.TryGetValue(KoreanLocaleId, out var koreanMenu))
+            {
+                logger.Error("기존 한국어 메뉴 언어파일을 찾을 수 없습니다.");
                 return Task.CompletedTask;
             }
 
@@ -47,20 +59,8 @@ public class KoreanPatcher(
                 return Task.CompletedTask;
             }
 
-            var localePath = Path.Combine(assemblyLocation, "locale", "kr.json");
-            if (!File.Exists(localePath))
-            {
-                logger.Error($"한글 패치 파일을 찾을 수 없습니다: {localePath}");
-                return Task.CompletedTask;
-            }
-
-            var jsonContent = File.ReadAllText(localePath);
-            var koreanPatch = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
-            if (koreanPatch == null || koreanPatch.Count == 0)
-            {
-                logger.Warning("한글 패치 파일이 비어있습니다.");
-                return Task.CompletedTask;
-            }
+            var koreanPatch = LoadLocalePatch(assemblyLocation, "kr.json");
+            var bilingualPatch = LoadLocalePatch(assemblyLocation, "kr-en.json");
 
             koreanLocale.AddTransformer(localeData =>
             {
@@ -75,12 +75,49 @@ public class KoreanPatcher(
                     localeData[entry.Key] = entry.Value;
                 }
 
+                localeData[BilingualLocaleId] = BilingualLocaleName;
                 return localeData;
             });
 
+            foreach (var (localeId, lazyLocale) in locales.Global.ToArray())
+            {
+                if (string.Equals(localeId, KoreanLocaleId, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                lazyLocale.AddTransformer(localeData =>
+                {
+                    if (localeData != null)
+                    {
+                        localeData[BilingualLocaleId] = BilingualLocaleName;
+                    }
+
+                    return localeData;
+                });
+            }
+
+            locales.Global[BilingualLocaleId] = new LazyLoad<Dictionary<string, string>>(() =>
+            {
+                var baseKoreanLocale = koreanLocale.Value;
+                var bilingualLocale = baseKoreanLocale == null
+                    ? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    : new Dictionary<string, string>(baseKoreanLocale, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var entry in bilingualPatch)
+                {
+                    bilingualLocale[entry.Key] = entry.Value;
+                }
+
+                bilingualLocale[BilingualLocaleId] = BilingualLocaleName;
+                return bilingualLocale;
+            });
+            locales.Menu[BilingualLocaleId] = new Dictionary<string, object>(koreanMenu);
+            locales.Languages[BilingualLocaleId] = "Korean-English";
+
             var elapsed = (DateTime.Now - startTime).TotalMilliseconds;
             logger.Success("고라니 SPT 한글화 프로젝트가 정상적으로 적용되었습니다. 재밌는 SPT되세요!");
-            logger.Info($"적용된 항목 줄 수: {koreanPatch.Count} (처리 시간: {elapsed:F2}ms)");
+            logger.Info($"적용된 항목 줄 수: 한글판 {koreanPatch.Count}, 한영 병기판 {bilingualPatch.Count} (처리 시간: {elapsed:F2}ms)");
         }
         catch (Exception ex)
         {
@@ -89,5 +126,22 @@ public class KoreanPatcher(
         }
 
         return Task.CompletedTask;
+    }
+
+    private static Dictionary<string, string> LoadLocalePatch(string assemblyLocation, string fileName)
+    {
+        var localePath = Path.Combine(assemblyLocation, "locale", fileName);
+        if (!File.Exists(localePath))
+        {
+            throw new FileNotFoundException($"한글 패치 파일을 찾을 수 없습니다: {localePath}", localePath);
+        }
+
+        var patch = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(localePath));
+        if (patch == null || patch.Count == 0)
+        {
+            throw new InvalidDataException($"한글 패치 파일이 비어있습니다: {localePath}");
+        }
+
+        return patch;
     }
 }
