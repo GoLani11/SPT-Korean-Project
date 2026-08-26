@@ -113,7 +113,7 @@ public class KoreanPatcher(
                 return bilingualLocale;
             });
             locales.Menu[BilingualLocaleId] = new Dictionary<string, object>(koreanMenu);
-            locales.Languages[BilingualLocaleId] = "Korean-English";
+            InsertBilingualLanguageAfterKorean(locales.Languages);
 
             var elapsed = (DateTime.Now - startTime).TotalMilliseconds;
             logger.Success("고라니 SPT 한글화 프로젝트가 정상적으로 적용되었습니다. 재밌는 SPT되세요!");
@@ -126,6 +126,30 @@ public class KoreanPatcher(
         }
 
         return Task.CompletedTask;
+    }
+
+    private static void InsertBilingualLanguageAfterKorean(IDictionary<string, string> languages)
+    {
+        var existingLanguages = languages
+            .Where(entry => !string.Equals(entry.Key, BilingualLocaleId, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        languages.Clear();
+
+        var inserted = false;
+        foreach (var entry in existingLanguages)
+        {
+            languages[entry.Key] = entry.Value;
+            if (string.Equals(entry.Key, KoreanLocaleId, StringComparison.OrdinalIgnoreCase))
+            {
+                languages[BilingualLocaleId] = "Korean-English";
+                inserted = true;
+            }
+        }
+
+        if (!inserted)
+        {
+            languages[BilingualLocaleId] = "Korean-English";
+        }
     }
 
     private static Dictionary<string, string> LoadLocalePatch(string assemblyLocation, string fileName)

@@ -17,7 +17,7 @@ SPT 서버 한글 번역과 한국어 UI 표시 보정을 하나의 패키지로
 ### 2.1.0 주요 변경 사항
 
 - 한글판과 한영 병기판을 버전별 ZIP 하나로 통합
-- 게임의 `설정 > 게임 > 인터페이스 언어`에 `한국어 (한영 병기)` 추가
+- 게임의 `설정 > 게임 > 인터페이스 언어`에서 `한국어` 바로 아래에 `한국어 (한영 병기)` 추가
 - 게임이나 서버를 재시작하지 않고 한글판과 한영 병기판 전환
 - 총 7개 ZIP에 포함된 두 로케일의 키 순서, 내부 경로, 대상 DLL과 SHA-256 자동 검증
 
@@ -104,7 +104,7 @@ The translation is continuously maintained. If you find a mistranslation or untr
 ### What's new in 2.1.0
 
 - Combined the Korean and full Korean–English editions into one ZIP per supported version.
-- Added `한국어 (한영 병기)` to the existing in-game interface-language setting.
+- Added `한국어 (한영 병기)` immediately below `Korean` in the existing in-game interface-language setting.
 - Made both display modes switchable without restarting the game or server.
 - Strengthened the release pipeline to validate both locale payloads, archive paths, target DLLs, and SHA-256 hashes across all seven ZIP files.
 

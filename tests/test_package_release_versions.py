@@ -177,6 +177,16 @@ class ReleaseContractTests(unittest.TestCase):
             self.assertIn('"kr-en"', source)
             self.assertIn('"kr-en.json"', source)
             self.assertIn("한국어 (한영 병기)", source)
+            self.assertIn("InsertBilingualLanguageAfterKorean" if source != server_3 else "insertBilingualLanguageAfterKorean", source)
+
+        for source in (server_41, server_40):
+            insertion = source.index('languages[BilingualLocaleId] = "Korean-English"')
+            korean_check = source.rindex("KoreanLocaleId", 0, insertion)
+            self.assertLess(korean_check, insertion)
+
+        node_insertion = server_3.index('languages["kr-en"] = "Korean-English"')
+        node_korean_check = server_3.rindex('localeId.toLowerCase() === "kr"', 0, node_insertion)
+        self.assertLess(node_korean_check, node_insertion)
 
         self.assertIn('string.Equals(value, "kr-en"', compatibility)
         self.assertIn('private const string BilingualLocaleId = "kr-en"', font_fix)

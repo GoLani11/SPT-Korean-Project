@@ -52,7 +52,7 @@ class KoreanPatcher {
                 "kr-en": "한국어 (한영 병기)"
             };
             locales.menu["kr-en"] = { ...locales.menu.kr };
-            locales.languages["kr-en"] = "Korean-English";
+            this.insertBilingualLanguageAfterKorean(locales.languages);
 
             const elapsed = Date.now() - startTime;
             const koreanCount = Object.keys(this.koreanPatch).length;
@@ -63,6 +63,28 @@ class KoreanPatcher {
         }
         catch (error) {
             logger.error(`고라니 SPT 한글화 프로젝트 적용 중 오류 발생: ${error?.stack ?? error}`);
+        }
+    }
+
+    insertBilingualLanguageAfterKorean(languages) {
+        const existingLanguages = Object.entries(languages)
+            .filter(([localeId]) => localeId.toLowerCase() !== "kr-en");
+
+        for (const localeId of Object.keys(languages)) {
+            delete languages[localeId];
+        }
+
+        let inserted = false;
+        for (const [localeId, localeName] of existingLanguages) {
+            languages[localeId] = localeName;
+            if (localeId.toLowerCase() === "kr") {
+                languages["kr-en"] = "Korean-English";
+                inserted = true;
+            }
+        }
+
+        if (!inserted) {
+            languages["kr-en"] = "Korean-English";
         }
     }
 
