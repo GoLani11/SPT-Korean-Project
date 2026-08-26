@@ -62,6 +62,7 @@ class ReleaseContractTests(unittest.TestCase):
     def test_node_manifests_target_only_the_exact_loader_version(self):
         for spec in release.SUPPORTED_VERSIONS[:4]:
             manifest = release.node_manifest(spec)
+            self.assertEqual(manifest["name"], "SPT Korean Localization")
             self.assertEqual(manifest["version"], "2.1.0")
             self.assertEqual(manifest[spec.manifest_version_field], spec.version)
             other_field = "sptVersion" if spec.manifest_version_field == "akiVersion" else "akiVersion"
@@ -176,10 +177,11 @@ class ReleaseContractTests(unittest.TestCase):
         for source in (server_41, server_40, server_3):
             self.assertIn('"kr-en"', source)
             self.assertIn('"kr-en.json"', source)
-            self.assertIn("한국어 (한영 병기)", source)
+            self.assertIn("한국어 (Korean)", source)
             self.assertIn("InsertBilingualLanguageAfterKorean" if source != server_3 else "insertBilingualLanguageAfterKorean", source)
 
         for source in (server_41, server_40):
+            self.assertIn('Name { get; init; } = "SPT Korean Localization"', source)
             insertion = source.index('languages[BilingualLocaleId] = "Korean-English"')
             korean_check = source.rindex("KoreanLocaleId", 0, insertion)
             self.assertLess(korean_check, insertion)
@@ -198,12 +200,13 @@ class ReleaseContractTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("#if SPT_410", policy_source)
         self.assertIn('FourOneServerRange = "4.1.0"', policy_source)
-        self.assertIn('FourOneServerRange = "~4.1.2"', policy_source)
+        self.assertIn('FourOneServerRange = ">=4.1.2 <=4.1.3"', policy_source)
         self.assertIn('string.Equals(version, "4.1.0"', policy_source)
         self.assertIn("Version.TryParse(version, out var parsed)", policy_source)
         self.assertIn("parsed.Major == 4", policy_source)
         self.assertIn("parsed.Minor == 1", policy_source)
         self.assertIn("parsed.Build >= 2", policy_source)
+        self.assertIn("parsed.Build <= 3", policy_source)
 
         compatibility_source = (
             PROJECT_ROOT / "src" / "ClientModFixPlugin" / "Compatibility.cs"

@@ -19,7 +19,7 @@ The command always restores and builds the solution, executes both 4.1 compatibi
 
 ## Runtime Verification
 
-Extract each ZIP into its matching clean SPT install. The server log must report `SPT_Korean_Localization_(G&M)` and the version's expected key counts for both display modes. The native interface-language list must contain `한국어 (한영 병기)`, and switching between it and `한국어` must reload visible locale text without restarting the game or server. The BepInEx log must report the detected SPT version, the bilingual font patch, and a final enabled/unavailable/failed patch summary. Prestige reward adjustment is normally unavailable on SPT 3.8.3–3.10.5.
+Extract each ZIP into its matching clean SPT install. The server log must report `SPT Korean Localization` and the version's expected key counts for both display modes. The native interface-language list must contain `한국어 (Korean)`, and switching between it and `한국어` must reload visible locale text without restarting the game or server. The BepInEx log must report the detected SPT version, the bilingual font patch, and a final enabled/unavailable/failed patch summary. Prestige reward adjustment is normally unavailable on SPT 3.8.3–3.10.5.
 
 Before a release, resolve the common client DLL's patch targets against the actual `Assembly-CSharp.dll` from every supported install, then visually smoke-test the adjusted UI through the normal SPT launcher. A reflection target check confirms structural compatibility but does not replace rendered UI verification.
 

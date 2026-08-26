@@ -12,7 +12,7 @@ SPT-KR-<version-or-range>.zip
 
 Exactly seven archives are produced for five legacy exact versions, exact SPT 4.1.0, and the shared SPT 4.1.2–4.1.3 range. Every archive copies `kr.generated.json` to `locale/kr.json` and `kr-en.generated.json` to `locale/kr-en.json`. The `KR` source still preserves reference-formatted quest titles, objectives, exceptional quest headers, item-description English headers, and verified raid-exfil names.
 
-The public locale IDs are `kr` for the existing Korean display and `kr-en` for full Korean-English display. The native language list places `kr-en` immediately after `kr` and displays it as `한국어 (한영 병기)`. The game owns selection persistence and reload behavior.
+The public locale IDs are `kr` for the existing Korean display and `kr-en` for full Korean-English display. The native language list places `kr-en` immediately after `kr` and displays it as `한국어 (Korean)`. The game owns selection persistence and reload behavior.
 
 ## Archive Layouts
 

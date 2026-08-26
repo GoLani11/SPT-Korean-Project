@@ -17,7 +17,7 @@ SPT 서버 한글 번역과 한국어 UI 표시 보정을 하나의 패키지로
 ### 2.1.0 주요 변경 사항
 
 - 한글판과 한영 병기판을 버전별 ZIP 하나로 통합
-- 게임의 `설정 > 게임 > 인터페이스 언어`에서 `한국어` 바로 아래에 `한국어 (한영 병기)` 추가
+- 게임의 `설정 > 게임 > 인터페이스 언어`에서 `한국어` 바로 아래에 `한국어 (Korean)` 추가
 - 게임이나 서버를 재시작하지 않고 한글판과 한영 병기판 전환
 - 총 7개 ZIP에 포함된 두 로케일의 키 순서, 내부 경로, 대상 DLL과 SHA-256 자동 검증
 
@@ -38,7 +38,7 @@ SPT 3.x, 4.0.13, 4.1.0은 설치 버전과 **정확히 같은 ZIP 하나**를 �
 각 ZIP에는 두 표시 방식이 모두 들어 있습니다.
 
 - `한국어`: 기본 한글판입니다. 기존 형식에 따라 퀘스트 제목·목표, 아이템 설명의 영문 머리말과 일부 레이드 탈출구에는 영어가 함께 표시될 수 있습니다.
-- `한국어 (한영 병기)`: 전체 한영 병기판입니다.
+- `한국어 (Korean)`: 전체 한영 병기판입니다.
 
 다른 SPT 버전용 ZIP이나 다른 한국어 로케일 모드를 함께 설치하면 충돌할 수 있습니다.
 
@@ -47,7 +47,7 @@ SPT 3.x, 4.0.13, 4.1.0은 설치 버전과 **정확히 같은 ZIP 하나**를 �
 1. 실행 중인 SPT 서버와 게임을 모두 종료하세요.
 2. 선택한 ZIP을 **SPT 설치 최상위 폴더**에 바로 압축 해제하세요.
 3. 기존 파일을 바꿀지 물으면 덮어쓰세요.
-4. 서버를 실행한 뒤 `설정 > 게임 > 인터페이스 언어`에서 `한국어` 또는 `한국어 (한영 병기)`를 선택하세요.
+4. 서버를 실행한 뒤 `설정 > 게임 > 인터페이스 언어`에서 `한국어` 또는 `한국어 (Korean)`를 선택하세요.
 
 두 표시 방식은 게임과 서버를 재시작하지 않고 전환할 수 있으며, 선택값은 게임 설정에 저장됩니다.
 
@@ -104,7 +104,7 @@ The translation is continuously maintained. If you find a mistranslation or untr
 ### What's new in 2.1.0
 
 - Combined the Korean and full Korean–English editions into one ZIP per supported version.
-- Added `한국어 (한영 병기)` immediately below `Korean` in the existing in-game interface-language setting.
+- Added `한국어 (Korean)` immediately below `Korean` in the existing in-game interface-language setting.
 - Made both display modes switchable without restarting the game or server.
 - Strengthened the release pipeline to validate both locale payloads, archive paths, target DLLs, and SHA-256 hashes across all seven ZIP files.
 
@@ -125,7 +125,7 @@ For SPT 3.x, 4.0.13, and 4.1.0, download the **one ZIP that exactly matches your
 Each ZIP contains both display modes.
 
 - `Korean`: Primarily Korean. To preserve the established format, English may still appear alongside quest titles and objectives, as item-description headers, and on some raid extraction names.
-- `한국어 (한영 병기)`: Full Korean–English bilingual edition.
+- `한국어 (Korean)`: Full Korean–English bilingual edition.
 
 Do not install a ZIP for another SPT version or use it alongside another Korean locale mod.
 
@@ -134,7 +134,7 @@ Do not install a ZIP for another SPT version or use it alongside another Korean 
 1. Close the running SPT server and game.
 2. Extract the selected ZIP directly into the **top-level SPT installation folder**.
 3. Allow existing files to be overwritten when prompted.
-4. Start the server, then choose `Korean` or `한국어 (한영 병기)` under `Settings > Game > Interface Language`.
+4. Start the server, then choose `Korean` or `한국어 (Korean)` under `Settings > Game > Interface Language`.
 
 You can switch between both modes without restarting the game or server. The game saves the selected language normally.
 

@@ -2,7 +2,7 @@
 
 ## Server Compatibility
 
-SPT 3.x uses the historical CommonJS `postDBLoad` contract and exact loader metadata. SPT 4.0.13 and SPT 4.1 use different DI and locale APIs, so they intentionally have separate source projects and target frameworks. The exact SPT 4.1.0 server target compiles against 4.1.0 packages and declares `4.1.0`. The shared SPT 4.1.2–4.1.3 target compiles against 4.1.2 packages and declares `~4.1.2`; its release label remains limited to the two verified patches.
+SPT 3.x uses the historical CommonJS `postDBLoad` contract and exact loader metadata. SPT 4.0.13 and SPT 4.1 use different DI and locale APIs, so they intentionally have separate source projects and target frameworks. The exact SPT 4.1.0 server target compiles against 4.1.0 packages and declares `4.1.0`. The shared SPT 4.1.2–4.1.3 target compiles against 4.1.2 packages and declares `>=4.1.2 <=4.1.3`, limiting it to the two verified patches.
 
 ## Client Compatibility
 

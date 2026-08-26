@@ -256,7 +256,7 @@ def node_manifest(spec: VersionSpec) -> dict[str, Any]:
         raise ValueError(f"missing manifest field for {spec.version}")
 
     return {
-        "name": "SPT_Korean_Localization_(G&M)",
+        "name": "SPT Korean Localization",
         "version": PACKAGE_VERSION,
         "description": "SPT Korean localization by Golani and Makina",
         spec.manifest_version_field: spec.version,

@@ -12,7 +12,7 @@ An unbounded compatibility declaration would also admit prereleases, SPT 4.2, an
 
 ## Decision
 
-Build the SPT 4.1 server DLL against the lowest admitted 4.1.2 packages and declare `~4.1.2`. The client uses the equivalent stable-release rule: `4.1.x` with a patch number of at least 2. Both sides reject 4.1.0, 4.1.1, prereleases, and 4.2 or later.
+Build the SPT 4.1 server DLL against the lowest admitted 4.1.2 packages and declare `>=4.1.2 <=4.1.3`. The client uses the equivalent stable-release rule. Both sides reject 4.1.0, 4.1.1, prereleases, unverified later 4.1 patches, and 4.2 or later.
 
 The `4.1.2-4.1.3`-labelled archive is shared by the two verified patches. A future stable 4.1.x patch may satisfy the binary gate but does not become a release target until its server API references, client patch targets, locale data, and runtime behavior are checked and the release label is updated.
 

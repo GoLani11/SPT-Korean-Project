@@ -11,7 +11,7 @@ namespace SPT_Korean_Localization;
 public record ModMetadata : AbstractModMetadata
 {
     public override string ModGuid { get; init; } = "com.golani.makina.korean";
-    public override string Name { get; init; } = "SPT_Korean_Localization_(G&M)";
+    public override string Name { get; init; } = "SPT Korean Localization";
     public override string Author { get; init; } = "Golani, Makina";
     public override List<string>? Contributors { get; init; }
     public override SemanticVersioning.Version Version { get; init; } = new("2.1.0");
@@ -31,7 +31,7 @@ public class KoreanPatcher(
 {
     private const string KoreanLocaleId = "kr";
     private const string BilingualLocaleId = "kr-en";
-    private const string BilingualLocaleName = "한국어 (한영 병기)";
+    private const string BilingualLocaleName = "한국어 (Korean)";
 
     public Task OnLoad()
     {

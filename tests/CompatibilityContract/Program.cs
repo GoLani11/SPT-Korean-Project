@@ -19,7 +19,7 @@ var clientCases = new (string? Version, bool Expected)[]
     ("4.1.1", false),
     ("4.1.2", true),
     ("4.1.3", true),
-    ("4.1.99", true),
+    ("4.1.99", false),
 #endif
     ("4.1.3-pre", false),
     ("4.2.0", false),
@@ -50,7 +50,7 @@ var serverCases = new (string Version, bool Expected)[]
     ("4.1.1", false),
     ("4.1.2", true),
     ("4.1.3", true),
-    ("4.1.99", true),
+    ("4.1.99", false),
 #endif
     ("4.1.3-pre", false),
     ("4.2.0", false),

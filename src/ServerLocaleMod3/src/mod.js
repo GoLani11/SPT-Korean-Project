@@ -40,16 +40,16 @@ class KoreanPatcher {
 
             const startTime = Date.now();
             Object.assign(koreanLocale, this.koreanPatch);
-            koreanLocale["kr-en"] = "한국어 (한영 병기)";
+            koreanLocale["kr-en"] = "한국어 (Korean)";
 
             for (const locale of Object.values(locales.global)) {
-                locale["kr-en"] = "한국어 (한영 병기)";
+                locale["kr-en"] = "한국어 (Korean)";
             }
 
             locales.global["kr-en"] = {
                 ...koreanLocale,
                 ...this.bilingualPatch,
-                "kr-en": "한국어 (한영 병기)"
+                "kr-en": "한국어 (Korean)"
             };
             locales.menu["kr-en"] = { ...locales.menu.kr };
             this.insertBilingualLanguageAfterKorean(locales.languages);
