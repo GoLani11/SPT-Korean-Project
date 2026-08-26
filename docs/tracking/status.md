@@ -33,4 +33,4 @@ The repository builds exact-version Korean localization packages for SPT 3.8.3, 
 
 - Later stable 4.1.x patches may satisfy the bounded binary rule but require explicit release-label, server API, translation, patch-target, and runtime review before distribution. Prereleases and SPT 4.2 are rejected.
 - The newly generated exact 4.1.0 artifacts still need release runtime server-log and in-game UI/texture smoke tests when launching that version is available.
-- Release smoke testing should visually confirm the new `한국어 (Korean)` option, immediate two-way switching, persisted selection, and adjusted UI inside a launcher-started game; the automated client check proves the 4.1.3 font target exists but does not render game screens.
+- Release smoke testing should visually confirm the adjacent `한국어 (Korean)` and `한국어 (한영 병기)` options, immediate two-way switching, persisted selection, and adjusted UI inside a launcher-started game; the automated client check proves the 4.1.3 font target exists but does not render game screens.

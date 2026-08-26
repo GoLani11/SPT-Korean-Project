@@ -10,7 +10,7 @@ Korean and full Korean-English display modes were distributed as separate ZIP fi
 
 ## Decision
 
-Publish one `SPT-KR-<version-or-range>.zip` per release label. Each archive contains `locale/kr.json` and `locale/kr-en.json`. The server keeps `kr` as the default Korean locale and registers `kr-en` as `한국어 (Korean)`, inheriting the Korean menu locale. The client plugin uses the Korean font fallback for both IDs.
+Publish one `SPT-KR-<version-or-range>.zip` per release label. Each archive contains `locale/kr.json` and `locale/kr-en.json`. The server exposes the default `kr` locale as `한국어 (Korean)` and registers `kr-en` as `한국어 (한영 병기)`, inheriting the Korean menu locale. The client plugin uses the Korean font fallback for both IDs.
 
 Use the game's existing interface-language setting for selection, reload, and persistence. Do not add a mod configuration file or a separate settings UI.
 

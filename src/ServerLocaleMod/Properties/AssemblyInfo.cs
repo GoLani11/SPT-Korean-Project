@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("SPT_Korean_Localization")]
-[assembly: AssemblyDescription("SPT Korean Localization Mod by Golani & Makina")]
+[assembly: AssemblyDescription("SPT Korean Localization Mod by Golani")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SPT Korean Project")]
 [assembly: AssemblyProduct("SPT_Korean_Localization")]

@@ -258,14 +258,14 @@ def node_manifest(spec: VersionSpec) -> dict[str, Any]:
     return {
         "name": "SPT Korean Localization",
         "version": PACKAGE_VERSION,
-        "description": "SPT Korean localization by Golani and Makina",
+        "description": "SPT Korean localization by Golani",
         spec.manifest_version_field: spec.version,
         "loadBefore": [],
         "loadAfter": [],
         "incompatibilities": [],
         "isBundleMod": False,
         "main": "src/mod.js",
-        "author": "Golani, Makina",
+        "author": "Golani",
         "contributors": [],
         "license": "MIT",
     }

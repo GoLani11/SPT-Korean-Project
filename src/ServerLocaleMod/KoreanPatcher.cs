@@ -10,9 +10,9 @@ namespace SPT_Korean_Localization;
 
 public record ModMetadata : IModMetadata
 {
-    public string ModGuid { get; init; } = "com.golani.makina.korean";
+    public string ModGuid { get; init; } = "com.golani.korean";
     public string Name { get; init; } = "SPT Korean Localization";
-    public string Author { get; init; } = "Golani, Makina";
+    public string Author { get; init; } = "Golani";
     public List<string>? Contributors { get; init; }
     public SemanticVersioning.Version Version { get; init; } = new("2.1.0");
     public SemanticVersioning.Range SptVersion { get; init; } = new(KoreanPatchFix.SptCompatibilityPolicy.FourOneServerRange);
@@ -31,7 +31,8 @@ public class KoreanPatcher(
 {
     private const string KoreanLocaleId = "kr";
     private const string BilingualLocaleId = "kr-en";
-    private const string BilingualLocaleName = "한국어 (Korean)";
+    private const string KoreanLocaleName = "한국어 (Korean)";
+    private const string BilingualLocaleName = "한국어 (한영 병기)";
 
     public Task OnLoadAsync(CancellationToken cancellationToken)
     {
@@ -76,6 +77,7 @@ public class KoreanPatcher(
                     localeData[kvp.Key] = kvp.Value;
                 }
 
+                localeData[KoreanLocaleId] = KoreanLocaleName;
                 localeData[BilingualLocaleId] = BilingualLocaleName;
                 return localeData;
             });
@@ -91,6 +93,7 @@ public class KoreanPatcher(
                 {
                     if (localeData != null)
                     {
+                        localeData[KoreanLocaleId] = KoreanLocaleName;
                         localeData[BilingualLocaleId] = BilingualLocaleName;
                     }
 
@@ -115,6 +118,7 @@ public class KoreanPatcher(
                     bilingualLocale[entry.Key] = entry.Value;
                 }
 
+                bilingualLocale[KoreanLocaleId] = KoreanLocaleName;
                 bilingualLocale[BilingualLocaleId] = BilingualLocaleName;
                 return bilingualLocale;
             });

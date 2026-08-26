@@ -63,6 +63,7 @@ class ReleaseContractTests(unittest.TestCase):
         for spec in release.SUPPORTED_VERSIONS[:4]:
             manifest = release.node_manifest(spec)
             self.assertEqual(manifest["name"], "SPT Korean Localization")
+            self.assertEqual(manifest["author"], "Golani")
             self.assertEqual(manifest["version"], "2.1.0")
             self.assertEqual(manifest[spec.manifest_version_field], spec.version)
             other_field = "sptVersion" if spec.manifest_version_field == "akiVersion" else "akiVersion"
@@ -178,10 +179,13 @@ class ReleaseContractTests(unittest.TestCase):
             self.assertIn('"kr-en"', source)
             self.assertIn('"kr-en.json"', source)
             self.assertIn("한국어 (Korean)", source)
+            self.assertIn("한국어 (한영 병기)", source)
             self.assertIn("InsertBilingualLanguageAfterKorean" if source != server_3 else "insertBilingualLanguageAfterKorean", source)
 
         for source in (server_41, server_40):
+            self.assertIn('ModGuid { get; init; } = "com.golani.korean"', source)
             self.assertIn('Name { get; init; } = "SPT Korean Localization"', source)
+            self.assertIn('Author { get; init; } = "Golani"', source)
             insertion = source.index('languages[BilingualLocaleId] = "Korean-English"')
             korean_check = source.rindex("KoreanLocaleId", 0, insertion)
             self.assertLess(korean_check, insertion)
