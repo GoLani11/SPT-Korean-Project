@@ -13,15 +13,20 @@ var clientCases = new (string? Version, bool Expected)[]
     ("4.1.1", false),
     ("4.1.2", false),
     ("4.1.3", false),
+    ("4.1.4", false),
+    ("4.1.5", false),
     ("4.1.99", false),
 #else
     ("4.1.0", false),
     ("4.1.1", false),
     ("4.1.2", true),
     ("4.1.3", true),
-    ("4.1.99", false),
+    ("4.1.4", true),
+    ("4.1.5", true),
+    ("4.1.99", true),
 #endif
     ("4.1.3-pre", false),
+    ("4.1.5-pre", false),
     ("4.2.0", false),
 };
 
@@ -44,15 +49,20 @@ var serverCases = new (string Version, bool Expected)[]
     ("4.1.1", false),
     ("4.1.2", false),
     ("4.1.3", false),
+    ("4.1.4", false),
+    ("4.1.5", false),
     ("4.1.99", false),
 #else
     ("4.1.0", false),
     ("4.1.1", false),
     ("4.1.2", true),
     ("4.1.3", true),
-    ("4.1.99", false),
+    ("4.1.4", true),
+    ("4.1.5", true),
+    ("4.1.99", true),
 #endif
     ("4.1.3-pre", false),
+    ("4.1.5-pre", false),
     ("4.2.0", false),
 };
 

@@ -204,13 +204,13 @@ class ReleaseContractTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("#if SPT_410", policy_source)
         self.assertIn('FourOneServerRange = "4.1.0"', policy_source)
-        self.assertIn('FourOneServerRange = ">=4.1.2 <=4.1.3"', policy_source)
+        self.assertIn('FourOneServerRange = "~4.1.2"', policy_source)
         self.assertIn('string.Equals(version, "4.1.0"', policy_source)
         self.assertIn("Version.TryParse(version, out var parsed)", policy_source)
         self.assertIn("parsed.Major == 4", policy_source)
         self.assertIn("parsed.Minor == 1", policy_source)
         self.assertIn("parsed.Build >= 2", policy_source)
-        self.assertIn("parsed.Build <= 3", policy_source)
+        self.assertNotIn("parsed.Build <=", policy_source)
 
         compatibility_source = (
             PROJECT_ROOT / "src" / "ClientModFixPlugin" / "Compatibility.cs"
