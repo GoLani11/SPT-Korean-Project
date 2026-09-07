@@ -67,16 +67,18 @@ def validate_archive(archive: Path, expected: dict[str, str]) -> None:
                 raise ValueError(f"prototype archive hash mismatch: {name}")
 
 
-def run_windows_contract(executable: Path, arguments: list[Path]) -> None:
+def run_windows_contract(executable: Path, arguments: list[Path], mono_root: Path | None = None) -> None:
     if os.name == "nt":
-        command = [str(executable), *(str(path) for path in arguments)]
+        prefix = ["--unity-mono", str(mono_root)] if mono_root is not None else []
+        command = [str(executable), *prefix, *(str(path) for path in arguments)]
     elif shutil.which("wslpath"):
         # The game and its Harmony runtime target .NET Framework; execute that runtime through WSL interop.
         executable.chmod(executable.stat().st_mode | 0o111)
         def windows_path(path: Path) -> str:
             return subprocess.check_output(["wslpath", "-w", str(path.resolve())], text=True).strip()
 
-        command = [str(executable), *(windows_path(path) for path in arguments)]
+        prefix = ["--unity-mono", windows_path(mono_root)] if mono_root is not None else []
+        command = [str(executable), *prefix, *(windows_path(path) for path in arguments)]
     else:
         raise RuntimeError("the client runtime contract requires Windows or WSL interop")
     subprocess.run(command, check=True)
@@ -87,6 +89,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--translation-root", type=Path, default=project_root.parent / "spt-korean-translate")
     parser.add_argument("--dotnet")
+    parser.add_argument("--no-archive", action="store_true", help="stage and verify files for direct copying without creating a ZIP")
     parser.add_argument("--spt-383-root", type=Path, default=Path("D:/SPT_3.8.3" if os.name == "nt" else "/mnt/d/SPT_3.8.3"))
     parser.add_argument("--spt-415-root", type=Path, default=Path("D:/SPT" if os.name == "nt" else "/mnt/d/SPT"))
     args = parser.parse_args()
@@ -121,20 +124,37 @@ def main() -> None:
     run_windows_contract(build / "ClientLocaleContract/ClientLocaleContract.exe", [
         stage.joinpath(*BUNDLE_ROOT.parts), args.spt_383_root, args.spt_415_root, contract_report,
     ])
-    release.create_deterministic_zip(stage, archive)
-    validate_archive(archive, expected)
+    mono_reports = []
+    for label, mono_root in (("3.8.3", args.spt_383_root), ("4.1.5", args.spt_415_root)):
+        mono_report = work / f"mono-{label}-verification.json"
+        if mono_report.exists():
+            mono_report.unlink()
+        run_windows_contract(build / "ClientLocaleContract/ClientLocaleContract.exe", [
+            stage.joinpath(*BUNDLE_ROOT.parts), args.spt_383_root, args.spt_415_root, mono_report,
+        ], mono_root=mono_root)
+        mono_reports.append({"hostSptVersion": label, **release.load_ordered_json(mono_report)})
+    staged_hashes = {
+        path.relative_to(stage).as_posix(): release.sha256_file(path)
+        for path in release.iter_package_files(stage)
+    }
+    if staged_hashes != expected:
+        raise ValueError("staged prototype files differ from their verified build sources")
+    if not args.no_archive:
+        release.create_deterministic_zip(stage, archive)
+        validate_archive(archive, expected)
     summary = {
         "kind": "client-only-prototype",
         "profiles": ["3.8.3", "4.1.5"],
         "runtime_contract": "passed: native reload fixture with actual Harmony and locale payloads",
         "contract_details": release.load_ordered_json(contract_report),
+        "unity_mono_contracts": mono_reports,
         "in_game_visual_validation": "not performed by this command",
-        "archive": archive.name,
-        "archive_sha256": release.sha256_file(archive),
+        "archive": None if args.no_archive else archive.name,
+        "archive_sha256": None if args.no_archive else release.sha256_file(archive),
         "files": expected,
     }
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Verified client-only prototype: {archive}")
+    print(f"Verified client-only prototype: {stage if args.no_archive else archive}")
 
 
 if __name__ == "__main__":

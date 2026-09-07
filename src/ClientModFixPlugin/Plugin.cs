@@ -3,7 +3,6 @@ using BepInEx.Logging;
 using HarmonyLib;
 using System;
 #if CLIENT_LOCALE_PROTOTYPE
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 #endif
@@ -33,7 +32,7 @@ namespace KoreanPatchFix
             {
                 var gameRoot = AppDomain.CurrentDomain.BaseDirectory;
                 var bundleRoot = Path.Combine(Path.GetDirectoryName(typeof(Plugin).Assembly.Location), "SPT-Korean");
-                var eftVersion = FileVersionInfo.GetVersionInfo(Path.Combine(gameRoot, "EscapeFromTarkov.exe")).FileVersion;
+                var eftVersion = ClientLocaleBuild.ReadEftVersion(Path.Combine(gameRoot, "EscapeFromTarkov.exe"));
                 var bundle = ClientLocaleBundle.Load(bundleRoot, gameRoot, detectedVersion, eftVersion);
                 var gameAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Assembly-CSharp");
                 ClientLocaleRuntime.Enable(new Harmony(PluginGuid + ".clientlocale"), gameAssembly, bundle);

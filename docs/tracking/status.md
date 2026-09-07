@@ -14,9 +14,10 @@ A separate installer-free prototype now targets exact SPT 3.8.3 / EFT 0.14.1.291
 
 - The prototype DLL and full nine-project solution build with zero warnings and errors.
 - Both installed clients pass static inspection of the five locale patch targets, native asynchronous reload sequence, and existing UI entry points.
-- Actual Harmony patches pass the Windows .NET Framework native-flow contract with both real locale sets, both cache behaviors, cold/default bilingual startup, repeated switches, preserved mod keys, late dialogue updates, and failure cases (216,531 assertions, mostly full-payload comparisons).
+- Actual Harmony patches pass the native-flow contract on Windows .NET Framework and both installed Unity Mono runtimes with both real locale sets, both cache behaviors, cold/default bilingual startup, repeated switches, preserved mod keys, late dialogue updates, and failure cases (216,533 assertions per runtime, mostly full-payload comparisons).
 - Nine Python tests, both existing compatibility contracts, and all seven existing release ZIP validations pass.
-- `artifacts/client-locale-prototype/SPT-KR-Client-Prototype-3.8.3-4.1.5.zip` and its verification reports are generated separately from published packages. No installed game/server files were replaced during these checks.
+- Prototype artifacts and their verification reports are generated separately from published packages. `--no-archive` produces verified staging files for direct copying without a ZIP.
+- The first actual 4.1.5 launch exposed Unity Mono truncating `FileVersion`, which disabled localization before it could run. Detection now uses the complete fixed numeric PE version; the exact build gate is retained. Corrected DLLs were copied directly into both local test installations, with the previous DLLs backed up.
 - In-game font/UI and server-rendered message verification remain open. The fixture is not an actual game launch, and other supported release versions are not yet prototype profiles.
 
 See [client-only localization prototype](../client-locale-prototype.md) for implementation, installation, and rollback details.

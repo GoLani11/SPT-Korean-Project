@@ -30,6 +30,8 @@ The archive contains no server mod, installer, command script, game assembly, or
 
 The plugin verifies the exact SPT profile, EFT executable build, three payload hashes, locale key order, and the installed English key/value pairs before enabling localization. English JSON formatting does not affect this comparison.
 
+EFT detection uses the PE's four fixed numeric version fields. Unity Mono truncates the formatted `FileVersion` text in the inspected clients (`40743` becomes `4074`, and `29197` becomes `2919`); accepting that text would incorrectly disable the mod. The exact build check remains enforced.
+
 The client discovers the localization manager by the `UpdateLocales(string, Dictionary<string,string>)` contract, including the obfuscated manager types in older clients. Five native methods are patched:
 
 - `Init` inserts `kr-en` immediately after `kr` in the native language list.
@@ -50,13 +52,13 @@ Use a .NET SDK capable of building net48 and a Windows host with .NET Framework 
 python .\tools\package_client_locale_prototype.py --spt-383-root D:\SPT_3.8.3 --spt-415-root D:\SPT
 ```
 
-Use `--dotnet` to select an SDK executable and `--translation-root` to select the translation checkout. The command rebuilds the plugin and contract executable, verifies the real client metadata and payloads, executes the actual Harmony patches against a native-flow fixture on Windows .NET Framework, and only then creates and verifies the ZIP.
+Use `--dotnet` to select an SDK executable and `--translation-root` to select the translation checkout. Add `--no-archive` to stage and verify the files for direct copying without creating a ZIP. The command rebuilds the plugin and contract executable, verifies the real client metadata and payloads, and executes the actual Harmony patches against a native-flow fixture in three isolated processes: Windows .NET Framework and each target installation's bundled Unity Mono runtime. It then verifies the staged files and, unless disabled, creates and verifies the ZIP.
 
 Output is under `artifacts/client-locale-prototype/`, including `verification.json` and `contract-verification.json`. Generated files are not committed. The contract's JSON dependency is an official signed package because the game's modified JSON DLL is accepted by Unity Mono but fails Windows CLR strong-name validation. The shipped plugin still references the game's existing JSON assembly and does not bundle another copy.
 
 The contract covers cold bilingual startup before/after session creation, null/default language selection, old cached and current reloading clients, repeated native language switches, every generated translation value, case aliases, later dialogue/mod fragments, preservation of backend response objects, async failures, unsupported versions, wrong source/build, corrupt payloads, and duplicate JSON keys. Client probes verify the five locale entry points, native asynchronous reload call sequence, and existing UI patch entry points in the actual game assemblies.
 
-These checks do not start Unity, render fonts, prove all server-produced messages are translated, or establish compatibility with every other mod. In-game verification is required before expanding the profile list or replacing a published package.
+The Mono checks host only the managed test executable in the game's runtime; they do not start the game or Unity graphics, render fonts, prove all server-produced messages are translated, or establish compatibility with every other mod. In-game verification is required before expanding the profile list or replacing a published package.
 
 ## Local game test
 

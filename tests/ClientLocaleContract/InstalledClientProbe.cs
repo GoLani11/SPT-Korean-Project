@@ -1,4 +1,5 @@
 using Mono.Cecil;
+using KoreanPatchFix;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,8 @@ internal static class InstalledClientProbe
 
     internal static JObject Check(string root, string sptVersion, string eftVersion)
     {
-        var detectedBuild = FileVersionInfo.GetVersionInfo(Path.Combine(root, "EscapeFromTarkov.exe")).FileVersion;
+        var executable = Path.Combine(root, "EscapeFromTarkov.exe");
+        var detectedBuild = ClientLocaleBuild.ReadEftVersion(executable);
         Require(detectedBuild == eftVersion, "Installed EFT executable build");
         if (sptVersion == "3.8.3")
         {
@@ -94,6 +96,8 @@ internal static class InstalledClientProbe
             {
                 ["sptVersion"] = sptVersion,
                 ["eftVersion"] = eftVersion,
+                ["eftReportedVersion"] = FileVersionInfo.GetVersionInfo(executable).FileVersion,
+                ["eftFixedVersion"] = detectedBuild,
                 ["assemblySha256"] = hash,
                 ["localeTargets"] = new JArray(new[] { init, global, menu, reload, font }.Select(method => method.FullName)),
                 ["kind"] = "static metadata and native call-sequence inspection; not an in-game visual test"

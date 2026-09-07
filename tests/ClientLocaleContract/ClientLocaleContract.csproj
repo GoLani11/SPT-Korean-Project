@@ -2,6 +2,7 @@
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
         <OutputType>Exe</OutputType>
+        <PlatformTarget>x64</PlatformTarget>
         <LangVersion>latest</LangVersion>
         <Nullable>disable</Nullable>
         <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ClientLocaleContract\</OutputPath>

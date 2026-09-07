@@ -20,12 +20,16 @@ internal static class Program
         Console.OutputEncoding = new UTF8Encoding(false);
         try
         {
+            if (args.Length == 6 && args[0] == "--unity-mono")
+            {
+                return UnityMonoHost.Run(args[1], Assembly.GetExecutingAssembly().Location, args.Skip(2).ToArray());
+            }
             if (args.Length != 4) { throw new ArgumentException("Expected bundle root, SPT 3.8.3 root, SPT 4.1.5 root, and report path."); }
             Run(args).GetAwaiter().GetResult();
             File.WriteAllText(args[3], new JObject
             {
                 ["assertions"] = assertions,
-                ["harmonyRuntime"] = "Windows .NET Framework; native reload fixture",
+                ["harmonyRuntime"] = (Type.GetType("Mono.Runtime") != null ? "Mono" : "Windows .NET Framework") + "; native reload fixture",
                 ["installedClientProbes"] = probes,
                 ["inGameVisualValidation"] = false
             }.ToString(), new UTF8Encoding(false));
@@ -48,7 +52,9 @@ internal static class Program
         })
         {
             probes.Add(InstalledClientProbe.Check(profile[3], profile[0], profile[2]));
-            var bundle = ClientLocaleBundle.Load(args[0], profile[3], profile[0], profile[2]);
+            var eftVersion = ClientLocaleBuild.ReadEftVersion(Path.Combine(profile[3], "EscapeFromTarkov.exe"));
+            Expect(eftVersion == profile[2], "Complete five-digit EFT build from the fixed version fields");
+            var bundle = ClientLocaleBundle.Load(args[0], profile[3], profile[0], eftVersion);
             Expect(bundle.SptVersion == profile[0] && bundle.TranslationVersion == profile[1], "Exact profile selection");
             Reject(() => ClientLocaleBundle.Load(args[0], profile[3], "4.1.99", profile[2]), "Unknown SPT version");
             Reject(() => ClientLocaleBundle.Load(args[0], profile[3], profile[0], "0.0.0.0"), "Wrong EFT build");
