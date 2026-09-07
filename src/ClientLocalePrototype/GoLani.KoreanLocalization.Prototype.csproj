@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <RootNamespace>KoreanPatchFix</RootNamespace>
+        <AssemblyName>GoLani.KoreanModFix</AssemblyName>
+        <LangVersion>latest</LangVersion>
+        <Nullable>disable</Nullable>
+        <Version>2.2.0-prototype.1</Version>
+        <DefineConstants>$(DefineConstants);CLIENT_LOCALE_PROTOTYPE</DefineConstants>
+        <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ClientLocalePrototype\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <ClientReferenceSptRoot Condition="'$(ClientReferenceSptRoot)' == ''">D:\SPT_3.8.3</ClientReferenceSptRoot>
+        <BepInExCore>$(ClientReferenceSptRoot)\BepInEx\core</BepInExCore>
+        <ManagedRefs>$(ClientReferenceSptRoot)\EscapeFromTarkov_Data\Managed</ManagedRefs>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="..\ClientModFixPlugin\*.cs" Link="Client\%(Filename)%(Extension)" />
+        <Compile Include="..\ClientModFixPlugin\Patches\*.cs" Link="Client\Patches\%(Filename)%(Extension)" />
+        <Compile Include="..\Shared\SptCompatibilityPolicy.cs" Link="SptCompatibilityPolicy.cs" />
+        <Reference Include="0Harmony"><HintPath>$(BepInExCore)\0Harmony.dll</HintPath><Private>false</Private></Reference>
+        <Reference Include="BepInEx"><HintPath>$(BepInExCore)\BepInEx.dll</HintPath><Private>false</Private></Reference>
+        <Reference Include="Newtonsoft.Json"><HintPath>$(ManagedRefs)\Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+        <Reference Include="Unity.TextMeshPro"><HintPath>$(ManagedRefs)\Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
+        <Reference Include="UnityEngine"><HintPath>$(ManagedRefs)\UnityEngine.dll</HintPath><Private>false</Private></Reference>
+        <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedRefs)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+        <Reference Include="UnityEngine.UI"><HintPath>$(ManagedRefs)\UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    </ItemGroup>
+</Project>

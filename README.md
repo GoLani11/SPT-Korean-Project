@@ -77,6 +77,12 @@ SPT 4.1.0 / 4.1.2–4.1.3
 
 SPT 4.1.0 ZIP에는 해당 버전 전용 서버 모드와 클라이언트 플러그인이 들어 있습니다. 4.1.2–4.1.3 ZIP은 두 버전에서 공용으로 검증한 바이너리와 번역을 사용합니다. 서로 바꿔 설치하거나 표시되지 않은 SPT 버전에 설치하지 마세요.
 
+### 설치 도구 없는 클라이언트 전용 시제품
+
+SPT 3.8.3과 4.1.5를 한 ZIP으로 지원하는 별도 시제품을 개발 중입니다. `BepInEx/plugins`에 압축을 풀면 클라이언트가 버전에 맞는 번역을 선택하며, 기존 서버 한글 모드 없이 한글·한영 병기를 처리합니다. 현재는 해당 버전의 로컬 서버 데이터가 필요합니다.
+
+시제품은 기존 2.1.0 배포본을 대체하지 않습니다. 실제 게임의 글꼴·화면과 서버가 직접 만드는 메시지는 추가 검증 대상입니다. 빌드, 검증 범위와 설치·복구 절차는 [시제품 문서](docs/client-locale-prototype.md)를 참고하세요.
+
 ### 개발용 릴리스 빌드
 
 빌드하려면 .NET 10 SDK, SPT 클라이언트 참조 파일과 같은 상위 폴더의 `spt-korean-translate` 저장소가 필요합니다. `make-release-packages.bat`은 `D:\SPT3.8.3`을 먼저 확인하고, 없으면 `D:\SPT`를 사용합니다.
@@ -163,6 +169,12 @@ SPT 4.1.0 / 4.1.2–4.1.3
 ```
 
 The SPT 4.1.0 ZIP contains server and client binaries gated specifically to 4.1.0. The 4.1.2–4.1.3 ZIP uses binaries and translations validated for both versions. Do not swap these packages or install them on an unlisted SPT version.
+
+### Installer-free client-only prototype
+
+A separate prototype targets SPT 3.8.3 and 4.1.5 in one ZIP. It installs under `BepInEx/plugins`, selects the matching translations, and implements both native Korean display modes without the Korean server mod. It currently requires the matching local server database.
+
+The prototype does not replace the published 2.1.0 packages. In-game fonts/UI and server-rendered messages still require verification. See the [prototype document](docs/client-locale-prototype.md) for building, verification boundaries, installation, and rollback.
 
 ### Development release build
 

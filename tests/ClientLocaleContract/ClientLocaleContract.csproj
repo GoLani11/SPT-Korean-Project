@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <LangVersion>latest</LangVersion>
+        <Nullable>disable</Nullable>
+        <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ClientLocaleContract\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <ClientReferenceSptRoot Condition="'$(ClientReferenceSptRoot)' == ''">D:\SPT_3.8.3</ClientReferenceSptRoot>
+        <BepInExCore>$(ClientReferenceSptRoot)\BepInEx\core</BepInExCore>
+        <ManagedRefs>$(ClientReferenceSptRoot)\EscapeFromTarkov_Data\Managed</ManagedRefs>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="..\..\src\ClientLocalePrototype\ClientLocale*.cs" Link="Runtime\%(Filename)%(Extension)" />
+        <Reference Include="0Harmony"><HintPath>$(BepInExCore)\0Harmony.dll</HintPath></Reference>
+        <Reference Include="Mono.Cecil"><HintPath>$(BepInExCore)\Mono.Cecil.dll</HintPath></Reference>
+        <Reference Include="MonoMod.RuntimeDetour"><HintPath>$(BepInExCore)\MonoMod.RuntimeDetour.dll</HintPath></Reference>
+        <Reference Include="MonoMod.Utils"><HintPath>$(BepInExCore)\MonoMod.Utils.dll</HintPath></Reference>
+        <!-- EFT's modified JSON assembly is accepted by Unity Mono, but fails Windows CLR strong-name validation. -->
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+</Project>

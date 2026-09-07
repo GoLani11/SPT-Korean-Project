@@ -2,6 +2,8 @@
 
 ## Supported Releases
 
+These rules describe published releases. The separately built [client-only prototype](client-locale-prototype.md) experiments with one installer-free ZIP for SPT 3.8.3 and 4.1.5; it is not a new release compatibility promise.
+
 The exact supported SPT versions are 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.0. SPT 4.1.2 and 4.1.3 share one labelled archive whose server metadata uses the bounded `>=4.1.2 <=4.1.3` range. SPT 4.1.1, prereleases, 4.2, and unlabelled later patches are not release targets.
 
 Each release label has one ZIP containing both the Korean and Korean-English locale payloads. A universal cross-version ZIP is intentionally not published because it would leave unused server-mod folders in the installation.

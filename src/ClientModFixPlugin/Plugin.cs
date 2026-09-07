@@ -2,6 +2,11 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using System;
+#if CLIENT_LOCALE_PROTOTYPE
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+#endif
 
 namespace KoreanPatchFix
 {
@@ -12,13 +17,34 @@ namespace KoreanPatchFix
     {
         public const string PluginGuid = "com.GoLani.koreanpatchfix";
         public const string PluginName = "Korean Patch Fix";
+#if CLIENT_LOCALE_PROTOTYPE
+        public const string PluginVersion = "2.2.0";
+#else
         public const string PluginVersion = "2.1.0";
+#endif
 
         private void Awake()
         {
             PluginLog.Initialize(Logger);
 
             var detectedVersion = SptVersionDetector.Detect();
+#if CLIENT_LOCALE_PROTOTYPE
+            try
+            {
+                var gameRoot = AppDomain.CurrentDomain.BaseDirectory;
+                var bundleRoot = Path.Combine(Path.GetDirectoryName(typeof(Plugin).Assembly.Location), "SPT-Korean");
+                var eftVersion = FileVersionInfo.GetVersionInfo(Path.Combine(gameRoot, "EscapeFromTarkov.exe")).FileVersion;
+                var bundle = ClientLocaleBundle.Load(bundleRoot, gameRoot, detectedVersion, eftVersion);
+                var gameAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Assembly-CSharp");
+                ClientLocaleRuntime.Enable(new Harmony(PluginGuid + ".clientlocale"), gameAssembly, bundle);
+                Logger.LogInfo($"Client-only localization prototype: SPT {detectedVersion}, translation {bundle.TranslationVersion}, {bundle.SourceKeyCount} source keys per mode.");
+            }
+            catch (Exception error)
+            {
+                Logger.LogError($"Client-only localization prototype was not enabled: {error}");
+                return;
+            }
+#else
             if (!SptVersionDetector.IsSupported(detectedVersion))
             {
                 Logger.LogError(
@@ -26,6 +52,7 @@ namespace KoreanPatchFix
                     $"Korean Patch Fix supports {SptCompatibilityPolicy.SupportedVersionsDescription}.");
                 return;
             }
+#endif
 
             Logger.LogInfo($"Loading Korean Patch Fix for SPT {detectedVersion}");
             var harmony = new Harmony(PluginGuid);
@@ -33,7 +60,9 @@ namespace KoreanPatchFix
             var skippedCount = 0;
             var failedCount = 0;
 
+#if !CLIENT_LOCALE_PROTOTYPE
             EnablePatch(nameof(KoreanBilingualFontFix), () => KoreanBilingualFontFix.Enable(harmony), ref enabledCount, ref skippedCount, ref failedCount);
+#endif
             EnablePatch(nameof(FleaMarketItemNameFix), () => FleaMarketItemNameFix.Enable(harmony), ref enabledCount, ref skippedCount, ref failedCount);
             EnablePatch(nameof(FleaMarketItemCategoryFix), () => FleaMarketItemCategoryFix.Enable(harmony), ref enabledCount, ref skippedCount, ref failedCount);
             EnablePatch(nameof(GesturesMenuFix), () => GesturesMenuFix.Enable(harmony), ref enabledCount, ref skippedCount, ref failedCount);

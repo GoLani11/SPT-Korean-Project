@@ -2,6 +2,8 @@
 
 ## Runtime Components
 
+An experimental `src/ClientLocalePrototype` build shares the existing UI patch source and adds client-side locale loading for exact SPT 3.8.3 and 4.1.5 profiles. Its separate ZIP contains only `BepInEx/plugins` files. It does not change the release matrix below. See [client-only localization prototype](client-locale-prototype.md) for its native reload hooks and verification limits.
+
 The release contains one client plugin and one server locale mod selected for the target SPT version.
 
 ```text

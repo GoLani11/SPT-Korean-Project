@@ -8,6 +8,19 @@ The repository builds exact-version Korean localization packages for SPT 3.8.3, 
 
 The current source policy accepts stable SPT 4.1.x patches from 4.1.2 onward (`~4.1.2`). A server-only rebuild has passed local SPT 4.1.5 runtime checks, retaining the installed client DLL and translation files. No new release was published: the seven existing ZIP names, release labels, and distribution targets remain unchanged.
 
+## Client-only Prototype
+
+A separate installer-free prototype now targets exact SPT 3.8.3 / EFT 0.14.1.29197 and SPT 4.1.5 / EFT 0.16.9.40743. It installs only a client DLL and verified locale data under `BepInEx/plugins`, and uses the native language reload flow to provide `kr` and `kr-en` without the Korean server mod. The current experiment requires the matching local server English database.
+
+- The prototype DLL and full nine-project solution build with zero warnings and errors.
+- Both installed clients pass static inspection of the five locale patch targets, native asynchronous reload sequence, and existing UI entry points.
+- Actual Harmony patches pass the Windows .NET Framework native-flow contract with both real locale sets, both cache behaviors, cold/default bilingual startup, repeated switches, preserved mod keys, late dialogue updates, and failure cases (216,531 assertions, mostly full-payload comparisons).
+- Nine Python tests, both existing compatibility contracts, and all seven existing release ZIP validations pass.
+- `artifacts/client-locale-prototype/SPT-KR-Client-Prototype-3.8.3-4.1.5.zip` and its verification reports are generated separately from published packages. No installed game/server files were replaced during these checks.
+- In-game font/UI and server-rendered message verification remain open. The fixture is not an actual game launch, and other supported release versions are not yet prototype profiles.
+
+See [client-only localization prototype](../client-locale-prototype.md) for implementation, installation, and rollback details.
+
 ## Completed
 
 - Added SPT 3.x CommonJS, SPT 4.0.13 net9, exact SPT 4.1.0 net10, and shared SPT 4.1.2–4.1.3 net10 server implementations.

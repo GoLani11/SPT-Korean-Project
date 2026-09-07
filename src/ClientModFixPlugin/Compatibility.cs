@@ -146,6 +146,14 @@ namespace KoreanPatchFix
         {
             try
             {
+#if CLIENT_LOCALE_PROTOTYPE
+                var culture = ClientLocaleRuntime.CurrentCulture();
+                if (culture != null)
+                {
+                    return ClientLocaleBundle.Is(culture, ClientLocaleBundle.Korean)
+                        || ClientLocaleBundle.Is(culture, ClientLocaleBundle.Bilingual);
+                }
+#endif
                 var singletonType = ReflectionTools.FindType("Comfort.Common.Singleton`1");
                 var settingsManagerType = ReflectionTools.FindType("EFT.Settings.SettingsManager");
                 if (singletonType == null || settingsManagerType == null)
