@@ -172,9 +172,9 @@ The SPT 4.1.0 ZIP contains server and client binaries gated specifically to 4.1.
 
 ### Installer-free client-only prototype
 
-A separate prototype targets SPT 3.8.3 and 4.1.5 in one ZIP. It installs under `BepInEx/plugins`, selects the matching translations, and implements both native Korean display modes without the Korean server mod. It currently requires the matching local server database.
+A separate prototype covers all nine explicitly listed test profiles with one common client bundle. It installs under `BepInEx/plugins`, selects the matching translations, and implements both native Korean display modes without the Korean server mod. It currently requires the matching local server database.
 
-The prototype does not replace the published 2.1.0 packages. In-game fonts/UI and server-rendered messages still require verification. See the [prototype document](docs/client-locale-prototype.md) for building, verification boundaries, installation, and rollback.
+Optional version-specific server companions show mod/SPT versions and file readiness at startup; translation stays in the common client. The prototype does not replace the published 2.1.0 packages. In-game fonts/UI and server-rendered messages still require verification. See the [prototype document](docs/client-locale-prototype.md) for building, verification boundaries, installation, and rollback.
 
 ### Development release build
 

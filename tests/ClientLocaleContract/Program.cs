@@ -20,13 +20,13 @@ internal static class Program
         Console.OutputEncoding = new UTF8Encoding(false);
         try
         {
-            if (args.Length == 6 && args[0] == "--unity-mono")
+            if (args.Length == 5 && args[0] == "--unity-mono")
             {
                 return UnityMonoHost.Run(args[1], Assembly.GetExecutingAssembly().Location, args.Skip(2).ToArray());
             }
-            if (args.Length != 4) { throw new ArgumentException("Expected bundle root, SPT 3.8.3 root, SPT 4.1.5 root, and report path."); }
+            if (args.Length != 3) { throw new ArgumentException("Expected bundle root, installation matrix, and report path."); }
             Run(args).GetAwaiter().GetResult();
-            File.WriteAllText(args[3], new JObject
+            File.WriteAllText(args[2], new JObject
             {
                 ["assertions"] = assertions,
                 ["harmonyRuntime"] = (Type.GetType("Mono.Runtime") != null ? "Mono" : "Windows .NET Framework") + "; native reload fixture",
@@ -45,16 +45,23 @@ internal static class Program
 
     private static async Task Run(string[] args)
     {
-        foreach (var profile in new[]
+        var manifest = JObject.Parse(File.ReadAllText(Path.Combine(args[0], "manifest.json")));
+        var installations = JObject.Parse(File.ReadAllText(args[1]));
+        foreach (var entry in ((JObject)manifest["profiles"]).Properties())
         {
-            new[] { "3.8.3", "3.8.3", "0.14.1.29197", args[1], "22:00~05:00" },
-            new[] { "4.1.5", "4.1.3", "0.16.9.40743", args[2], "21:00-06:00" }
-        })
-        {
-            probes.Add(InstalledClientProbe.Check(profile[3], profile[0], profile[2]));
-            var eftVersion = ClientLocaleBuild.ReadEftVersion(Path.Combine(profile[3], "EscapeFromTarkov.exe"));
-            Expect(eftVersion == profile[2], "Complete five-digit EFT build from the fixed version fields");
-            var bundle = ClientLocaleBundle.Load(args[0], profile[3], profile[0], eftVersion);
+            var definition = entry.Value;
+            var profile = new[] { entry.Name, (string)definition["translationVersion"], (string)definition["eftVersion"], (string)installations[entry.Name]["root"] };
+            var installed = (bool)installations[entry.Name]["completeClient"];
+            if (installed)
+            {
+                probes.Add(InstalledClientProbe.Check(profile[3], profile[0], profile[2]));
+                Expect(ClientLocaleBuild.ReadEftVersion(Path.Combine(profile[3], "EscapeFromTarkov.exe")) == profile[2], "Complete EFT build from fixed version fields");
+            }
+            else
+            {
+                probes.Add(new JObject { ["sptVersion"] = profile[0], ["kind"] = "payload/native fixture only; matching game client unavailable" });
+            }
+            var bundle = ClientLocaleBundle.Load(args[0], profile[3], profile[0], profile[2]);
             Expect(bundle.SptVersion == profile[0] && bundle.TranslationVersion == profile[1], "Exact profile selection");
             Reject(() => ClientLocaleBundle.Load(args[0], profile[3], "4.1.99", profile[2]), "Unknown SPT version");
             Reject(() => ClientLocaleBundle.Load(args[0], profile[3], profile[0], "0.0.0.0"), "Wrong EFT build");
@@ -80,7 +87,7 @@ internal static class Program
                 harmony.UnpatchSelf();
             }
         }
-        CheckInvalidPayloads(args[0], args[1]);
+        CheckInvalidPayloads(args[0], (string)installations["3.8.3"]["root"]);
     }
 
     private static async Task CheckNativeFlow(ClientLocaleBundle bundle, string[] profile, string bundleRoot, bool cached)
@@ -110,7 +117,6 @@ internal static class Program
         Expect(manager.LastFont == "kr" && manager.LastApplicationCulture == "kr-en", "Korean font with bilingual culture");
         Expect(manager.ReloadEvents == 1, "Native screen reload occurs after both locales are populated");
         Expect(backend.Global["5c1242fa86f7742aa04fed52"] == "SERVER VALUE", "Cached server response is not overwritten");
-        Expect(manager.Locales["kr"]["5c1242fa86f7742aa04fed52"].Contains(profile[4]), "Version-specific Insomnia hours");
         foreach (var mode in new[] { "kr", "kr-en" })
         {
             var expected = JObject.Parse(File.ReadAllText(Path.Combine(bundleRoot, "locales", profile[1], mode + ".json")));

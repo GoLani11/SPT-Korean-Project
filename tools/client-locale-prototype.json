@@ -6,6 +6,41 @@
       "eftVersion": "0.14.1.29197",
       "englishPath": "Aki_Data/Server/database/locales/global/en.json"
     },
+    "3.9.8": {
+      "translationVersion": "3.9.8",
+      "eftVersion": "0.14.9.30626",
+      "englishPath": "SPT_Data/Server/database/locales/global/en.json"
+    },
+    "3.10.5": {
+      "translationVersion": "3.10.5",
+      "eftVersion": "0.15.5.33420",
+      "englishPath": "SPT_Data/Server/database/locales/global/en.json"
+    },
+    "3.11.4": {
+      "translationVersion": "3.11.4",
+      "eftVersion": "0.16.1.35392",
+      "englishPath": "SPT_Data/Server/database/locales/global/en.json"
+    },
+    "4.0.13": {
+      "translationVersion": "4.0.13",
+      "eftVersion": "0.16.9.40087",
+      "englishPath": "SPT/SPT_Data/database/locales/global/en.json"
+    },
+    "4.1.0": {
+      "translationVersion": "4.1.0",
+      "eftVersion": "0.16.9.40743",
+      "englishPath": "SPT_Runtime/SPT_Data/database/locales/global/en.json"
+    },
+    "4.1.2": {
+      "translationVersion": "4.1.2",
+      "eftVersion": "0.16.9.40743",
+      "englishPath": "SPT_Runtime/SPT_Data/database/locales/global/en.json"
+    },
+    "4.1.3": {
+      "translationVersion": "4.1.3",
+      "eftVersion": "0.16.9.40743",
+      "englishPath": "SPT_Runtime/SPT_Data/database/locales/global/en.json"
+    },
     "4.1.5": {
       "translationVersion": "4.1.3",
       "eftVersion": "0.16.9.40743",

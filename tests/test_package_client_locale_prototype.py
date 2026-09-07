@@ -22,7 +22,11 @@ class ClientPrototypePackageTests(unittest.TestCase):
                 output.mkdir(parents=True)
                 for mode in ("kr", "kr-en"):
                     (output / f"{mode}.generated.json").write_text(json.dumps({"quest": mode + text}), encoding="utf-8")
-            expected = prototype.stage_payloads(root / "source", root / "stage")
+            config = json.loads(prototype.PROFILE_FILE.read_text())
+            config["profiles"] = {key: value for key, value in config["profiles"].items() if key in ("3.8.3", "4.1.5")}
+            profile_file = root / "profiles.json"
+            profile_file.write_text(json.dumps(config))
+            expected = prototype.stage_payloads(root / "source", root / "stage", profile_file)
             self.assertEqual(len(expected), 7)
             for name, digest in expected.items():
                 self.assertEqual(hashlib.sha256((root / "stage" / name).read_bytes()).hexdigest(), digest)
@@ -34,7 +38,7 @@ class ClientPrototypePackageTests(unittest.TestCase):
             )
             (root / "source/output/3.8.3/kr.generated.json").write_text('{"wrong-key":"text"}', encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "key set/order mismatch"):
-                prototype.stage_payloads(root / "source", root / "stage-invalid")
+                prototype.stage_payloads(root / "source", root / "stage-invalid", profile_file)
 
     def test_archive_rejects_installer_server_paths_and_corrupt_payloads(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -18,14 +18,14 @@ internal static class InstalledClientProbe
         var executable = Path.Combine(root, "EscapeFromTarkov.exe");
         var detectedBuild = ClientLocaleBuild.ReadEftVersion(executable);
         Require(detectedBuild == eftVersion, "Installed EFT executable build");
-        if (sptVersion == "3.8.3")
+        if (sptVersion.StartsWith("3.", StringComparison.Ordinal))
         {
-            var core = JObject.Parse(File.ReadAllText(Path.Combine(root, "Aki_Data/Server/configs/core.json")));
-            Require((string)core["akiVersion"] == sptVersion, "Installed Aki version");
+            var core = JObject.Parse(File.ReadAllText(Path.Combine(root, sptVersion == "3.8.3" ? "Aki_Data/Server/configs/core.json" : "SPT_Data/Server/configs/core.json")));
+            Require((string)(core["akiVersion"] ?? core["sptVersion"]) == sptVersion, "Installed Aki version");
         }
         else
         {
-            var version = FileVersionInfo.GetVersionInfo(Path.Combine(root, "SPT_Runtime/SPT.Server.exe")).ProductVersion;
+            var version = FileVersionInfo.GetVersionInfo(Path.Combine(root, sptVersion == "4.0.13" ? "SPT/SPT.Server.exe" : "SPT_Runtime/SPT.Server.exe")).ProductVersion;
             Require(version == sptVersion || version.StartsWith(sptVersion + "-RELEASE", StringComparison.Ordinal), "Installed SPT server version");
         }
 

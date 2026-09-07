@@ -2,7 +2,7 @@
 
 ## Current State
 
-Date: 2026-09-07
+Date: 2026-09-08
 
 The repository builds exact-version Korean localization packages for SPT 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.0. SPT 4.1.2 and 4.1.3 share an explicitly labelled range package. Each release label has one ZIP containing both `kr` and `kr-en`, producing seven ZIP files.
 
@@ -10,15 +10,16 @@ The current source policy accepts stable SPT 4.1.x patches from 4.1.2 onward (`~
 
 ## Client-only Prototype
 
-A separate installer-free prototype now targets exact SPT 3.8.3 / EFT 0.14.1.29197 and SPT 4.1.5 / EFT 0.16.9.40743. It installs only a client DLL and verified locale data under `BepInEx/plugins`, and uses the native language reload flow to provide `kr` and `kr-en` without the Korean server mod. The current experiment requires the matching local server English database.
+The common client prototype now has nine exact profiles: 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, 4.1.0, 4.1.2, 4.1.3, and 4.1.5. It requires the matching local server English database. Published release packages are unchanged.
 
-- The prototype DLL and full nine-project solution build with zero warnings and errors.
-- Both installed clients pass static inspection of the five locale patch targets, native asynchronous reload sequence, and existing UI entry points.
-- Actual Harmony patches pass the native-flow contract on Windows .NET Framework and both installed Unity Mono runtimes with both real locale sets, both cache behaviors, cold/default bilingual startup, repeated switches, preserved mod keys, late dialogue updates, and failure cases (216,533 assertions per runtime, mostly full-payload comparisons).
-- Nine Python tests, both existing compatibility contracts, and all seven existing release ZIP validations pass.
-- Prototype artifacts and their verification reports are generated separately from published packages. `--no-archive` produces verified staging files for direct copying without a ZIP.
-- The first actual 4.1.5 launch exposed Unity Mono truncating `FileVersion`, which disabled localization before it could run. Detection now uses the complete fixed numeric PE version; the exact build gate is retained. Corrected DLLs were copied directly into both local test installations, with the previous DLLs backed up.
-- In-game font/UI and server-rendered message verification remain open. The fixture is not an actual game launch, and other supported release versions are not yet prototype profiles.
+- Five complete local clients pass static inspection and native-flow contracts in Windows .NET Framework and all five bundled Unity Mono runtimes (1,037,872 assertions per runtime, mostly full-payload comparisons across all profiles).
+- 4.0.13 has only SPT files locally; 4.1.0/4.1.2/4.1.3 clients are absent. Their payload/fixture checks pass but do not establish installed-client or visual compatibility.
+- The user confirmed 3.8.3 applies correctly in game. The previous Unity Mono version-string truncation fix remains in use.
+- Optional server status modules display mod/SPT/translation versions and verified file readiness. They never change server locale data or claim a game has already applied translations.
+- The 13-project solution builds without warnings/errors. Nine Python tests, 24 Node server-status cases, eight Windows .NET status cases, and both legacy compatibility contracts pass.
+- `--no-archive` prepares common client files and separate per-version status modules for direct installation, with file hashes recorded in `verification.json`.
+- Common client files and matching status modules were copied directly into six local roots, with backups and post-copy hash checks. All five complete installations emitted the expected readiness log during actual server startup; the test processes were then stopped.
+- Broader in-game font/UI and server-rendered-message verification remains open.
 
 See [client-only localization prototype](../client-locale-prototype.md) for implementation, installation, and rollback details.
 
