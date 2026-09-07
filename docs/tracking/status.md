@@ -2,9 +2,11 @@
 
 ## Current State
 
-Date: 2026-08-26
+Date: 2026-09-07
 
 The repository builds exact-version Korean localization packages for SPT 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.0. SPT 4.1.2 and 4.1.3 share an explicitly labelled range package. Each release label has one ZIP containing both `kr` and `kr-en`, producing seven ZIP files.
+
+The current source policy accepts stable SPT 4.1.x patches from 4.1.2 onward (`~4.1.2`). A server-only rebuild has passed local SPT 4.1.5 runtime checks, retaining the installed client DLL and translation files. No new release was published: the seven existing ZIP names, release labels, and distribution targets remain unchanged.
 
 ## Completed
 
@@ -18,6 +20,8 @@ The repository builds exact-version Korean localization packages for SPT 3.8.3, 
 
 ## Verification State
 
+- Local SPT 4.1.5 verification on 2026-09-07 loaded Korean localization 2.1.0, WTT-ServerCommonLib 3.0.6, and Fika Server 2.4.0, with zero startup errors. Both `/client/locale/kr` and `/client/locale/kr-en` served 31,844 entries; all 31,550 existing translation entries per mode matched after accounting for case-insensitive key aliases and existing language-name overrides. In-game visual validation was not performed.
+- The server-only Release build completed with zero warnings and errors. Seven Python tests and both compatibility contract configurations passed (26 cases per configuration). Comparing the installed and rebuilt DLLs confirmed unchanged locale-loading methods and lambdas; only compatibility metadata and policy changed. The dependency manifest stayed identical.
 - The full solution builds with zero warnings and zero errors.
 - Both locale payloads for all seven release labels match their exact English key set, order, and string types; the shared 4.1.2–4.1.3 English, KR, and KR-EN payloads are equivalent.
 - All seven ZIP files pass root-layout, safe-path, forbidden-file, manifest-version, both-locale-hash, and target-DLL-hash checks.

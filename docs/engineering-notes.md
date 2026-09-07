@@ -2,11 +2,13 @@
 
 ## Server Compatibility
 
-SPT 3.x uses the historical CommonJS `postDBLoad` contract and exact loader metadata. SPT 4.0.13 and SPT 4.1 use different DI and locale APIs, so they intentionally have separate source projects and target frameworks. The exact SPT 4.1.0 server target compiles against 4.1.0 packages and declares `4.1.0`. The shared SPT 4.1.2–4.1.3 target compiles against 4.1.2 packages and declares `>=4.1.2 <=4.1.3`, limiting it to the two verified patches.
+SPT 3.x uses the historical CommonJS `postDBLoad` contract and exact loader metadata. SPT 4.0.13 and SPT 4.1 use different DI and locale APIs, so they intentionally have separate source projects and target frameworks. The exact SPT 4.1.0 server target compiles against 4.1.0 packages and declares `4.1.0`. The shared SPT 4.1 target compiles against 4.1.2 packages and now declares `~4.1.2`, accepting stable 4.1.x patches from 4.1.2 onward while rejecting prereleases and 4.2.
+
+This source compatibility policy was verified locally on SPT 4.1.5 with a rebuilt server DLL. The published shared ZIP remains labelled 4.1.2–4.1.3; the source change does not rename, replace, or expand the published release assets.
 
 ## Client Compatibility
 
-All supported clients use Harmony 2.9 and BepInEx 5.4.22 or 5.4.23. Both client builds compile against the shared API surface and have soft ordering hints for `com.spt-aki.core` and `com.SPT.core`. Their patch implementation is shared, while compile-time compatibility gates keep 4.1.0 separate from 4.1.2–4.1.3.
+All supported clients use Harmony 2.9 and BepInEx 5.4.22 or 5.4.23. Both client builds compile against the shared API surface and have soft ordering hints for `com.spt-aki.core` and `com.SPT.core`. Their patch implementation is shared, while the current source compatibility gates keep exact 4.1.0 separate from stable 4.1.x patches starting at 4.1.2. The local 4.1.5 update retains the installed client DLL, which already uses this shared compatibility policy.
 
 The following target differences are handled at runtime:
 
