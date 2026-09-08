@@ -2,7 +2,8 @@ using HarmonyLib;
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 
@@ -10,136 +11,153 @@ namespace KoreanPatchFix
 {
     internal static class ItemViewShortNameFix
     {
-        private static Type _itemViewType;
-        private static Type _infoWindowType;
-        private static Type _gridWindowType;
+        private static FieldInfo _itemCaption;
+        private static readonly ConditionalWeakTable<TextMeshProUGUI, CaptionState> Original =
+            new ConditionalWeakTable<TextMeshProUGUI, CaptionState>();
 
         internal static PatchResult Enable(Harmony harmony)
         {
-            var target = ResolveTarget();
-            var postfix = typeof(ItemViewShortNameFix).GetMethod(
-                nameof(AfterPoolsInitialized),
-                BindingFlags.Static | BindingFlags.NonPublic);
-            harmony.Patch(target, postfix: new HarmonyMethod(postfix));
-            return PatchResult.Applied(target);
-        }
-
-        internal static PatchResult Probe()
-        {
-            return PatchResult.Applied(ResolveTarget());
-        }
-
-        private static MethodInfo ResolveTarget()
-        {
-            var type = ReflectionTools.FindType("EFT.UI.UiPools")
-                ?? throw new TypeLoadException("EFT.UI.UiPools was not found.");
-            var target = ReflectionTools.FindMethod(
-                type,
-                "Init",
-                method => method.GetParameters().Length == 0 && typeof(Task).IsAssignableFrom(method.ReturnType))
-                ?? throw new MissingMethodException(type.FullName, "Init()");
-
-            _itemViewType = ReflectionTools.FindType("EFT.UI.DragAndDrop.ItemView")
-                ?? throw new TypeLoadException("EFT.UI.DragAndDrop.ItemView was not found.");
-            _infoWindowType = ReflectionTools.FindType("EFT.UI.InfoWindow")
-                ?? throw new TypeLoadException("EFT.UI.InfoWindow was not found.");
-            _gridWindowType = ReflectionTools.FindType("EFT.UI.GridWindow")
-                ?? throw new TypeLoadException("EFT.UI.GridWindow was not found.");
-
-            return target;
-        }
-
-        private static async void AfterPoolsInitialized(Task __result)
-        {
+            var targets = ResolveTargets();
+            var hooks = new[] { nameof(AfterItemCaptionUpdated), nameof(AfterInfoWindowShown), nameof(AfterGridWindowShown) };
+            var installed = 0;
             try
             {
-                if (__result != null)
-                {
-                    await __result;
-                }
-
-                if (!GameLanguageDetector.IsKorean())
-                {
-                    return;
-                }
-
-                foreach (var itemView in Resources.FindObjectsOfTypeAll(_itemViewType).OfType<Component>())
-                {
-                    AdjustItemViewCaption(itemView);
-                }
-
-                foreach (var infoWindow in Resources.FindObjectsOfTypeAll(_infoWindowType).OfType<Component>())
-                {
-                    AdjustInfoWindowCaption(infoWindow);
-                }
-
-                foreach (var gridWindow in Resources.FindObjectsOfTypeAll(_gridWindowType).OfType<Component>())
-                {
-                    AdjustGridWindowCaption(gridWindow);
-                }
+                for (; installed < targets.Length; installed++)
+                    harmony.Patch(targets[installed], postfix: new HarmonyMethod(typeof(ItemViewShortNameFix), hooks[installed]));
             }
-            catch (Exception ex)
+            catch
             {
-                PluginLog.Error($"Item short-name adjustment failed: {ex}");
+                // Remove only this feature's hooks if a later window hook fails.
+                for (var i = 0; i < installed; i++)
+                    harmony.Unpatch(targets[i], typeof(ItemViewShortNameFix).GetMethod(hooks[i], BindingFlags.Static | BindingFlags.NonPublic));
+                throw;
             }
+            return PatchResult.Applied(targets[0]);
         }
 
-        private static void AdjustItemViewCaption(Component itemView)
+        internal static PatchResult Probe() => PatchResult.Applied(ResolveTargets()[0]);
+
+        private static MethodInfo[] ResolveTargets()
         {
-            var caption = FindChild(itemView, "Caption", "Name");
-            if (caption == null)
+            var gridItem = ReflectionTools.FindType("EFT.UI.DragAndDrop.GridItemView")
+                ?? throw new TypeLoadException("EFT.UI.DragAndDrop.GridItemView was not found.");
+            _itemCaption = ReflectionTools.FindField(gridItem, "Caption");
+            if (_itemCaption == null || !typeof(TextMeshProUGUI).IsAssignableFrom(_itemCaption.FieldType))
+                throw new MissingFieldException(gridItem.FullName, "Caption");
+
+            // Older clients obfuscate UpdateItemName. Locate the actual caption writer,
+            // which also runs for late-created/reused views and native language changes.
+            var captionWriter = gridItem.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
+                .Where(method => method.ReturnType == typeof(void) && method.GetParameters().Length == 0 && method.GetMethodBody() != null)
+                .Single(method =>
+                {
+                    var instructions = PatchProcessor.GetOriginalInstructions(method);
+                    return instructions.Any(instruction => instruction.opcode == OpCodes.Ldfld && Equals(instruction.operand, _itemCaption))
+                        && instructions.Any(instruction => instruction.operand is MethodInfo called && called.Name == "set_text"
+                            && typeof(TMP_Text).IsAssignableFrom(called.DeclaringType));
+                });
+            return new[] { captionWriter, WindowShow("EFT.UI.InfoWindow"), WindowShow("EFT.UI.GridWindow") };
+        }
+
+        private static MethodInfo WindowShow(string name)
+        {
+            var type = ReflectionTools.FindType(name) ?? throw new TypeLoadException(name + " was not found.");
+            var caption = type.GetProperty("Caption", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (caption == null || !typeof(TextMeshProUGUI).IsAssignableFrom(caption.PropertyType))
+                throw new MissingMemberException(name, "Caption");
+            return ReflectionTools.FindMethod(type, "Show", method => method.DeclaringType == type)
+                ?? throw new MissingMethodException(name, "Show");
+        }
+
+        private static void AfterItemCaptionUpdated(object __instance)
+        {
+            try { Adjust(_itemCaption.GetValue(__instance) as TextMeshProUGUI, CaptionKind.Item); }
+            catch (Exception error) { PluginLog.Error($"Item short-name adjustment failed: {error}"); }
+        }
+
+        private static void AfterInfoWindowShown(object __instance) => AdjustWindow(__instance, CaptionKind.Info);
+        private static void AfterGridWindowShown(object __instance) => AdjustWindow(__instance, CaptionKind.Grid);
+
+        private static void AdjustWindow(object instance, CaptionKind kind)
+        {
+            try { Adjust(ReflectionTools.ReadMember(instance, "Caption") as TextMeshProUGUI, kind); }
+            catch (Exception error) { PluginLog.Error($"Window caption adjustment failed: {error}"); }
+        }
+
+        private static void Adjust(TextMeshProUGUI text, CaptionKind kind)
+        {
+            if (text == null) return;
+            if (!GameLanguageDetector.IsKorean())
             {
+                if (Original.TryGetValue(text, out var previous))
+                {
+                    previous.Restore(text);
+                    Original.Remove(text);
+                }
                 return;
             }
-
-            var rectTransform = caption.GetComponent<RectTransform>();
-            if (rectTransform != null)
+            // Keep the original layout so an English switch on the same pooled view restores it.
+            Original.GetValue(text, value => new CaptionState(value, kind));
+            if (kind == CaptionKind.Item)
             {
-                rectTransform.offsetMax = new Vector2(-3f, -1f);
-                rectTransform.offsetMin = new Vector2(1f, -17f);
+                text.rectTransform.offsetMax = new Vector2(-3f, -1f);
+                text.rectTransform.offsetMin = new Vector2(1f, -17f);
             }
-
-            var text = caption.GetComponentInChildren<TextMeshProUGUI>(true);
-            if (text != null)
+            else if (kind == CaptionKind.Info)
             {
-                SetAutoSizingText(text);
+                text.rectTransform.offsetMax = new Vector2(-25f, 2f);
+                text.rectTransform.offsetMin = new Vector2(25f, -2f);
             }
+            if (kind != CaptionKind.Info)
+            {
+                text.enableAutoSizing = true;
+                text.fontSizeMin = 8;
+                text.fontSizeMax = 12;
+                text.lineSpacing = -15;
+            }
+            if (kind == CaptionKind.Grid) text.overflowMode = TextOverflowModes.Overflow;
         }
 
-        private static void AdjustInfoWindowCaption(Component infoWindow)
+        private enum CaptionKind { Item, Info, Grid }
+
+        private sealed class CaptionState
         {
-            var caption = FindChild(infoWindow, "Caption");
-            var rectTransform = caption?.GetComponent<RectTransform>();
-            if (rectTransform != null)
+            private readonly CaptionKind kind;
+            private readonly Vector2 offsetMin, offsetMax;
+            private readonly bool autoSize;
+            private readonly float size, minimum, maximum, spacing;
+            private readonly TextOverflowModes overflow;
+
+            internal CaptionState(TextMeshProUGUI text, CaptionKind kind)
             {
-                rectTransform.offsetMax = new Vector2(-25f, 2f);
-                rectTransform.offsetMin = new Vector2(25f, -2f);
+                this.kind = kind;
+                offsetMin = text.rectTransform.offsetMin;
+                offsetMax = text.rectTransform.offsetMax;
+                autoSize = text.enableAutoSizing;
+                size = text.fontSize;
+                minimum = text.fontSizeMin;
+                maximum = text.fontSizeMax;
+                spacing = text.lineSpacing;
+                overflow = text.overflowMode;
             }
-        }
 
-        private static void AdjustGridWindowCaption(Component gridWindow)
-        {
-            var caption = FindChild(gridWindow, "Caption");
-            var text = caption?.GetComponentInChildren<TextMeshProUGUI>(true);
-            if (text != null)
+            internal void Restore(TextMeshProUGUI text)
             {
-                text.overflowMode = TextOverflowModes.Overflow;
-                SetAutoSizingText(text);
+                if (kind != CaptionKind.Grid)
+                {
+                    text.rectTransform.offsetMin = offsetMin;
+                    text.rectTransform.offsetMax = offsetMax;
+                }
+                if (kind != CaptionKind.Info)
+                {
+                    text.enableAutoSizing = autoSize;
+                    text.fontSize = size;
+                    text.fontSizeMin = minimum;
+                    text.fontSizeMax = maximum;
+                    text.lineSpacing = spacing;
+                }
+                if (kind == CaptionKind.Grid) text.overflowMode = overflow;
             }
-        }
-
-        private static Transform FindChild(Component component, params string[] names)
-        {
-            return component.GetComponentsInChildren<Transform>(true)
-                .FirstOrDefault(transform => names.Contains(transform.name));
-        }
-
-        private static void SetAutoSizingText(TextMeshProUGUI text)
-        {
-            text.enableAutoSizing = true;
-            text.fontSizeMin = 8;
-            text.fontSizeMax = 12;
-            text.lineSpacing = -15;
         }
     }
 }

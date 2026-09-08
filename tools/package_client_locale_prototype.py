@@ -133,6 +133,7 @@ def main() -> None:
     for project in (
         project_root / "src/ClientLocalePrototype/GoLani.KoreanLocalization.Prototype.csproj",
         project_root / "tests/ClientLocaleContract/ClientLocaleContract.csproj",
+        project_root / "tests/ShortNameContract/ShortNameContract.csproj",
     ):
         release.run_command([
             dotnet, "build", str(project), "-c", "Release",
@@ -170,12 +171,14 @@ def main() -> None:
     run_windows_contract(build / "ClientLocaleContract/ClientLocaleContract.exe", [
         stage.joinpath(*BUNDLE_ROOT.parts), matrix_path, contract_report,
     ])
+    run_windows_contract(build / "ShortNameContract/ShortNameContract.exe", [])
     mono_reports = []
     for label, mono_root in complete_roots.items():
         mono_report = work / f"mono-{label}-verification.json"
         run_windows_contract(build / "ClientLocaleContract/ClientLocaleContract.exe", [
             stage.joinpath(*BUNDLE_ROOT.parts), matrix_path, mono_report,
         ], mono_root=mono_root)
+        run_windows_contract(build / "ShortNameContract/ShortNameContract.exe", [], mono_root=mono_root)
         mono_reports.append({"hostSptVersion": label, **release.load_ordered_json(mono_report)})
     staged_hashes = {
         path.relative_to(stage).as_posix(): release.sha256_file(path)
@@ -190,6 +193,7 @@ def main() -> None:
     summary = {
         "kind": "client-only-prototype",
         "profiles": list(manifest["profiles"]),
+        "short_name_contract": "passed: real Harmony with UI lifecycle stand-ins; not visual rendering",
         "runtime_contract": "passed: native reload fixture with actual Harmony and locale payloads",
         "contract_details": release.load_ordered_json(contract_report),
         "unity_mono_contracts": mono_reports,

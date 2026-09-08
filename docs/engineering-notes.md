@@ -15,7 +15,9 @@ The following target differences are handled at runtime:
 - Flea-market item names use `SetItemName` on 4.1 and `Show` on older clients.
 - Flea-market subcategories use `SetExpandedStatus` on 4.1 and `Show` on older clients.
 - Prestige rewards do not exist on 3.8.3–3.10.5 and are skipped normally.
-- Quick-access `Show` signatures and `UiPools.Init` overloads drift, so targets are selected by capability rather than EFT parameter types.
+- Quick-access and window `Show` signatures drift, so targets are selected by capability rather than EFT parameter types.
+- Short-name layout hooks the method that writes `GridItemView.Caption.text` (`method_26` in 3.9.8; `UpdateItemName` in 4.1.5), plus declared `InfoWindow.Show` and `GridWindow.Show`. The former one-shot `UiPools.Init` scan could miss late-created views and could target the wrong child transform. Exact caption references now receive the existing margins/autosizing settings whenever refreshed; weakly held original styles are restored when switching out of Korean. No asynchronous global resource scan is used.
+- `ShortNameContract` runs the actual Harmony hooks against UI lifecycle stand-ins, covering late creation, reuse, unrelated labels, both Korean modes, native return values and English restoration. Installed-client metadata probes verify the actual caption writer; these tests do not establish visual rendering quality.
 
 A clean build confirms binary compatibility only. Actual layout still requires in-game inspection because private UI fields and prefab hierarchies can change.
 

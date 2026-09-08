@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework><OutputType>Exe</OutputType><PlatformTarget>x64</PlatformTarget>
+    <LangVersion>latest</LangVersion><DefineConstants>$(DefineConstants);CLIENT_LOCALE_PROTOTYPE</DefineConstants>
+    <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ShortNameContract\</OutputPath><AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <ClientReferenceSptRoot Condition="'$(ClientReferenceSptRoot)' == ''">D:\SPT_3.8.3</ClientReferenceSptRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\ClientModFixPlugin\Patches\ItemViewShortNameFix.cs" Link="ItemViewShortNameFix.cs" />
+    <Compile Include="..\..\src\ClientModFixPlugin\Compatibility.cs" Link="Compatibility.cs" />
+    <Compile Include="..\..\src\Shared\SptCompatibilityPolicy.cs" Link="SptCompatibilityPolicy.cs" />
+    <Compile Include="..\ClientLocaleContract\UnityMonoHost.cs" Link="UnityMonoHost.cs" />
+    <Reference Include="0Harmony"><HintPath>$(ClientReferenceSptRoot)\BepInEx\core\0Harmony.dll</HintPath></Reference>
+    <Reference Include="Mono.Cecil"><HintPath>$(ClientReferenceSptRoot)\BepInEx\core\Mono.Cecil.dll</HintPath></Reference>
+    <Reference Include="MonoMod.RuntimeDetour"><HintPath>$(ClientReferenceSptRoot)\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath></Reference>
+    <Reference Include="MonoMod.Utils"><HintPath>$(ClientReferenceSptRoot)\BepInEx\core\MonoMod.Utils.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

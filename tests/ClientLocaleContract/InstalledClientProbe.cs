@@ -85,6 +85,20 @@ internal static class InstalledClientProbe
                 Require(types.Any(type => type.FullName == name), "Existing UI dependency: " + name);
             }
 
+            var gridItem = types.Single(type => type.FullName == "EFT.UI.DragAndDrop.GridItemView");
+            var caption = gridItem.Fields.Single(field => field.Name == "Caption" && field.FieldType.FullName == "TMPro.TextMeshProUGUI");
+            var captionWriter = gridItem.Methods.Single(method => !method.IsStatic && method.ReturnType.FullName == "System.Void"
+                && method.Parameters.Count == 0 && method.HasBody
+                && method.Body.Instructions.Any(instruction => instruction.OpCode == Mono.Cecil.Cil.OpCodes.Ldfld
+                    && instruction.Operand is FieldReference field && field.FullName == caption.FullName)
+                && method.Body.Instructions.Any(instruction => instruction.Operand is MethodReference called
+                    && called.Name == "set_text" && called.DeclaringType.FullName == "TMPro.TMP_Text"));
+            foreach (var windowName in new[] { "EFT.UI.InfoWindow", "EFT.UI.GridWindow" })
+            {
+                var window = types.Single(type => type.FullName == windowName);
+                Require(window.Methods.Any(method => method.Name == "Show" && !method.IsStatic), "Declared window Show hook: " + windowName);
+            }
+
             string hash;
             using (var sha = SHA256.Create())
             using (var input = File.OpenRead(path))
@@ -100,6 +114,7 @@ internal static class InstalledClientProbe
                 ["eftFixedVersion"] = detectedBuild,
                 ["assemblySha256"] = hash,
                 ["localeTargets"] = new JArray(new[] { init, global, menu, reload, font }.Select(method => method.FullName)),
+                ["shortNameCaptionWriter"] = captionWriter.FullName,
                 ["kind"] = "static metadata and native call-sequence inspection; not an in-game visual test"
             };
         }

@@ -16,9 +16,10 @@ The common client prototype now has nine exact profiles: 3.8.3, 3.9.8, 3.10.5, 3
 - 4.0.13 has only SPT files locally; 4.1.0/4.1.2/4.1.3 clients are absent. Their payload/fixture checks pass but do not establish installed-client or visual compatibility.
 - The user confirmed 3.8.3 applies correctly in game. The previous Unity Mono version-string truncation fix remains in use.
 - Optional server status modules display mod/SPT/translation versions and verified file readiness. They never change server locale data or claim a game has already applied translations.
-- The 13-project solution builds without warnings/errors. Nine Python tests, 24 Node server-status cases, 22 Windows .NET status cases, and both legacy compatibility contracts pass.
+- The 14-project solution builds without warnings/errors. Nine Python tests, 28 short-name lifecycle cases per runtime, 24 Node server-status cases, 22 Windows .NET status cases, and both legacy compatibility contracts pass.
 - `--no-archive` prepares common client files and separate per-version status modules for direct installation, with file hashes recorded in `verification.json`.
 - Common client files and matching status modules were copied directly into six local roots, with backups and post-copy hash checks. All five complete installations emitted the expected readiness log during actual server startup; the test processes were then stopped.
+- Short-name correction now follows actual caption updates and window creation, preserving original English styles when views are reused.
 - Broader in-game font/UI and server-rendered-message verification remains open.
 
 See [client-only localization prototype](../client-locale-prototype.md) for implementation, installation, and rollback details.

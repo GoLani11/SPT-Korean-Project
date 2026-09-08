@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerLocaleStatus41", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerLocaleStatusContract", "tests\ServerLocaleStatusContract\ServerLocaleStatusContract.csproj", "{8F4302E6-70B3-4992-84F4-73023C76B483}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortNameContract", "tests\ShortNameContract\ShortNameContract.csproj", "{F4B77E7D-3B44-421D-BDE8-FB522131AA56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{8F4302E6-70B3-4992-84F4-73023C76B483}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F4302E6-70B3-4992-84F4-73023C76B483}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F4302E6-70B3-4992-84F4-73023C76B483}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4B77E7D-3B44-421D-BDE8-FB522131AA56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4B77E7D-3B44-421D-BDE8-FB522131AA56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4B77E7D-3B44-421D-BDE8-FB522131AA56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4B77E7D-3B44-421D-BDE8-FB522131AA56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
