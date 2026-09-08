@@ -36,6 +36,8 @@ namespace KoreanPatchFix
                 var bundle = ClientLocaleBundle.Load(bundleRoot, gameRoot, detectedVersion, eftVersion);
                 var gameAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(assembly => assembly.GetName().Name == "Assembly-CSharp");
                 ClientLocaleRuntime.Enable(new Harmony(PluginGuid + ".clientlocale"), gameAssembly, bundle);
+                if (bundle.ProfileVersion != detectedVersion)
+                    Logger.LogInfo($"SPT {detectedVersion} | 번역 기준 {bundle.TranslationVersion}: 호환성 검사 통과 — 기존 번역 사용 (프로필 {bundle.ProfileVersion}).");
                 Logger.LogInfo($"Client-only localization prototype: SPT {detectedVersion}, translation {bundle.TranslationVersion}, {bundle.SourceKeyCount} source keys per mode.");
             }
             catch (Exception error)

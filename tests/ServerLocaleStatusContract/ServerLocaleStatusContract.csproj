@@ -10,5 +10,6 @@
   <ItemGroup>
     <Compile Include="..\..\src\ServerLocaleStatus\StatusVerifier.cs" Link="StatusVerifier.cs" />
     <Compile Include="..\..\src\ClientLocalePrototype\ClientLocaleBuild.cs" Link="ClientLocaleBuild.cs" />
+    <Compile Include="..\..\src\ClientLocalePrototype\ClientLocaleProfilePolicy.cs" Link="ClientLocaleProfilePolicy.cs" />
   </ItemGroup>
 </Project>

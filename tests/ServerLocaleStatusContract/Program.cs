@@ -39,15 +39,31 @@ try
     if (!result.Contains("v2.2.0 | SPT 4.1.5") || !result.Contains("적용 준비 완료")) throw new Exception(result);
     checks++;
     Console.WriteLine(result);
-    Reject(() => StatusVerifier.Verify(temporary, "4.1.99"), "unknown version");
+    foreach (var version in new[] { "4.1.4", "4.1.6", "4.1.99" })
+    {
+        var upgrade = StatusVerifier.Verify(temporary, version);
+        if (!upgrade.Contains("SPT " + version) || !upgrade.Contains("기존 번역 사용 (프로필 4.1.5)")) throw new Exception(upgrade);
+        checks++;
+    }
+    foreach (var version in new[] { "4.1.1", "4.2.0", "5.0.0", "4.1.6-pre", "4.1.6.0", "4.1.06", "unknown" })
+        Reject(() => StatusVerifier.Verify(temporary, version), "unsupported upgrade");
     Corrupt("BepInEx/plugins/GoLani.KoreanModFix.dll", "dll hash");
     Corrupt("BepInEx/plugins/SPT-Korean/locales/4.1.3/kr.json", "locale hash");
     var original = File.ReadAllText(english);
     File.WriteAllText(english, "{\"different\":\"source\"}");
     Reject(() => StatusVerifier.Verify(temporary, "4.1.5"), "wrong English");
+    Reject(() => StatusVerifier.Verify(temporary, "4.1.6"), "fallback wrong English");
     File.WriteAllText(english, original);
     var manifestPath = Path.Combine(temporary, "BepInEx/plugins/SPT-Korean/manifest.json");
     var manifest = JsonNode.Parse(File.ReadAllText(manifestPath))!;
+    manifest["profiles"]!["4.1.5"]!["eftVersion"] = "0.0.0.0";
+    File.WriteAllText(manifestPath, manifest.ToJsonString());
+    Reject(() => StatusVerifier.Verify(temporary, "4.1.6"), "fallback wrong EFT");
+    manifest["profiles"]!["4.1.5"]!["eftVersion"] = "0.16.9.40743";
+    manifest["profiles"]!["4.1.6"] = manifest["profiles"]!["4.1.5"]!.DeepClone();
+    manifest["profiles"]!["4.1.6"]!["eftVersion"] = "0.0.0.0";
+    File.WriteAllText(manifestPath, manifest.ToJsonString());
+    Reject(() => StatusVerifier.Verify(temporary, "4.1.6"), "exact mismatch must not fall back");
     manifest["profiles"]!["4.1.5"]!["eftVersion"] = "0.0.0.0";
     File.WriteAllText(manifestPath, manifest.ToJsonString());
     Reject(() => StatusVerifier.Verify(temporary, "4.1.5"), "wrong EFT");
@@ -63,6 +79,7 @@ void Corrupt(string relative, string label)
     var bytes = File.ReadAllBytes(path);
     File.AppendAllText(path, " ");
     Reject(() => StatusVerifier.Verify(temporary, "4.1.5"), label);
+    Reject(() => StatusVerifier.Verify(temporary, "4.1.6"), "fallback " + label);
     File.WriteAllBytes(path, bytes);
 }
 void Reject(Action action, string label)

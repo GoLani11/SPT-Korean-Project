@@ -2,7 +2,7 @@
 
 This experiment installs one client plugin and its locale data at the SPT game root, with no installer. It tests whether Korean localization can move out of the server mod while preserving the game's native Korean / Korean-English language selection.
 
-The prototype is a separate build, not a replacement for the seven published 2.1.0 packages. It admits only these profiles:
+The prototype is a separate build, not a replacement for the seven published 2.1.0 packages. It includes these explicitly verified source profiles:
 
 | SPT | EFT executable file version | Translation source |
 | --- | --- | --- |
@@ -16,7 +16,7 @@ The prototype is a separate build, not a replacement for the seven published 2.1
 | 4.1.3 | 0.16.9.40743 | 4.1.3 |
 | 4.1.5 | 0.16.9.40743 | 4.1.3, after matching the installed English locale |
 
-Other SPT/EFT combinations are rejected. This first experiment requires the matching local server database to verify the English source; a client installation without that database is not supported yet.
+An unlisted stable SPT 4.1.x patch at or above 4.1.2 may reuse the 4.1.5 profile only after the checks below pass. Other unlisted SPT families and prereleases are rejected. This experiment requires the matching local server database to verify the English source; a client installation without that database is not supported yet.
 
 ## Package
 
@@ -36,9 +36,11 @@ The archive contains no server mod, installer, command script, game assembly, or
 
 ## Runtime behavior
 
-The plugin verifies the exact SPT profile, EFT executable build, three payload hashes, locale key order, and the installed English key/value pairs before enabling localization. English JSON formatting does not affect this comparison.
+The plugin selects an exact profile first, otherwise the shared policy permits the 4.1.5 fallback only for stable 4.1.2+ patches below 4.2.0. An incompatible exact profile never falls back to another profile. It then verifies the EFT executable build, three payload hashes, locale key order, and the installed English key/value pairs before enabling localization. English JSON formatting does not affect this comparison.
 
 EFT detection uses the PE's four fixed numeric version fields. Unity Mono truncates the formatted `FileVersion` text in the inspected clients (`40743` becomes `4074`, and `29197` becomes `2919`); accepting that text would incorrectly disable the mod. The exact build check remains enforced.
+
+Fallback selection alone does not enable translation: the EFT build and the complete installed English key/value set must match, and all five native hook targets must resolve. Missing targets disable localization before hooks are installed. A new patch with changed source text needs an updated translation; 4.2, 4.1.1, prereleases, and malformed versions remain blocked.
 
 The client discovers the localization manager by the `UpdateLocales(string, Dictionary<string,string>)` contract, including the obfuscated manager types in older clients. Five native methods are patched:
 
@@ -99,3 +101,17 @@ dotnet run --project tests/ServerLocaleStatusContract -c Release -- artifacts/cl
 ```
 
 The Node contract invokes the real `postDBLoad` export and logger fallback for all four installed 3.x versions. Both contracts exercise corrupt DLL/payload, mismatched English, and missing-client failures; the .NET contract also checks unsupported SPT and wrong EFT builds. The contracts do not launch servers or change live databases. Separate local smoke tests confirmed the actual startup log on 3.8.3, 3.9.8, 3.10.5, 3.11.4, and 4.1.5; each test server was stopped afterwards. Node servers require console stdout, so these smoke tests read their own log files rather than redirecting stdout.
+
+## Automatic patch-upgrade compatibility
+
+The client and .NET status companion compile the same `ClientLocaleProfilePolicy` source. The nine listed profiles remain explicit sources; an unlisted stable patch such as 4.1.6 does not need a new manifest entry when its game build and English source are unchanged. Neither the installed SPT version nor its database is rewritten.
+
+After file checks and native hook installation, the client logs the actual SPT version, translation source, and reused profile:
+
+```text
+SPT 4.1.6 | 번역 기준 4.1.3: 호환성 검사 통과 — 기존 번역 사용 (프로필 4.1.5).
+```
+
+The server log says `호환 파일 검사 통과` because native game hooks can only be checked when the client runs. Server metadata already permits stable `~4.1.2` patches.
+
+Contracts simulate 4.1.6 against the installed 4.1.5 game/data and exercise both native language reload behaviors. They also cover later patches, boundary/prerelease rejection, changed EFT/English, corrupt files, exact-profile precedence, a missing fallback, and missing native hook targets. This is a simulated upgrade, not a claim that an actual 4.1.6 game installation was tested.

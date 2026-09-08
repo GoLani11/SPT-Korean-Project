@@ -13,8 +13,11 @@ internal static class StatusVerifier
         var bundle = Path.Combine(plugins, "SPT-Korean");
         using var manifest = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(bundle, "manifest.json")));
         var data = manifest.RootElement;
-        if (data.GetProperty("schemaVersion").GetInt32() != 1 || !data.GetProperty("profiles").TryGetProperty(version, out var profile))
+        if (data.GetProperty("schemaVersion").GetInt32() != 1)
             throw new InvalidDataException($"SPT {version} 번역 프로필이 없습니다.");
+        var profiles = data.GetProperty("profiles");
+        var profileVersion = KoreanPatchFix.ClientLocaleProfilePolicy.Select(version, profiles.EnumerateObject().Select(entry => entry.Name));
+        var profile = profiles.GetProperty(profileVersion);
         if (data.GetProperty("clientVersion").GetString() != "2.2.0")
             throw new InvalidDataException("알림 모듈과 클라이언트 버전이 다릅니다.");
         CheckHash(Path.Combine(plugins, "GoLani.KoreanModFix.dll"), data.GetProperty("clientDllSha256").GetString());
@@ -41,8 +44,9 @@ internal static class StatusVerifier
         var installed = ReadLocale(Path.Combine(root, relative));
         if (installed.Count != english.Count || english.Any(entry => !installed.TryGetValue(entry.Key, out var value) || value != entry.Value))
             throw new InvalidDataException("설치된 서버 원문과 번역 기준이 다릅니다.");
+        var compatibility = profileVersion == version ? "" : $"호환 파일 검사 통과 — 기존 번역 사용 (프로필 {profileVersion}). ";
         return $"[고라니 SPT 한글화 v2.2.0 | SPT {version}] 한글화 파일 검증 및 적용 준비 완료! "
-            + $"(번역 기준 {translation}, 한글판 {locales["kr.json"].Count:N0} / 한영 병기판 {locales["kr-en.json"].Count:N0}개)";
+            + compatibility + $"(번역 기준 {translation}, 한글판 {locales["kr.json"].Count:N0} / 한영 병기판 {locales["kr-en.json"].Count:N0}개)";
     }
 
     private static void CheckHash(string path, string? expected)

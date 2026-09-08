@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Include="..\ServerLocaleStatus\*.cs" Link="%(Filename)%(Extension)" />
     <Compile Include="..\ClientLocalePrototype\ClientLocaleBuild.cs" Link="ClientLocaleBuild.cs" />
+    <Compile Include="..\ClientLocalePrototype\ClientLocaleProfilePolicy.cs" Link="ClientLocaleProfilePolicy.cs" />
     <PackageReference Include="SPTarkov.Common" Version="4.0.13" />
     <PackageReference Include="SPTarkov.DI" Version="4.0.13" />
     <PackageReference Include="SPTarkov.Server.Core" Version="4.0.13" />

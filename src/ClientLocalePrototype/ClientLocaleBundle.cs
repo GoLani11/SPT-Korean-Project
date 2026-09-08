@@ -21,10 +21,11 @@ namespace KoreanPatchFix
         private readonly Dictionary<string, string> korean;
         private readonly Dictionary<string, string> bilingual;
 
-        private ClientLocaleBundle(string sptVersion, string translationVersion,
+        private ClientLocaleBundle(string sptVersion, string profileVersion, string translationVersion,
             JObject koreanJson, JObject bilingualJson)
         {
             SptVersion = sptVersion;
+            ProfileVersion = profileVersion;
             TranslationVersion = translationVersion;
             SourceKeyCount = koreanJson.Count;
             korean = FoldAliases(ReadEntries(koreanJson));
@@ -32,6 +33,7 @@ namespace KoreanPatchFix
         }
 
         internal string SptVersion { get; }
+        internal string ProfileVersion { get; }
         internal string TranslationVersion { get; }
         internal int SourceKeyCount { get; }
 
@@ -44,11 +46,11 @@ namespace KoreanPatchFix
                 throw new InvalidDataException("Unsupported client locale manifest schema.");
             }
 
-            var profile = sptVersion == null ? null : manifest["profiles"]?[sptVersion] as JObject;
-            if (profile == null)
-            {
-                throw new InvalidDataException($"This client-only prototype has no profile for SPT {sptVersion ?? "unknown"}.");
-            }
+            var profiles = manifest["profiles"] as JObject
+                ?? throw new InvalidDataException("Missing client locale profiles.");
+            var profileVersion = ClientLocaleProfilePolicy.Select(sptVersion, profiles.Properties().Select(entry => entry.Name));
+            var profile = profiles[profileVersion] as JObject
+                ?? throw new InvalidDataException("Invalid client locale profile.");
             if (!string.Equals((string)profile["eftVersion"], eftVersion, StringComparison.Ordinal))
             {
                 throw new InvalidDataException($"EFT build mismatch: expected {profile["eftVersion"]}, detected {eftVersion ?? "unknown"}.");
@@ -109,7 +111,7 @@ namespace KoreanPatchFix
                 throw new InvalidDataException("Installed English locale differs from the verified translation source; the prototype was not enabled.");
             }
 
-            return new ClientLocaleBundle(sptVersion, translationVersion, files["kr.json"], files["kr-en.json"]);
+            return new ClientLocaleBundle(sptVersion, profileVersion, translationVersion, files["kr.json"], files["kr-en.json"]);
         }
 
         internal Dictionary<string, string> MergeGlobal(string locale, IDictionary<string, string> source)

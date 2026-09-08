@@ -10,13 +10,13 @@ The current source policy accepts stable SPT 4.1.x patches from 4.1.2 onward (`~
 
 ## Client-only Prototype
 
-The common client prototype now has nine exact profiles: 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, 4.1.0, 4.1.2, 4.1.3, and 4.1.5. It requires the matching local server English database. Published release packages are unchanged.
+The common client prototype now has nine exact profiles: 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, 4.1.0, 4.1.2, 4.1.3, and 4.1.5. Unlisted stable 4.1.2+ patches below 4.2.0 reuse the 4.1.5 profile only when the EFT build, local English source, payload integrity, and required native hooks match. Exact profiles always take precedence. Client and server status share the profile policy. Published release packages are unchanged.
 
-- Five complete local clients pass static inspection and native-flow contracts in Windows .NET Framework and all five bundled Unity Mono runtimes (1,037,872 assertions per runtime, mostly full-payload comparisons across all profiles).
+- Five complete local clients pass static inspection and native-flow contracts in Windows .NET Framework and all five bundled Unity Mono runtimes (1,164,124 assertions per runtime, including a simulated 4.1.6 upgrade and full-payload comparisons).
 - 4.0.13 has only SPT files locally; 4.1.0/4.1.2/4.1.3 clients are absent. Their payload/fixture checks pass but do not establish installed-client or visual compatibility.
 - The user confirmed 3.8.3 applies correctly in game. The previous Unity Mono version-string truncation fix remains in use.
 - Optional server status modules display mod/SPT/translation versions and verified file readiness. They never change server locale data or claim a game has already applied translations.
-- The 13-project solution builds without warnings/errors. Nine Python tests, 24 Node server-status cases, eight Windows .NET status cases, and both legacy compatibility contracts pass.
+- The 13-project solution builds without warnings/errors. Nine Python tests, 24 Node server-status cases, 22 Windows .NET status cases, and both legacy compatibility contracts pass.
 - `--no-archive` prepares common client files and separate per-version status modules for direct installation, with file hashes recorded in `verification.json`.
 - Common client files and matching status modules were copied directly into six local roots, with backups and post-copy hash checks. All five complete installations emitted the expected readiness log during actual server startup; the test processes were then stopped.
 - Broader in-game font/UI and server-rendered-message verification remains open.

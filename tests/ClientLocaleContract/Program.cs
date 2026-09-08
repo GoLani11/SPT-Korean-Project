@@ -47,11 +47,17 @@ internal static class Program
     {
         var manifest = JObject.Parse(File.ReadAllText(Path.Combine(args[0], "manifest.json")));
         var installations = JObject.Parse(File.ReadAllText(args[1]));
-        foreach (var entry in ((JObject)manifest["profiles"]).Properties())
+        var cases = ((JObject)manifest["profiles"]).Properties().Concat(new[]
+        {
+            new JProperty("4.1.6", manifest["profiles"]["4.1.5"].DeepClone())
+        });
+        foreach (var entry in cases)
         {
             var definition = entry.Value;
-            var profile = new[] { entry.Name, (string)definition["translationVersion"], (string)definition["eftVersion"], (string)installations[entry.Name]["root"] };
-            var installed = (bool)installations[entry.Name]["completeClient"];
+            var simulated = entry.Name == "4.1.6";
+            var installation = installations[simulated ? "4.1.5" : entry.Name];
+            var profile = new[] { entry.Name, (string)definition["translationVersion"], (string)definition["eftVersion"], (string)installation["root"] };
+            var installed = !simulated && (bool)installation["completeClient"];
             if (installed)
             {
                 probes.Add(InstalledClientProbe.Check(profile[3], profile[0], profile[2]));
@@ -59,11 +65,12 @@ internal static class Program
             }
             else
             {
-                probes.Add(new JObject { ["sptVersion"] = profile[0], ["kind"] = "payload/native fixture only; matching game client unavailable" });
+                probes.Add(new JObject { ["sptVersion"] = profile[0], ["kind"] = simulated ? "simulated SPT patch upgrade on unchanged 4.1.5 game/data; not a real 4.1.6 installation" : "payload/native fixture only; matching game client unavailable" });
             }
             var bundle = ClientLocaleBundle.Load(args[0], profile[3], profile[0], profile[2]);
-            Expect(bundle.SptVersion == profile[0] && bundle.TranslationVersion == profile[1], "Exact profile selection");
-            Reject(() => ClientLocaleBundle.Load(args[0], profile[3], "4.1.99", profile[2]), "Unknown SPT version");
+            Expect(bundle.SptVersion == profile[0] && bundle.TranslationVersion == profile[1], "Selected version and translation source");
+            Expect(bundle.ProfileVersion == (simulated ? "4.1.5" : profile[0]), "Exact profiles take precedence; patch upgrades use the verified fallback");
+            Reject(() => ClientLocaleBundle.Load(args[0], profile[3], "4.2.0", profile[2]), "Unknown SPT version");
             Reject(() => ClientLocaleBundle.Load(args[0], profile[3], profile[0], "0.0.0.0"), "Wrong EFT build");
 
             var source = new Dictionary<string, string> { ["mod-only"] = "kept", ["Alias"] = "first", ["alias"] = "last" };
@@ -87,7 +94,45 @@ internal static class Program
                 harmony.UnpatchSelf();
             }
         }
+        CheckPatchUpgrades(args[0], (string)installations["4.1.5"]["root"]);
         CheckInvalidPayloads(args[0], (string)installations["3.8.3"]["root"]);
+    }
+
+    private static void CheckPatchUpgrades(string bundleRoot, string gameRoot)
+    {
+        foreach (var version in new[] { "4.1.4", "4.1.99" })
+            Expect(ClientLocaleBundle.Load(bundleRoot, gameRoot, version, "0.16.9.40743").ProfileVersion == "4.1.5", "Stable patch fallback: " + version);
+        foreach (var version in new[] { "4.1.1", "4.2.0", "5.0.0", "4.1.6-pre", "4.1.6.0", "4.1.06", "unknown" })
+            Reject(() => ClientLocaleBundle.Load(bundleRoot, gameRoot, version, "0.16.9.40743"), "Unsupported patch family or unstable version");
+        Reject(() => ClientLocaleBundle.Load(bundleRoot, gameRoot, "4.1.6", "0.16.9.99999"), "Fallback must verify EFT build");
+        var temporary = Path.Combine(Path.GetTempPath(), "spt-patch-upgrade-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(temporary);
+        try
+        {
+            var english = Path.Combine(temporary, "SPT_Runtime/SPT_Data/database/locales/global/en.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(english));
+            File.WriteAllText(english, "{\"new-or-changed\":\"source\"}");
+            Reject(() => ClientLocaleBundle.Load(bundleRoot, temporary, "4.1.6", "0.16.9.40743"), "Fallback must verify installed English");
+            var manifest = JObject.Parse(File.ReadAllText(Path.Combine(bundleRoot, "manifest.json")));
+            manifest["profiles"]["4.1.6"] = manifest["profiles"]["4.1.5"].DeepClone();
+            manifest["profiles"]["4.1.6"]["eftVersion"] = "0.0.0.0";
+            File.WriteAllText(Path.Combine(temporary, "manifest.json"), manifest.ToString());
+            Reject(() => ClientLocaleBundle.Load(temporary, gameRoot, "4.1.6", "0.16.9.40743"), "An incompatible exact profile must not fall back");
+            ((JObject)manifest["profiles"]).Remove("4.1.6");
+            ((JObject)manifest["profiles"]).Remove("4.1.5");
+            File.WriteAllText(Path.Combine(temporary, "manifest.json"), manifest.ToString());
+            Reject(() => ClientLocaleBundle.Load(temporary, gameRoot, "4.1.6", "0.16.9.40743"), "Missing verified fallback must not choose arbitrary data");
+            var bundle = ClientLocaleBundle.Load(bundleRoot, gameRoot, "4.1.6", "0.16.9.40743");
+            var harmony = new Harmony("com.golani.clientlocale.missing-target-contract");
+            try
+            {
+                try { ClientLocaleRuntime.Enable(harmony, typeof(object).Assembly, bundle); }
+                catch (InvalidOperationException) { assertions++; return; }
+                throw new Exception("Missing game hooks must disable fallback localization.");
+            }
+            finally { harmony.UnpatchSelf(); }
+        }
+        finally { Directory.Delete(temporary, true); }
     }
 
     private static async Task CheckNativeFlow(ClientLocaleBundle bundle, string[] profile, string bundleRoot, bool cached)
