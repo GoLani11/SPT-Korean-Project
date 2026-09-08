@@ -96,7 +96,7 @@ def stage_server_status(project_root: Path, work: Path, dotnet: str, profiles: d
         if version.startswith("3."):
             destination = output / version / "user/mods/GoLani.KoreanLocalization.Status"
             shutil.copytree(project_root / "src/ServerLocaleStatus3/src", destination / "src")
-            metadata = {"name": "golani-korean-localization-status", "author": "Golani", "version": "2.2.0",
+            metadata = {"name": "SPT Korean Localization", "author": "Golani", "version": "2.2.0",
                         "main": "src/mod.js", "license": "MIT", "akiVersion" if version == "3.8.3" else "sptVersion": version}
             (destination / "package.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
         else:

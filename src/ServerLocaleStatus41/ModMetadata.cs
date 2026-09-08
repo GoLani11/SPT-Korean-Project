@@ -5,7 +5,7 @@ namespace KoreanLocalizationStatus;
 public record ModMetadata : IModMetadata
 {
     public string ModGuid { get; init; } = "com.golani.korean.status";
-    public string Name { get; init; } = "SPT Korean Localization Status";
+    public string Name { get; init; } = "SPT Korean Localization";
     public string Author { get; init; } = "Golani";
     public List<string>? Contributors { get; init; }
     public SemanticVersioning.Version Version { get; init; } = new("2.2.0");

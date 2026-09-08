@@ -5,7 +5,7 @@ namespace KoreanLocalizationStatus;
 public record ModMetadata : AbstractModMetadata
 {
     public override string ModGuid { get; init; } = "com.golani.korean.status";
-    public override string Name { get; init; } = "SPT Korean Localization Status";
+    public override string Name { get; init; } = "SPT Korean Localization";
     public override string Author { get; init; } = "Golani";
     public override List<string>? Contributors { get; init; }
     public override SemanticVersioning.Version Version { get; init; } = new("2.2.0");
