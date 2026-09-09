@@ -1,28 +1,28 @@
 # Operations
 
-## Prerequisites
+## Prerequisites and packaging
 
-- .NET 10 SDK capable of building net9, net10, and net48 projects
-- An SPT install exposing the shared BepInEx, Harmony, Unity, and TextMeshPro client references; `D:\SPT3.8.3` is preferred and the batch entry point falls back to `D:\SPT`
-- `spt-korean-translate` checked out beside this repository with its Python virtual environment
-- Generated translation outputs for all eight supported SPT versions
-
-## Build And Package
+Use .NET 10 SDK, Python, Windows .NET Framework 4.8 (directly or through WSL interop), the sibling `spt-korean-translate` generated outputs, and SPT 3.8.3 client references. Complete local game installations supply optional additional Unity Mono runtime coverage.
 
 ```powershell
-..\spt-korean-translate\.venv\Scripts\python.exe .\tools\package_release_versions.py
+python .\tools\package_release.py --spt-383-root D:\SPT_3.8.3 --spt-415-root D:\SPT
 ```
 
-Use `--client-reference-spt-root` when the 3.8.3 install is elsewhere. Use `--dotnet` to select a non-default .NET 10 SDK. `make-release-packages.bat` invokes the same Python entry point.
+`make-release-packages.bat` invokes this entry point using the translation repository's virtual environment. Use `--dotnet`, `--translation-root` and `--installations-root` to override local paths. WSL paths use `/mnt/d/...`.
 
-The command always restores and builds the solution, executes both 4.1 compatibility contracts, validates both locale payloads and all shared-range equivalence contracts, creates seven ZIP files under `artifacts\release`, reopens every archive for layout and source-hash checks, and writes `release-summary.json`. A build cannot be skipped because stale compatibility binaries must never be reused for a release.
+The command rebuilds the common plugin and contracts, verifies real payloads and native-flow fixtures on Windows and discovered Unity Mono runtimes, creates one ZIP under `artifacts/release-2.1.0`, validates safe paths and hashes, extracts it and reruns the Windows locale contract. It writes `verification.json`, `SHA256SUMS.txt`, release notes and upload instructions. No server module is shipped.
 
-## Runtime Verification
+For the full historical solution, pass the client reference root explicitly:
 
-Extract each ZIP into its matching clean SPT install. The server log must report `SPT Korean Localization` and the version's expected key counts for both display modes. The native interface-language list must contain adjacent `한국어 (Korean)` and `한국어 (한영 병기)` entries, and switching between them must reload visible locale text without restarting the game or server. The BepInEx log must report the detected SPT version, the bilingual font patch, and a final enabled/unavailable/failed patch summary. Prestige reward adjustment is normally unavailable on SPT 3.8.3–3.10.5.
+```text
+dotnet build SPT-Korean-Project.sln -c Release -p:ClientReferenceSptRoot=<local SPT 3.8.3 path>
+python -m unittest discover -s tests -p "test_*.py"
+```
 
-Before a release, resolve the common client DLL's patch targets against the actual `Assembly-CSharp.dll` from every supported install, then visually smoke-test the adjusted UI through the normal SPT launcher. A reflection target check confirms structural compatibility but does not replace rendered UI verification.
+## Runtime and handoff verification
 
-For the exact 4.1.0 package, positively verify 4.1.0 and negatively verify 4.1.1 and 4.1.2. For the shared package, positively verify 4.1.2 and 4.1.3 and negatively verify 4.1.0, 4.1.1, a prerelease, and 4.2.0. For exact-version packages, place the server package outside its declared version and confirm that the loader reports a mismatch without loading the mod. Do not continue using a mismatched installation.
+Follow the [installation guide](releases/2.1.0-install.md), including backing up and removing previous Korean server modules and duplicate DLLs. Use the normal launcher. Verify adjacent language choices, immediate switching, persisted selection and the adjusted UI. Check the game BepInEx log for version 2.1.0 and locale initialization; individual UI fixes report enabled/unavailable/failed separately. Features absent on older games may be unavailable normally.
 
-Generated `artifacts`, `bin`, and `obj` content is disposable and must not be committed.
+Metadata inspection and managed runtime fixtures do not render fonts or game screens. Record missing installations and visual coverage limits explicitly. Current coverage is listed in [status](tracking/status.md). A simulated future patch is not an actual future-client test.
+
+Before handoff, confirm the ZIP checksum, exact contents, version metadata and source commit. Copy the verified ZIP, release notes, upload instructions, checksum and author-only verification/build information into the delivery folder. The author creates the GitHub release/tag and uploads the asset separately. Generated `artifacts`, `bin`, `obj` and release files must not be committed.

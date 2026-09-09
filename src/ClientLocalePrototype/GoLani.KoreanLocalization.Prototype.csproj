@@ -5,7 +5,8 @@
         <AssemblyName>GoLani.KoreanModFix</AssemblyName>
         <LangVersion>latest</LangVersion>
         <Nullable>disable</Nullable>
-        <Version>2.2.0-prototype.1</Version>
+        <Version>2.1.0</Version>
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
         <DefineConstants>$(DefineConstants);CLIENT_LOCALE_PROTOTYPE</DefineConstants>
         <OutputPath>$(ArtifactsRoot)build\$(Configuration)\ClientLocalePrototype\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

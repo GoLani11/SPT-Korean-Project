@@ -108,7 +108,7 @@ def stage_server_status(project_root: Path, work: Path, dotnet: str, profiles: d
     return {path.relative_to(output).as_posix(): release.sha256_file(path) for path in release.iter_package_files(output)}
 
 
-def main() -> None:
+def main(release_build: bool = False) -> None:
     project_root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--translation-root", type=Path, default=project_root.parent / "spt-korean-translate")
@@ -119,9 +119,10 @@ def main() -> None:
     parser.add_argument("--spt-415-root", type=Path, default=Path("D:/SPT" if os.name == "nt" else "/mnt/d/SPT"))
     args = parser.parse_args()
     dotnet = release.resolve_dotnet(args.dotnet, project_root)
-    work = release.ensure_generated_output_path(project_root / "artifacts" / "client-locale-prototype", project_root)
+    work_name = "release-2.1.0" if release_build else "client-locale-prototype"
+    work = release.ensure_generated_output_path(project_root / "artifacts" / work_name, project_root)
     stage = work / "stage"
-    archive = work / ARCHIVE_NAME
+    archive = work / ("SPT-KR-2.1.0.zip" if release_build else ARCHIVE_NAME)
     if archive.exists():
         archive.unlink()
     summary_path = work / "verification.json"
@@ -146,7 +147,7 @@ def main() -> None:
     expected[(PLUGIN_ROOT / release.CLIENT_DLL_NAME).as_posix()] = release.sha256_file(client)
     manifest_path = stage.joinpath(*BUNDLE_ROOT.parts) / "manifest.json"
     manifest = release.load_ordered_json(manifest_path)
-    manifest.update(clientVersion="2.2.0", clientDllSha256=release.sha256_file(client))
+    manifest.update(clientVersion="2.1.0", clientDllSha256=release.sha256_file(client))
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     expected[(BUNDLE_ROOT / "manifest.json").as_posix()] = release.sha256_file(manifest_path)
     matrix = {}
@@ -180,6 +181,16 @@ def main() -> None:
         ], mono_root=mono_root)
         run_windows_contract(build / "ShortNameContract/ShortNameContract.exe", [], mono_root=mono_root)
         mono_reports.append({"hostSptVersion": label, **release.load_ordered_json(mono_report)})
+    if release_build:
+        for source, name in (
+            (project_root / "docs/releases/2.1.0-install.md", "README-ko.md"),
+            (project_root / "LICENSE.md", "LICENSE-mod.txt"),
+            (project_root / "src/ClientModFixPlugin/LICENSE.GoLani.KoreanModFix", "LICENSE-client.txt"),
+            (args.translation_root / "LICENSE", "LICENSE-translations.txt"),
+        ):
+            destination = stage.joinpath(*BUNDLE_ROOT.parts) / name
+            shutil.copy2(source, destination)
+            expected[destination.relative_to(stage).as_posix()] = release.sha256_file(destination)
     staged_hashes = {
         path.relative_to(stage).as_posix(): release.sha256_file(path)
         for path in release.iter_package_files(stage)
@@ -189,9 +200,19 @@ def main() -> None:
     if not args.no_archive:
         release.create_deterministic_zip(stage, archive)
         validate_archive(archive, expected)
-    status_files = stage_server_status(project_root, work, dotnet, manifest["profiles"])
+    # Server companions are retired from the unified distribution.
+    if release_build and not args.no_archive:
+        unpacked = work / "unpacked-verification"
+        if unpacked.exists():
+            shutil.rmtree(unpacked)
+        with zipfile.ZipFile(archive) as package:
+            package.extractall(unpacked)  # Entries were checked against the exact safe-path manifest above.
+        run_windows_contract(build / "ClientLocaleContract/ClientLocaleContract.exe", [
+            unpacked.joinpath(*BUNDLE_ROOT.parts), matrix_path, work / "unpacked-contract-verification.json",
+        ])
     summary = {
-        "kind": "client-only-prototype",
+        "kind": "unified-client-release" if release_build else "client-only-development",
+        "mod_version": "2.1.0",
         "profiles": list(manifest["profiles"]),
         "short_name_contract": "passed: real Harmony with UI lifecycle stand-ins; not visual rendering",
         "runtime_contract": "passed: native reload fixture with actual Harmony and locale payloads",
@@ -201,10 +222,14 @@ def main() -> None:
         "archive": None if args.no_archive else archive.name,
         "archive_sha256": None if args.no_archive else release.sha256_file(archive),
         "files": expected,
-        "optional_server_status_files": status_files,
+        "server_companions_included": False,
     }
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Verified client-only prototype: {stage if args.no_archive else archive}")
+    if release_build and not args.no_archive:
+        for name in ("release-notes.md", "upload-instructions.md"):
+            shutil.copy2(project_root / "docs/releases" / ("2.1.0-" + name), work / name)
+        (work / "SHA256SUMS.txt").write_text(f"{release.sha256_file(archive)}  {archive.name}\n", encoding="utf-8")
+    print(f"Verified unified client files: {stage if args.no_archive else archive}")
 
 
 if __name__ == "__main__":

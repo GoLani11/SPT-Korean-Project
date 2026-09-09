@@ -1,21 +1,21 @@
 # Business Rules
 
-## Supported Releases
+## Release format and compatibility
 
-These rules describe published releases. The separately built [client-only prototype](client-locale-prototype.md) experiments with one installer-free client bundle across nine exact test profiles; it is not a new release compatibility promise.
+2.1.0 uses one plugin-only ZIP, `SPT-KR-2.1.0.zip`, containing both Korean and Korean–English modes. Users install the BepInEx folder at the game root. No installer, server mod, status companion, game executable, save or personal configuration is included.
 
-The exact supported SPT versions are 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, and 4.1.0. SPT 4.1.2 and 4.1.3 share one labelled archive whose server metadata uses the bounded `>=4.1.2 <=4.1.3` range. SPT 4.1.1, prereleases, 4.2, and unlabelled later patches are not release targets.
+Explicit SPT profiles are 3.8.3, 3.9.8, 3.10.5, 3.11.4, 4.0.13, 4.1.0, 4.1.2, 4.1.3 and 4.1.5. Unlisted stable patches from 4.1.2 up to, but excluding, 4.2.0 require matching EFT build, English source and native hooks. Exact profiles cannot silently fall back after a validation failure. 4.1.1, prereleases and other unlisted families are rejected.
 
-Each release label has one ZIP containing both the Korean and Korean-English locale payloads. A universal cross-version ZIP is intentionally not published because it would leave unused server-mod folders in the installation.
+The matching local server database is required. A remote-server-only client is outside the supported installation model. Runtime fixture coverage must be distinguished from actual installed-client inspection and visual testing.
 
-## Translation Ownership
+## Translation ownership and behavior
 
-Release locale files come only from the generated outputs in the sibling `spt-korean-translate` repository. This repository must not keep or hand-edit duplicate locale snapshots.
+Locale files come from generated outputs of the sibling `spt-korean-translate` repository. Do not hand-edit duplicate translation snapshots here. Payload hashes, key order and the installed English key/value set must validate before localization starts.
 
-The SPT 4.1.0 archive uses its own generated output and exact-gated server and client binaries. The shared 4.1.2–4.1.3 archive uses the 4.1.3 generated locale output only when the release builder confirms that its English, KR, and KR-EN values and order match 4.1.2. Its server binary is built against the lowest admitted 4.1.2 API.
+The client provides adjacent native language choices and switching without restart, preserves unknown mod keys and does not rewrite server databases. Already-rendered server/mod messages are not guaranteed to be translated. The game log reports version and initialization results; there is no separate server startup notice.
 
-## Installation Promise
+## Updating and publication
 
-Users select the ZIP matching their exact SPT version; only SPT 4.1.2 and 4.1.3 share the explicitly labelled `4.1.2-4.1.3` archive. Archives have no wrapper directory, installer, script, executable, or payload for another SPT layout family.
+Users back up and remove old Korean server modules, test status companions and duplicate client DLLs before installing. Backups must be outside mod/plugin discovery paths. See [installation and rollback](releases/2.1.0-install.md).
 
-The server mod overlays the built-in `kr` locale and registers `kr-en` in the native language list at runtime. Users switch between them through the existing interface-language setting without restarting. The selected client plugin supplies the Korean font fallback for both locale IDs, adjusts UI presentation, and safely skips features missing from an older client.
+The release is prepared locally before publication. Ordinary source commits and pushes do not publish a GitHub release. The author creates the release/tag and uploads the verified ZIP following [upload instructions](releases/2.1.0-upload-instructions.md).

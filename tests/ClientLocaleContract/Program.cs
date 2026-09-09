@@ -46,6 +46,7 @@ internal static class Program
     private static async Task Run(string[] args)
     {
         var manifest = JObject.Parse(File.ReadAllText(Path.Combine(args[0], "manifest.json")));
+        CheckReleaseBinary(args[0], manifest);
         var installations = JObject.Parse(File.ReadAllText(args[1]));
         var cases = ((JObject)manifest["profiles"]).Properties().Concat(new[]
         {
@@ -96,6 +97,23 @@ internal static class Program
         }
         CheckPatchUpgrades(args[0], (string)installations["4.1.5"]["root"]);
         CheckInvalidPayloads(args[0], (string)installations["3.8.3"]["root"]);
+    }
+
+    private static void CheckReleaseBinary(string bundleRoot, JObject manifest)
+    {
+        var path = Path.Combine(Path.GetDirectoryName(bundleRoot), "GoLani.KoreanModFix.dll");
+        using (var assembly = Mono.Cecil.AssemblyDefinition.ReadAssembly(path))
+        {
+            Expect(assembly.Name.Version == new Version(2, 1, 0, 0), "Release assembly version 2.1.0");
+            var plugin = assembly.MainModule.Types.Single(type => type.FullName == "KoreanPatchFix.Plugin");
+            var registration = plugin.CustomAttributes.Single(attribute => attribute.AttributeType.FullName == "BepInEx.BepInPlugin");
+            Expect((string)registration.ConstructorArguments[2].Value == "2.1.0", "BepInEx plugin version 2.1.0");
+            Expect((string)plugin.Fields.Single(field => field.Name == "PluginVersion").Constant == "2.1.0", "Log version 2.1.0");
+        }
+        Expect((string)manifest["clientVersion"] == "2.1.0", "Manifest version 2.1.0");
+        using (var sha = SHA256.Create())
+            Expect(BitConverter.ToString(sha.ComputeHash(File.ReadAllBytes(path))).Replace("-", "").ToLowerInvariant()
+                == (string)manifest["clientDllSha256"], "Manifest references the shipped client binary");
     }
 
     private static void CheckPatchUpgrades(string bundleRoot, string gameRoot)

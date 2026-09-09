@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace KoreanPatchFix
 {
-    // Only the prototype references this file. Released server/client packages keep their existing behavior.
+    // Used by the unified client build; legacy server-based builds retain their own locale flow.
     internal sealed class ClientLocaleBundle
     {
         internal const string Korean = "kr";
@@ -108,7 +108,7 @@ namespace KoreanPatchFix
             if (installed.Count != english.Count || english.Any(entry =>
                 !installed.TryGetValue(entry.Key, out var value) || value != entry.Value))
             {
-                throw new InvalidDataException("Installed English locale differs from the verified translation source; the prototype was not enabled.");
+                throw new InvalidDataException("Installed English locale differs from the verified translation source; localization was not enabled.");
             }
 
             return new ClientLocaleBundle(sptVersion, profileVersion, translationVersion, files["kr.json"], files["kr-en.json"]);

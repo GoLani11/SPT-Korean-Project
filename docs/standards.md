@@ -23,7 +23,7 @@ Keep compatibility edits small. Locale translations belong to `spt-korean-transl
 Use the real user entry points when possible:
 
 ```powershell
-..\spt-korean-translate\.venv\Scripts\python.exe .\tools\package_release_versions.py
+..\spt-korean-translate\.venv\Scripts\python.exe .\tools\package_release.py
 ```
 
 Document any blocked verification separately from successful static checks.

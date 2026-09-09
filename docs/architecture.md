@@ -1,28 +1,21 @@
 # Architecture
 
-## Runtime Components
+## Current release: 2.1.0
 
-An experimental `src/ClientLocalePrototype` build shares the existing UI patch source and adds client-side locale loading for nine exact test profiles. Its separate ZIP contains only `BepInEx/plugins` files. It does not change the release matrix below. See [client-only localization prototype](client-locale-prototype.md) for its native reload hooks and verification limits.
+`src/ClientLocalePrototype` is the production build for the unified client release; its directory name is retained from development. It links the existing UI fixes in `src/ClientModFixPlugin` and adds client locale loading. It emits the net48 `GoLani.KoreanModFix.dll` with the existing plugin GUID and release version 2.1.0.
 
-The release contains one client plugin and one server locale mod selected for the target SPT version.
+The only distributed archive is `SPT-KR-2.1.0.zip`. It contains the plugin, a manifest, English/Korean/bilingual payloads and documentation under `BepInEx/plugins`. No server mod or status companion is built or shipped by this release path.
 
-```text
-src/ClientModFixPlugin -> universal net48 BepInEx plugin
-src/ClientModFixPlugin410 -> SPT 4.1.0-gated net48 BepInEx plugin
-src/ServerLocaleMod3   -> SPT 3.x CommonJS server mod
-src/ServerLocaleMod40  -> SPT 4.0.13 net9 server mod
-src/ServerLocaleMod410 -> exact SPT 4.1.0 net10 server mod
-src/ServerLocaleMod    -> shared SPT 4.1.2–4.1.3 net10 server mod
-```
+## Locale flow
 
-The client projects reference only the BepInEx, Harmony, Unity, and TextMeshPro assemblies shared by the supported installs. EFT and SPT client types are resolved by name at runtime. The 4.1.0 build has an exact compatibility gate; the other build admits the exact legacy versions and stable 4.1 patches starting at 4.1.2. Public method names are preferred, older clients fall back to stable `Show` entry points, and unavailable features such as pre-3.11 prestige rewards are skipped.
+The sibling `spt-korean-translate` generated outputs are the translation source. Nine explicit profiles select eight payload sets; 4.1.5 reuses 4.1.3 after English-source validation. Exact profiles take precedence. Unlisted stable 4.1.2+ patches below 4.2.0 can reuse the 4.1.5 profile only when the EFT build, installed English key/value set, payload integrity and native hooks match.
 
-## Locale Flow
+The client verifies numeric PE version fields, manifest hashes and locale key order before enabling localization. Native hooks register `kr-en`, reuse the Korean backend/menu locale, overlay the selected payload and apply Korean font fallback. Native language switching and settings persistence remain in use. Backend dictionaries and unknown mod keys are preserved. The server database and HTTP endpoints are not modified.
 
-The sibling `spt-korean-translate` repository is the only release locale source. For each release, packaging validates that both generated payloads have the exact key set, key order, and string value types of the declared locale source. The shared SPT 4.1.2–4.1.3 archive uses the 4.1.3 output only after the English, KR, and KR-EN JSON values and order have been proven equivalent to 4.1.2.
+See [runtime details](client-locale-prototype.md) for the five hooks and validation boundaries. Text already rendered into literal server/mod messages may remain untranslated.
 
-Every server mod overlays `kr.json` onto the built-in `kr` locale and registers `kr-en` as a second global locale built from the same Korean base plus `kr-en.json`. The new locale inherits the built-in Korean menu locale and is added to the native language list. The client plugin maps `kr-en` to the Korean font fallback while leaving the selected culture unchanged, so the game's normal language reload and persistence flow handles switching. No package edits SPT's original locale files.
+## Release flow
 
-## Release Flow
+`tools/package_release.py` calls the common builder in release mode. It builds the client and contracts, verifies Windows .NET Framework plus available Unity Mono runtimes, stages both language modes, creates a deterministic archive, validates exact paths and hashes, and reruns the locale contract on extracted ZIP contents. It also writes release notes, upload instructions, SHA-256 and `verification.json` to `artifacts/release-2.1.0`.
 
-`tools/package_release_versions.py` builds all binary targets once, stages only the target version's server mod with both locale payloads, selects the matching client DLL, and creates seven deterministic ZIP files. Every archive is reopened and checked for safe paths, exact root folders, source hashes for both locales and both DLL payloads, exact 3.x manifest compatibility, and forbidden installer files.
+The server locale/status projects and `tools/package_release_versions.py` remain historical implementations. They are not dependencies or contents of the current release ZIP. Publication is a separate author action.

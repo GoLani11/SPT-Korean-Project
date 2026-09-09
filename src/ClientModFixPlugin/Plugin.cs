@@ -16,11 +16,7 @@ namespace KoreanPatchFix
     {
         public const string PluginGuid = "com.GoLani.koreanpatchfix";
         public const string PluginName = "Korean Patch Fix";
-#if CLIENT_LOCALE_PROTOTYPE
-        public const string PluginVersion = "2.2.0";
-#else
         public const string PluginVersion = "2.1.0";
-#endif
 
         private void Awake()
         {
@@ -38,11 +34,11 @@ namespace KoreanPatchFix
                 ClientLocaleRuntime.Enable(new Harmony(PluginGuid + ".clientlocale"), gameAssembly, bundle);
                 if (bundle.ProfileVersion != detectedVersion)
                     Logger.LogInfo($"SPT {detectedVersion} | 번역 기준 {bundle.TranslationVersion}: 호환성 검사 통과 — 기존 번역 사용 (프로필 {bundle.ProfileVersion}).");
-                Logger.LogInfo($"Client-only localization prototype: SPT {detectedVersion}, translation {bundle.TranslationVersion}, {bundle.SourceKeyCount} source keys per mode.");
+                Logger.LogInfo($"[고라니 SPT 한글화 v{PluginVersion} | SPT {detectedVersion}] 번역 데이터 로드 및 언어 패치 적용 완료! 번역 기준 {bundle.TranslationVersion}, 한글판 / 한영 병기판 각 {bundle.SourceKeyCount:N0}개.");
             }
             catch (Exception error)
             {
-                Logger.LogError($"Client-only localization prototype was not enabled: {error}");
+                Logger.LogError($"[고라니 SPT 한글화 v{PluginVersion}] 적용하지 못했습니다: {error}");
                 return;
             }
 #else
