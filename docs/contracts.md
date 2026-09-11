@@ -2,26 +2,39 @@
 
 ## Stable Identities
 
-The server mod GUID is `com.golani.korean`. The BepInEx identity remains `com.GoLani.koreanpatchfix` / `Korean Patch Fix`. Both components use package version `2.1.0`.
+The BepInEx identity remains `com.GoLani.koreanpatchfix` / `Korean Patch Fix`, with package version `2.1.0`. The historical server mod GUID is `com.golani.korean`; no server module is included in the unified release.
 
 ## Package Names
 
 ```text
-SPT-KR-<version-or-range>.zip
+SPT-KR-2.1.0.zip
 ```
 
-Exactly seven archives are produced for five legacy exact versions, exact SPT 4.1.0, and the shared SPT 4.1.2–4.1.3 range. Every archive copies `kr.generated.json` to `locale/kr.json` and `kr-en.generated.json` to `locale/kr-en.json`. The `KR` source still preserves reference-formatted quest titles, objectives, exceptional quest headers, item-description English headers, and verified raid-exfil names.
+`tools/package_release.py` produces one plugin-only archive for all nine profiles in `tools/client-locale-prototype.json`. Eight translation datasets are included; SPT 4.1.5 uses the 4.1.3 dataset. The manifest records the translation version, EFT version, installed English path and payload hashes for each profile.
+
+For each dataset, the archive copies the translation repository's `input/en.json`, `kr.generated.json` and `kr-en.generated.json` to `locales/<translationVersion>/en.json`, `kr.json` and `kr-en.json`. The `KR` source still preserves reference-formatted quest titles, objectives, exceptional quest headers, item-description English headers, and verified raid-exfil names. Locale values and key order must match the selected translation sources exactly.
 
 The public locale IDs are `kr` for the existing Korean display and `kr-en` for full Korean-English display. The native language list displays `kr` as `한국어 (Korean)` and places `kr-en`, displayed as `한국어 (한영 병기)`, immediately after it. The game owns selection persistence and reload behavior.
 
 ## Archive Layouts
 
 ```text
-SPT 3.x:    BepInEx/plugins + user/mods/spt_korean_localization_G&M
-SPT 4.0.13: BepInEx/plugins + SPT/user/mods/SPT_Korean_Localization
-SPT 4.1.0 and 4.1.2–4.1.3: BepInEx/plugins + SPT_Runtime/user/mods/SPT_Korean_Localization
+BepInEx/plugins/
+├─ GoLani.KoreanModFix.dll
+└─ SPT-Korean/
+   ├─ manifest.json
+   ├─ locales/<translationVersion>/
+   │  ├─ en.json
+   │  ├─ kr.json
+   │  └─ kr-en.json
+   ├─ README-ko.md
+   ├─ LICENSE-mod.txt
+   ├─ LICENSE-client.txt
+   └─ LICENSE-translations.txt
 ```
 
-Each archive contains exactly `locale/kr.json` and `locale/kr-en.json`. The client payload is always `BepInEx/plugins/GoLani.KoreanModFix.dll`. A 3.x `package.json` contains only the exact loader field for that release: `akiVersion` for 3.8.3 and `sptVersion` for 3.9.8–3.11.4.
+The archive contains exactly 30 files for the current profile matrix. It includes no server locale module, server status companion, installer, game executable or personal configuration.
 
-Archive entries must be relative, remain under the two expected root folders, and contain no `.bat`, `.cmd`, or `.exe` file. Both packaged locales, the client DLL, server DLL, and dependency manifest must match the selected build sources by SHA-256.
+Archive entries must be relative, remain under `BepInEx/plugins`, and contain no `.bat`, `.cmd`, or `.exe` file. Every entry must match the verified staging manifest by SHA-256. The locale manifest also records the client DLL hash and version. The completed ZIP is extracted and its payloads are rechecked by the Windows locale contract.
+
+`tools/package_release_versions.py` retains the historical server-based, version-specific packaging implementation; it is not the 2.1.0 release entry point.
