@@ -15,9 +15,10 @@ values; older datasets retain their version-specific overrides and quest facts.
 The existing IceBreaker name and Boreas description remain included, and the
 4.1.5 profile continues to use the verified 4.1.3 dataset.
 
-The active `D:\SPT-Korean-Release\2.1.0` handoff is refreshed in place without a new
-backup at the user's request. Updating the live `D:\SPT` installation was deferred
-by the user; its existing 2.2.0 test plugin and server status companion remain in place.
+The active `D:\SPT-Korean-Release\2.1.0` handoff and six available SPT installation
+roots were refreshed in place without a new backup at the user's request. The installed
+plugin and locale bundle now report 2.1.0, and the retired test status companions were
+removed from those roots.
 
 ## Verification
 
@@ -28,6 +29,7 @@ by the user; its existing 2.2.0 test plugin and server status companion remain i
 - The final ZIP is reopened for exact file-path/hash validation, extracted, and tested again on Windows .NET Framework.
 - Binary assembly version, plugin registration, version constant, manifest version and DLL hash are checked together.
 - Translation validation passes all 268 pytest tests and rebuilds all eight supported versions without changing the pinned outputs. All nine Python packaging tests pass. The release plugin and two contract projects build with zero warnings/errors using the local SPT 3.8.3 client references.
+- All 30 package files match the release archive on each installed root, and each installed English source matches its selected profile. Windows native-flow verification passes against all six installed bundles. SPT 3.8.3, 3.9.8, 3.10.5, 3.11.4 and 4.1.5 also pass 1,164,129 assertions and 28 short-name checks on their own Unity Mono runtimes.
 
 Changed values in each language mode, compared with the September 11 handoff:
 
@@ -45,7 +47,7 @@ Changed values in each language mode, compared with the September 11 handoff:
 
 ## Limits
 
-Local 4.0.13 lacks game assemblies/runtime; 4.1.0, 4.1.2 and 4.1.3 game clients are unavailable. Their payload and fixture coverage does not establish actual-client or visual compatibility. Automated Unity Mono tests do not render game screens. This refresh has not been visually tested in the game.
+Local 4.0.13 lacks game assemblies/runtime; its installed payload passes hash, English-source and Windows fixture checks only. SPT 4.1.0, 4.1.2 and 4.1.3 installation roots are unavailable, so their profiles retain payload and fixture coverage only. Automated Unity Mono tests do not render game screens. This refresh has not been visually tested in the game.
 
 The matching local server database is required. Server-rendered text and every other-mod combination are not guaranteed. Future stable 4.1.x patches must pass runtime compatibility checks; the simulated upgrade does not certify an actual future installation.
 
