@@ -30,12 +30,12 @@
       "englishPath": "SPT/SPT_Data/database/locales/global/en.json"
     },
     "4.1.0": {
-      "translationVersion": "4.1.2",
+      "translationVersion": "4.1.5",
       "eftVersion": "0.16.9.40743",
       "englishPath": "SPT_Runtime/SPT_Data/database/locales/global/en.json"
     },
     "4.1.2": {
-      "translationVersion": "4.1.2",
+      "translationVersion": "4.1.5",
       "eftVersion": "0.16.9.40743",
       "englishPath": "SPT_Runtime/SPT_Data/database/locales/global/en.json"
     },

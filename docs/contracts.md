@@ -10,7 +10,7 @@ The BepInEx identity remains `com.GoLani.koreanpatchfix` / `Korean Patch Fix`, w
 SPT-KR-2.1.0.zip
 ```
 
-`tools/package_release.py` produces one plugin-only archive for all nine profiles in `tools/client-locale-prototype.json`. Seven translation datasets are included; SPT 4.1.0 uses the identical 4.1.2 dataset, while SPT 4.1.3 and 4.1.5 share `locales/4.1.5`. The build-only `translationSources` mapping packages the unchanged 4.1.3 source dataset under the 4.1.5 folder name. The manifest records the packaged translation version, EFT version, installed English path and payload hashes for each profile.
+`tools/package_release.py` produces one plugin-only archive for all nine profiles in `tools/client-locale-prototype.json`. Six translation datasets are included; all supported SPT 4.1 profiles share the identical data in `locales/4.1.5`. The build-only `translationSources` mapping packages the unchanged 4.1.3 source dataset under the 4.1.5 folder name. The manifest records the packaged translation version, EFT version, installed English path and payload hashes for each profile.
 
 For each dataset, the archive copies the translation repository's `input/en.json`, `kr.generated.json` and `kr-en.generated.json` to `locales/<translationVersion>/en.json`, `kr.json` and `kr-en.json`. The `KR` source still preserves reference-formatted quest titles, objectives, exceptional quest headers, item-description English headers, and verified raid-exfil names. Locale values and key order must match the selected translation sources exactly.
 
@@ -32,7 +32,7 @@ BepInEx/plugins/
    └─ LICENSE-translations.txt
 ```
 
-The archive contains exactly 26 files for the current profile matrix. Installation instructions are provided in the release description; no README is bundled. It includes no server locale module, server status companion, installer, game executable or personal configuration.
+The archive contains exactly 23 files for the current profile matrix. Installation instructions are provided in the release description; no README is bundled. It includes no server locale module, server status companion, installer, game executable or personal configuration.
 
 Archive entries must be relative, remain under `BepInEx/plugins`, and contain no `.bat`, `.cmd`, or `.exe` file. Every entry must match the verified staging manifest by SHA-256. The locale manifest also records the client DLL hash and version. The completed ZIP is extracted and its payloads are rechecked by the Windows locale contract.
 
