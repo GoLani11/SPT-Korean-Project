@@ -27,13 +27,12 @@ BepInEx/plugins/
    │  ├─ en.json
    │  ├─ kr.json
    │  └─ kr-en.json
-   ├─ README-ko.md
    ├─ LICENSE-mod.txt
    ├─ LICENSE-client.txt
    └─ LICENSE-translations.txt
 ```
 
-The archive contains exactly 30 files for the current profile matrix. It includes no server locale module, server status companion, installer, game executable or personal configuration.
+The archive contains exactly 29 files for the current profile matrix. Installation instructions are provided in the release description; no README is bundled. It includes no server locale module, server status companion, installer, game executable or personal configuration.
 
 Archive entries must be relative, remain under `BepInEx/plugins`, and contain no `.bat`, `.cmd`, or `.exe` file. Every entry must match the verified staging manifest by SHA-256. The locale manifest also records the client DLL hash and version. The completed ZIP is extracted and its payloads are rechecked by the Windows locale contract.
 

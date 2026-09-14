@@ -183,7 +183,6 @@ def main(release_build: bool = False) -> None:
         mono_reports.append({"hostSptVersion": label, **release.load_ordered_json(mono_report)})
     if release_build:
         for source, name in (
-            (project_root / "docs/releases/2.1.0-install.md", "README-ko.md"),
             (project_root / "LICENSE.md", "LICENSE-mod.txt"),
             (project_root / "src/ClientModFixPlugin/LICENSE.GoLani.KoreanModFix", "LICENSE-client.txt"),
             (args.translation_root / "LICENSE", "LICENSE-translations.txt"),
