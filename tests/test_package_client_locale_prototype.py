@@ -14,7 +14,7 @@ class ClientPrototypePackageTests(unittest.TestCase):
     def test_stage_keeps_version_specific_values_and_hashes(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for version, text in [("3.8.3", "22:00-05:00"), ("4.1.3", "21:00-06:00")]:
+            for version, text in [("3.8.3", "22:00-05:00"), ("4.1.2", "21:00-06:00"), ("4.1.3", "21:00-06:00")]:
                 english = root / "source" / "versions" / version / "input" / "en.json"
                 english.parent.mkdir(parents=True)
                 english.write_text(json.dumps({"quest": text}), encoding="utf-8")
@@ -23,14 +23,17 @@ class ClientPrototypePackageTests(unittest.TestCase):
                 for mode in ("kr", "kr-en"):
                     (output / f"{mode}.generated.json").write_text(json.dumps({"quest": mode + text}), encoding="utf-8")
             config = json.loads(prototype.PROFILE_FILE.read_text())
-            config["profiles"] = {key: value for key, value in config["profiles"].items() if key in ("3.8.3", "4.1.5")}
+            config["profiles"] = {key: value for key, value in config["profiles"].items() if key in ("3.8.3", "4.1.0", "4.1.2", "4.1.5")}
             profile_file = root / "profiles.json"
             profile_file.write_text(json.dumps(config))
             expected = prototype.stage_payloads(root / "source", root / "stage", profile_file)
-            self.assertEqual(len(expected), 7)
+            self.assertEqual(len(expected), 10)
             for name, digest in expected.items():
                 self.assertEqual(hashlib.sha256((root / "stage" / name).read_bytes()).hexdigest(), digest)
             manifest = json.loads((root / "stage/BepInEx/plugins/SPT-Korean/manifest.json").read_text())
+            self.assertEqual(manifest["profiles"]["4.1.0"]["translationVersion"], "4.1.2")
+            self.assertEqual(manifest["profiles"]["4.1.0"], manifest["profiles"]["4.1.2"])
+            self.assertFalse((root / "stage/BepInEx/plugins/SPT-Korean/locales/4.1.0").exists())
             self.assertEqual(manifest["profiles"]["4.1.5"]["translationVersion"], "4.1.3")
             self.assertNotEqual(
                 manifest["profiles"]["3.8.3"]["sha256"]["kr.json"],
