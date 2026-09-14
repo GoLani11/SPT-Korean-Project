@@ -23,7 +23,7 @@ class ClientPrototypePackageTests(unittest.TestCase):
                 for mode in ("kr", "kr-en"):
                     (output / f"{mode}.generated.json").write_text(json.dumps({"quest": mode + text}), encoding="utf-8")
             config = json.loads(prototype.PROFILE_FILE.read_text())
-            config["profiles"] = {key: value for key, value in config["profiles"].items() if key in ("3.8.3", "4.1.0", "4.1.2", "4.1.5")}
+            config["profiles"] = {key: value for key, value in config["profiles"].items() if key in ("3.8.3", "4.1.0", "4.1.2", "4.1.3", "4.1.5")}
             profile_file = root / "profiles.json"
             profile_file.write_text(json.dumps(config))
             expected = prototype.stage_payloads(root / "source", root / "stage", profile_file)
@@ -34,7 +34,13 @@ class ClientPrototypePackageTests(unittest.TestCase):
             self.assertEqual(manifest["profiles"]["4.1.0"]["translationVersion"], "4.1.2")
             self.assertEqual(manifest["profiles"]["4.1.0"], manifest["profiles"]["4.1.2"])
             self.assertFalse((root / "stage/BepInEx/plugins/SPT-Korean/locales/4.1.0").exists())
-            self.assertEqual(manifest["profiles"]["4.1.5"]["translationVersion"], "4.1.3")
+            self.assertEqual(manifest["profiles"]["4.1.5"]["translationVersion"], "4.1.5")
+            self.assertEqual(manifest["profiles"]["4.1.3"], manifest["profiles"]["4.1.5"])
+            self.assertFalse((root / "stage/BepInEx/plugins/SPT-Korean/locales/4.1.3").exists())
+            self.assertEqual(
+                (root / "stage/BepInEx/plugins/SPT-Korean/locales/4.1.5/kr.json").read_bytes(),
+                (root / "source/output/4.1.3/kr.generated.json").read_bytes(),
+            )
             self.assertNotEqual(
                 manifest["profiles"]["3.8.3"]["sha256"]["kr.json"],
                 manifest["profiles"]["4.1.5"]["sha256"]["kr.json"],
@@ -42,6 +48,11 @@ class ClientPrototypePackageTests(unittest.TestCase):
             (root / "source/output/3.8.3/kr.generated.json").write_text('{"wrong-key":"text"}', encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "key set/order mismatch"):
                 prototype.stage_payloads(root / "source", root / "stage-invalid", profile_file)
+            config["profiles"] = {"4.1.5": config["profiles"]["4.1.5"]}
+            config["translationSources"]["4.1.5"] = "../4.1.3"
+            profile_file.write_text(json.dumps(config))
+            with self.assertRaisesRegex(ValueError, "invalid SPT or translation version"):
+                prototype.stage_payloads(root / "source", root / "stage-invalid-source", profile_file)
 
     def test_archive_rejects_installer_server_paths_and_corrupt_payloads(self):
         with tempfile.TemporaryDirectory() as temporary:

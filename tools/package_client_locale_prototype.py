@@ -27,12 +27,13 @@ def stage_payloads(translation_root: Path, stage_root: Path, profile_file: Path 
     expected = {}
     for version, source_profile in config["profiles"].items():
         translation_version = source_profile["translationVersion"]
-        if not re.fullmatch(r"\d+\.\d+\.\d+", version) or not re.fullmatch(r"\d+\.\d+\.\d+", translation_version):
+        source_version = config.get("translationSources", {}).get(translation_version, translation_version)
+        if not all(re.fullmatch(r"\d+\.\d+\.\d+", value) for value in (version, translation_version, source_version)):
             raise ValueError(f"invalid SPT or translation version: {version}")
         sources = {
-            "en.json": translation_root / "versions" / translation_version / "input" / "en.json",
-            "kr.json": translation_root / "output" / translation_version / "kr.generated.json",
-            "kr-en.json": translation_root / "output" / translation_version / "kr-en.generated.json",
+            "en.json": translation_root / "versions" / source_version / "input" / "en.json",
+            "kr.json": translation_root / "output" / source_version / "kr.generated.json",
+            "kr-en.json": translation_root / "output" / source_version / "kr-en.generated.json",
         }
         for name in ("kr.json", "kr-en.json"):
             release.validate_locale_pair(sources["en.json"], sources[name])
