@@ -12,8 +12,6 @@ SPT-KR-2.1.0.zip
 
 `tools/package_release.py` produces one plugin-only archive for all nine profiles in `tools/client-locale-prototype.json`. Seven translation datasets are included; SPT 4.1.0 uses the identical 4.1.2 dataset, and SPT 4.1.5 uses the 4.1.3 dataset. The manifest records the translation version, EFT version, installed English path and payload hashes for each profile.
 
-At the user's request, SPT 4.1.0 is no longer a separate maintenance target. Do not perform dedicated translation edits, builds, packaging, installations or validation for 4.1.0, and do not recreate `locales/4.1.0`. Preserve its existing compatibility profile pointing to 4.1.2 and its coverage within the existing unified checks.
-
 For each dataset, the archive copies the translation repository's `input/en.json`, `kr.generated.json` and `kr-en.generated.json` to `locales/<translationVersion>/en.json`, `kr.json` and `kr-en.json`. The `KR` source still preserves reference-formatted quest titles, objectives, exceptional quest headers, item-description English headers, and verified raid-exfil names. Locale values and key order must match the selected translation sources exactly.
 
 The public locale IDs are `kr` for the existing Korean display and `kr-en` for full Korean-English display. The native language list displays `kr` as `한국어 (Korean)` and places `kr-en`, displayed as `한국어 (한영 병기)`, immediately after it. The game owns selection persistence and reload behavior.
