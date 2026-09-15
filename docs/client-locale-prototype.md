@@ -1,6 +1,6 @@
-# Client-side localization — 2.1.0
+# Client-side localization — 2.1.1
 
-The former prototype is the implementation shipped in the unified 2.1.0 release. The historical source/document filenames are retained. See the [installation guide](releases/2.1.0-install.md) for migration and rollback. These are the explicit source profiles:
+The former prototype is the implementation shipped in the unified 2.1.1 release. The historical source/document filenames are retained. See the [installation guide](releases/2.1.1-install.md) for migration and rollback. These are the explicit source profiles:
 
 | SPT | EFT executable file version | Translation source |
 | --- | --- | --- |
@@ -9,8 +9,8 @@ The former prototype is the implementation shipped in the unified 2.1.0 release.
 | 3.10.5 | 0.15.5.33420 | 3.10.5 |
 | 3.11.4 | 0.16.1.35392 | 3.11.4 |
 | 4.0.13 | 0.16.9.40087 | 4.0.13 |
-| 4.1.0 | 0.16.9.40743 | 4.1.0 |
-| 4.1.2 | 0.16.9.40743 | 4.1.2 |
+| 4.1.0 | 0.16.9.40743 | 4.1.3 (packaged as 4.1.5) |
+| 4.1.2 | 0.16.9.40743 | 4.1.3 (packaged as 4.1.5) |
 | 4.1.3 | 0.16.9.40743 | 4.1.3 |
 | 4.1.5 | 0.16.9.40743 | 4.1.3, after matching the installed English locale |
 
@@ -19,7 +19,7 @@ An unlisted stable SPT 4.1.x patch at or above 4.1.2 may reuse the 4.1.5 profile
 ## Package
 
 ```text
-stage/ (release ZIP: SPT-KR-2.1.0.zip)
+stage/ (release ZIP: SPT-KR-2.1.1.zip)
 └─ BepInEx/plugins/
    ├─ GoLani.KoreanModFix.dll
    └─ SPT-Korean/
@@ -30,7 +30,7 @@ stage/ (release ZIP: SPT-KR-2.1.0.zip)
          └─ 4.1.3/{en,kr,kr-en}.json
 ```
 
-The archive contains no server mod, installer, command script, game assembly, or replacement game database. The plugin keeps its existing GUID and filename and uses release version 2.1.0. The generated English and translation payloads remain owned by `spt-korean-translate`.
+The archive contains no server mod, installer, command script, game assembly, or replacement game database. The plugin keeps its existing GUID and filename and uses release version 2.1.1. The generated English and translation payloads remain owned by `spt-korean-translate`.
 
 ## Runtime behavior
 
@@ -45,7 +45,7 @@ The client discovers the localization manager by the `UpdateLocales(string, Dict
 - `Init` inserts `kr-en` immediately after `kr` in the native language list.
 - `ReloadBackendLocale` requests the existing `kr` backend locale when the user selected `kr-en`, including a saved/default selection. The selected culture and native settings persistence remain `kr-en`.
 - `UpdateMainMenuLocales` copies the Korean menu into the bilingual locale.
-- `UpdateLocales` overlays the selected generated payload and mirrors subsequent Korean dialogue/mod fragments into the bilingual locale. Unknown mod keys survive and cached input dictionaries are not mutated.
+- `UpdateLocales` translates unchanged backend entries and preserves modified/new entries. Raw Korean dialogue/mod fragments are accumulated per manager and mirrored into the bilingual locale before applying its translation. Cached input dictionaries are not mutated.
 - The font update method uses Korean fallback fonts for `kr-en`, without changing the selected culture.
 
 Both locales exist before the native reload event refreshes the screen. Mirroring is limited to updates whose locale ID is `kr`, so it cannot recursively mirror itself. Case aliases are folded in source order before constructing EFT's case-insensitive locale dictionary. Existing UI correction source is shared with the released client plugin; its standalone prototype resolves the current culture through the native localization manager.
@@ -62,7 +62,7 @@ python .\tools\package_release.py --spt-383-root D:\SPT_3.8.3 --spt-415-root D:\
 
 Use `--dotnet` to select an SDK executable and `--translation-root` to select the translation checkout. Add `--no-archive` to stage and verify the files for direct copying without creating a ZIP. The command rebuilds the plugin and contract executable, verifies the real client metadata and payloads, and executes the actual Harmony patches against a native-flow fixture in isolated processes: Windows .NET Framework and every complete installation's bundled Unity Mono runtime. Missing clients are explicitly reported as payload/fixture-only coverage; they are never marked as installed-client probes. It then verifies staged files and, unless disabled, creates and verifies the common client ZIP. Release mode also extracts the archive and runs the Windows locale contract on its actual contents. No server companion is built.
 
-Output is under `artifacts/release-2.1.0/`, including `verification.json` and `contract-verification.json`. Generated files are not committed. The contract's JSON dependency is an official signed package because the game's modified JSON DLL is accepted by Unity Mono but fails Windows CLR strong-name validation. The shipped plugin still references the game's existing JSON assembly and does not bundle another copy.
+Output is under `artifacts/release-2.1.1/`, including `verification.json` and `contract-verification.json`. Generated files are not committed. The contract's JSON dependency is an official signed package because the game's modified JSON DLL is accepted by Unity Mono but fails Windows CLR strong-name validation. The shipped plugin still references the game's existing JSON assembly and does not bundle another copy.
 
 The contract covers cold bilingual startup before/after session creation, null/default language selection, old cached and current reloading clients, repeated native language switches, every generated translation value, case aliases, later dialogue/mod fragments, preservation of backend response objects, async failures, unsupported versions, wrong source/build, corrupt payloads, and duplicate JSON keys. Client probes verify the five locale entry points, native asynchronous reload call sequence, and existing UI patch entry points in the actual game assemblies.
 
@@ -70,9 +70,9 @@ The Mono checks host only the managed test executable in the game's runtime; the
 
 ## Local game test
 
-Follow the [installation guide](releases/2.1.0-install.md), including removal of old server modules. Check both language choices, immediate switching in both directions, persisted selection after restart, quest/item text, trader dialogue, Korean glyphs and existing UI corrections. The Insomnia objective should show 22:00–05:00 on 3.8.3 and 21:00–06:00 on 4.1.5. Check server-generated messages separately.
+Follow the [installation guide](releases/2.1.1-install.md), including removal of old server modules. Check both language choices, immediate switching in both directions, persisted selection after restart, quest/item text, trader dialogue, Korean glyphs and existing UI corrections. The Insomnia objective should show 22:00–05:00 on 3.8.3 and 21:00–06:00 on 4.1.5. Check server-generated messages separately.
 
-The game log records `[고라니 SPT 한글화 v2.1.0 | SPT ...] 번역 데이터 로드 및 언어 패치 적용 완료!`. This reports locale initialization; individual UI patch results appear separately. There is no server console notification in this release.
+The game log records `[고라니 SPT 한글화 v2.1.1 | SPT ...] 번역 데이터 로드 및 언어 패치 적용 완료!`. This reports locale initialization; individual UI patch results appear separately. There is no server console notification in this release.
 
 ## Automatic patch-upgrade compatibility
 
@@ -85,3 +85,9 @@ SPT 4.1.6 | 번역 기준 4.1.3: 호환성 검사 통과 — 기존 번역 사�
 ```
 
 Contracts simulate 4.1.6 against the installed 4.1.5 game/data and exercise both native language reload behaviors. They also cover later patches, boundary/prerelease rejection, changed EFT/English, corrupt files, exact-profile precedence, a missing fallback, and missing native hook targets. This is a simulated upgrade, not a claim that an actual 4.1.6 game installation was tested.
+
+## Automatic preservation of mod text (2.1.1)
+
+The client compares raw Korean backend entries with the installed Korean database (English fallback for missing entries). Unchanged entries receive our translation; changed and new entries keep the server value in both Korean and bilingual modes. No user configuration or mod-specific allowlist is required. Modified text is preserved as a whole, including its original language; it is not machine-translated. Translation payload integrity checks remain enabled.
+
+Raw server fragments are retained per localization-manager instance and mirrored before translation so later partial updates cannot erase earlier mod changes. A server update restoring an original value restores our translation; restarting after uninstalling a mod also starts with a fresh comparison. Direct client-side UI replacements and on-disk modifications to the comparison database are outside this detection model.

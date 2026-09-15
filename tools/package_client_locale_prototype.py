@@ -114,16 +114,17 @@ def main(release_build: bool = False) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--translation-root", type=Path, default=project_root.parent / "spt-korean-translate")
     parser.add_argument("--dotnet")
+    parser.add_argument("--betterkeys-locale", type=Path, help="actual SPT 3.9.8 BetterKeys before/after snapshot")
     parser.add_argument("--installations-root", type=Path, default=Path("D:/" if os.name == "nt" else "/mnt/d"))
     parser.add_argument("--no-archive", action="store_true", help="stage and verify files for direct copying without creating a ZIP")
     parser.add_argument("--spt-383-root", type=Path, default=Path("D:/SPT_3.8.3" if os.name == "nt" else "/mnt/d/SPT_3.8.3"))
     parser.add_argument("--spt-415-root", type=Path, default=Path("D:/SPT" if os.name == "nt" else "/mnt/d/SPT"))
     args = parser.parse_args()
     dotnet = release.resolve_dotnet(args.dotnet, project_root)
-    work_name = "release-2.1.0" if release_build else "client-locale-prototype"
+    work_name = "release-2.1.1" if release_build else "client-locale-prototype"
     work = release.ensure_generated_output_path(project_root / "artifacts" / work_name, project_root)
     stage = work / "stage"
-    archive = work / ("SPT-KR-2.1.0.zip" if release_build else ARCHIVE_NAME)
+    archive = work / ("SPT-KR-2.1.1.zip" if release_build else ARCHIVE_NAME)
     if archive.exists():
         archive.unlink()
     summary_path = work / "verification.json"
@@ -148,7 +149,7 @@ def main(release_build: bool = False) -> None:
     expected[(PLUGIN_ROOT / release.CLIENT_DLL_NAME).as_posix()] = release.sha256_file(client)
     manifest_path = stage.joinpath(*BUNDLE_ROOT.parts) / "manifest.json"
     manifest = release.load_ordered_json(manifest_path)
-    manifest.update(clientVersion="2.1.0", clientDllSha256=release.sha256_file(client))
+    manifest.update(clientVersion="2.1.1", clientDllSha256=release.sha256_file(client))
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     expected[(BUNDLE_ROOT / "manifest.json").as_posix()] = release.sha256_file(manifest_path)
     matrix = {}
@@ -167,6 +168,9 @@ def main(release_build: bool = False) -> None:
             shutil.copy2(stage.joinpath(*BUNDLE_ROOT.parts) / "locales" / profile["translationVersion"] / "en.json", english)
         windows_root = str(root.resolve()) if os.name == "nt" else subprocess.check_output(["wslpath", "-w", str(root.resolve())], text=True).strip()
         matrix[version] = {"root": windows_root, "completeClient": complete}
+    if args.betterkeys_locale:
+        snapshot = args.betterkeys_locale.resolve()
+        matrix["3.9.8"]["betterKeysLocale"] = str(snapshot) if os.name == "nt" else subprocess.check_output(["wslpath", "-w", str(snapshot)], text=True).strip()
     matrix_path = work / "installations.json"
     matrix_path.write_text(json.dumps(matrix, indent=2) + "\n", encoding="utf-8")
     contract_report = work / "contract-verification.json"
@@ -212,7 +216,7 @@ def main(release_build: bool = False) -> None:
         ])
     summary = {
         "kind": "unified-client-release" if release_build else "client-only-development",
-        "mod_version": "2.1.0",
+        "mod_version": "2.1.1",
         "profiles": list(manifest["profiles"]),
         "short_name_contract": "passed: real Harmony with UI lifecycle stand-ins; not visual rendering",
         "runtime_contract": "passed: native reload fixture with actual Harmony and locale payloads",
@@ -227,7 +231,7 @@ def main(release_build: bool = False) -> None:
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if release_build and not args.no_archive:
         for name in ("release-notes.md", "upload-instructions.md"):
-            shutil.copy2(project_root / "docs/releases" / ("2.1.0-" + name), work / name)
+            shutil.copy2(project_root / "docs/releases" / ("2.1.1-" + name), work / name)
         (work / "SHA256SUMS.txt").write_text(f"{release.sha256_file(archive)}  {archive.name}\n", encoding="utf-8")
     print(f"Verified unified client files: {stage if args.no_archive else archive}")
 

@@ -1,8 +1,16 @@
 # Status
 
-Date: 2026-09-12
+## 2.1.1 — 2026-09-15
 
-## Current state
+The client now translates unchanged Korean backend entries and automatically preserves modified/new mod text, including across partial updates and bilingual switches. No compatibility toggle or mod-specific list is exposed. Payload integrity checks and UI fixes remain enabled.
+
+BetterKeys Updated 1.3.0 (source `957a17d69cbb8754efaa0ed010cc7c447570ba37`) was loaded by a separate SPT 3.9.8 server with no player profiles. It changed 206 descriptions. The original unconditional overlay would replace all 206; the new Harmony native-flow checks preserve them in both language modes, including cached reloads and later fragments. This is actual server-output validation, not a rendered-game test.
+
+The translation checkout is `9be1db381e73d75eb2c9536afa15008a17a8f560`; this change does not edit its generated payloads. The new package is prepared under `artifacts/release-2.1.1`. Existing gameplay installations and the 2.1.0 handoff are not overwritten. Release publication remains a separate author action. See [2.1.1 release notes](../releases/2.1.1-release-notes.md).
+
+The final Windows .NET Framework and five Unity Mono runs each pass 1,166,289 locale assertions and 28 short-name checks. Coverage includes every supported profile, preservation/removal of overrides, raw-fragment mirroring, a competing Harmony prefix suppressing updates, and both BetterKeys reload behaviors. All nine Python packaging tests pass. Build projects report zero warnings/errors.
+
+## Previous handoff — 2026-09-12
 
 2.1.0 is prepared as one common plugin-only ZIP with both language modes. The previous prototype is now the release implementation. No GitHub release/tag or asset upload was performed during preparation; publication remains the author's action.
 

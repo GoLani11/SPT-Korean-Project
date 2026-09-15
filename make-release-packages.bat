@@ -27,5 +27,5 @@ if not "%EXIT_CODE%"=="0" (
 )
 
 echo The unified release ZIP and upload documents are ready under:
-echo %PROJECT_ROOT%artifacts\release-2.1.0
+echo %PROJECT_ROOT%artifacts\release-2.1.1
 pause

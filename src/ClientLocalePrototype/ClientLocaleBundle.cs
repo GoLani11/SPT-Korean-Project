@@ -18,12 +18,14 @@ namespace KoreanPatchFix
         internal const string KoreanName = "한국어 (Korean)";
         internal const string BilingualName = "한국어 (한영 병기)";
 
+        private readonly Dictionary<string, string> baseline;
         private readonly Dictionary<string, string> korean;
         private readonly Dictionary<string, string> bilingual;
 
         private ClientLocaleBundle(string sptVersion, string profileVersion, string translationVersion,
-            JObject koreanJson, JObject bilingualJson)
+            JObject koreanJson, JObject bilingualJson, Dictionary<string, string> baseline)
         {
+            this.baseline = baseline;
             SptVersion = sptVersion;
             ProfileVersion = profileVersion;
             TranslationVersion = translationVersion;
@@ -111,7 +113,16 @@ namespace KoreanPatchFix
                 throw new InvalidDataException("Installed English locale differs from the verified translation source; localization was not enabled.");
             }
 
-            return new ClientLocaleBundle(sptVersion, profileVersion, translationVersion, files["kr.json"], files["kr-en.json"]);
+            // Compare against the backend's Korean text with English fallback.
+            var baseline = FoldAliases(englishEntries);
+            var koreanSource = Path.Combine(Path.GetDirectoryName(Path.Combine(gameRoot,
+                relativeSource.Replace('/', Path.DirectorySeparatorChar))), "kr.json");
+            if (File.Exists(koreanSource))
+                foreach (var entry in ReadEntries(ReadObject(koreanSource)))
+                    baseline[entry.Key] = entry.Value;
+
+            return new ClientLocaleBundle(sptVersion, profileVersion, translationVersion,
+                files["kr.json"], files["kr-en.json"], baseline);
         }
 
         internal Dictionary<string, string> MergeGlobal(string locale, IDictionary<string, string> source)
@@ -122,7 +133,9 @@ namespace KoreanPatchFix
             {
                 foreach (var entry in patch)
                 {
-                    result[entry.Key] = entry.Value;
+                    if (!result.TryGetValue(entry.Key, out var incoming) ||
+                        (baseline.TryGetValue(entry.Key, out var original) && incoming == original))
+                        result[entry.Key] = entry.Value;
                 }
             }
             AddLanguageNames(result);

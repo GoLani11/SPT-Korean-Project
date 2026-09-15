@@ -2,6 +2,7 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace KoreanPatchFix
 {
@@ -9,12 +10,15 @@ namespace KoreanPatchFix
     {
         private static ClientLocaleBundle bundle;
         private static ClientLocaleTargets targets;
+        private static ConditionalWeakTable<object, Dictionary<string, string>> serverLocales =
+            new ConditionalWeakTable<object, Dictionary<string, string>>();
 
         internal static void Enable(Harmony harmony, Assembly gameAssembly, ClientLocaleBundle localeBundle)
         {
             // Resolve every required target before installing any patch.
             var resolved = ClientLocaleTargets.Resolve(gameAssembly);
             bundle = localeBundle;
+            serverLocales = new ConditionalWeakTable<object, Dictionary<string, string>>();
             targets = resolved;
             try
             {
@@ -43,8 +47,9 @@ namespace KoreanPatchFix
             return instance == null ? null : targets.Culture.GetValue(instance, null) as string;
         }
 
-        private static void BeforeInit(ref Dictionary<string, string> __0)
+        private static void BeforeInit(object __instance, ref Dictionary<string, string> __0)
         {
+            serverLocales.Remove(__instance);
             __0 = ClientLocaleBundle.WithBilingualLanguage(__0);
         }
 
@@ -58,17 +63,29 @@ namespace KoreanPatchFix
             }
         }
 
-        private static void BeforeGlobal(string __0, ref Dictionary<string, string> __1)
+        private static void BeforeGlobal(object __instance, string __0,
+            ref Dictionary<string, string> __1, out Dictionary<string, string> __state)
         {
-            __1 = bundle.MergeGlobal(__0, __1);
-        }
-
-        private static void AfterGlobal(object __instance, string __0, Dictionary<string, string> __1)
-        {
+            __state = null;
             if (ClientLocaleBundle.Is(__0, ClientLocaleBundle.Korean))
             {
-                // Also mirrors later dialogue/mod fragments. The locale-ID guard prevents recursive mirroring.
-                targets.UpdateGlobal.Invoke(__instance, new object[] { ClientLocaleBundle.Bilingual, __1 });
+                // Retain raw fragments so a later update cannot erase a mod override.
+                var raw = serverLocales.GetValue(__instance,
+                    _ => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+                foreach (var entry in __1) raw[entry.Key] = entry.Value;
+                __state = new Dictionary<string, string>(raw, StringComparer.OrdinalIgnoreCase);
+                __1 = bundle.MergeGlobal(__0, __state);
+            }
+            else
+                __1 = bundle.MergeGlobal(__0, __1);
+        }
+
+        private static void AfterGlobal(object __instance, string __0, Dictionary<string, string> __state)
+        {
+            if (__state != null && ClientLocaleBundle.Is(__0, ClientLocaleBundle.Korean))
+            {
+                // Mirror raw values, not our Korean overlay, into bilingual mode.
+                targets.UpdateGlobal.Invoke(__instance, new object[] { ClientLocaleBundle.Bilingual, __state });
             }
         }
 

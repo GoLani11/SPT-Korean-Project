@@ -16,7 +16,7 @@ namespace KoreanPatchFix
     {
         public const string PluginGuid = "com.GoLani.koreanpatchfix";
         public const string PluginName = "Korean Patch Fix";
-        public const string PluginVersion = "2.1.0";
+        public const string PluginVersion = "2.1.1";
 
         private void Awake()
         {

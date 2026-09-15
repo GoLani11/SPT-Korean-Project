@@ -14,6 +14,7 @@ internal static class Program
 {
     private static int assertions;
     private static readonly JArray probes = new JArray();
+    private static readonly JArray betterKeysChecks = new JArray();
 
     public static int Main(string[] args)
     {
@@ -31,6 +32,7 @@ internal static class Program
                 ["assertions"] = assertions,
                 ["harmonyRuntime"] = (Type.GetType("Mono.Runtime") != null ? "Mono" : "Windows .NET Framework") + "; native reload fixture",
                 ["installedClientProbes"] = probes,
+                ["betterKeysChecks"] = betterKeysChecks,
                 ["inGameVisualValidation"] = false
             }.ToString(), new UTF8Encoding(false));
             Console.WriteLine($"Client locale contract passed: {assertions} assertions, real payloads, both native reload behaviors.");
@@ -88,7 +90,10 @@ internal static class Program
                 foreach (var cached in new[] { true, false })
                 {
                     await CheckNativeFlow(bundle, profile, args[0], cached);
+                    if (installation["betterKeysLocale"] != null)
+                        await CheckBetterKeys(bundle, profile, args[0], (string)installation["betterKeysLocale"], cached);
                 }
+                CheckSuppressedUpdate();
             }
             finally
             {
@@ -99,18 +104,35 @@ internal static class Program
         CheckInvalidPayloads(args[0], (string)installations["3.8.3"]["root"]);
     }
 
+    private static void CheckSuppressedUpdate()
+    {
+        var otherMod = new Harmony("com.golani.contract.other-mod");
+        try
+        {
+            otherMod.Patch(typeof(NativeLocaleManager).GetMethod("UpdateLocales"), prefix:
+                new HarmonyMethod(typeof(Program).GetMethod(nameof(SuppressUpdate), BindingFlags.Static | BindingFlags.NonPublic))
+                { priority = Priority.First });
+            var manager = new NativeLocaleManager();
+            manager.UpdateLocales("kr", new Dictionary<string, string> { ["mod-owned"] = "handled elsewhere" });
+            Expect(manager.GlobalCultures.Count == 0, "A mod suppressing the original update does not cause a null-state mirror");
+        }
+        finally { otherMod.UnpatchSelf(); }
+    }
+
+    private static bool SuppressUpdate() => false;
+
     private static void CheckReleaseBinary(string bundleRoot, JObject manifest)
     {
         var path = Path.Combine(Path.GetDirectoryName(bundleRoot), "GoLani.KoreanModFix.dll");
         using (var assembly = Mono.Cecil.AssemblyDefinition.ReadAssembly(path))
         {
-            Expect(assembly.Name.Version == new Version(2, 1, 0, 0), "Release assembly version 2.1.0");
+            Expect(assembly.Name.Version == new Version(2, 1, 1, 0), "Release assembly version 2.1.1");
             var plugin = assembly.MainModule.Types.Single(type => type.FullName == "KoreanPatchFix.Plugin");
             var registration = plugin.CustomAttributes.Single(attribute => attribute.AttributeType.FullName == "BepInEx.BepInPlugin");
-            Expect((string)registration.ConstructorArguments[2].Value == "2.1.0", "BepInEx plugin version 2.1.0");
-            Expect((string)plugin.Fields.Single(field => field.Name == "PluginVersion").Constant == "2.1.0", "Log version 2.1.0");
+            Expect((string)registration.ConstructorArguments[2].Value == "2.1.1", "BepInEx plugin version 2.1.1");
+            Expect((string)plugin.Fields.Single(field => field.Name == "PluginVersion").Constant == "2.1.1", "Log version 2.1.1");
         }
-        Expect((string)manifest["clientVersion"] == "2.1.0", "Manifest version 2.1.0");
+        Expect((string)manifest["clientVersion"] == "2.1.1", "Manifest version 2.1.1");
         using (var sha = SHA256.Create())
             Expect(BitConverter.ToString(sha.ComputeHash(File.ReadAllBytes(path))).Replace("-", "").ToLowerInvariant()
                 == (string)manifest["clientDllSha256"], "Manifest references the shipped client binary");
@@ -168,6 +190,16 @@ internal static class Program
         Expect(languages.Keys.ElementAt(1) == "kr-en", "Language source is not mutated");
 
         var backend = new NativeBackend();
+        backend.Global.Clear();
+        var manifestProfile = JObject.Parse(File.ReadAllText(Path.Combine(bundleRoot, "manifest.json")))["profiles"][bundle.ProfileVersion];
+        var baselinePath = Path.Combine(profile[3], ((string)manifestProfile["englishPath"]).Replace('/', Path.DirectorySeparatorChar));
+        foreach (var entry in JObject.Parse(File.ReadAllText(baselinePath)).Properties())
+            backend.Global[entry.Name] = (string)entry.Value;
+        var baselineKrPath = Path.Combine(Path.GetDirectoryName(baselinePath), "kr.json");
+        if (File.Exists(baselineKrPath))
+            foreach (var entry in JObject.Parse(File.ReadAllText(baselineKrPath)).Properties())
+                backend.Global[entry.Name] = (string)entry.Value;
+        var originalBackend = new Dictionary<string, string>(backend.Global);
         // A saved bilingual selection can be loaded before a session exists; null must use the game's default.
         await NativeDataPreparation.ReloadBackendLocale(backend, null, null);
         Expect(backend.Requests.SequenceEqual(new[] { "menu:kr" }), "Cold bilingual menu requests Korean from a plain server");
@@ -179,7 +211,7 @@ internal static class Program
         Expect(manager.Culture == "kr-en" && ClientLocaleRuntime.CurrentCulture() == "kr-en", "Native selection survives backend aliasing");
         Expect(manager.LastFont == "kr" && manager.LastApplicationCulture == "kr-en", "Korean font with bilingual culture");
         Expect(manager.ReloadEvents == 1, "Native screen reload occurs after both locales are populated");
-        Expect(backend.Global["5c1242fa86f7742aa04fed52"] == "SERVER VALUE", "Cached server response is not overwritten");
+        Expect(originalBackend.Count == backend.Global.Count && originalBackend.All(p => backend.Global[p.Key] == p.Value), "Cached server response is not overwritten");
         foreach (var mode in new[] { "kr", "kr-en" })
         {
             var expected = JObject.Parse(File.ReadAllText(Path.Combine(bundleRoot, "locales", profile[1], mode + ".json")));
@@ -208,6 +240,23 @@ internal static class Program
             "Later dialogue and mod fragments are mirrored");
         Expect(manager.Locales["kr-en"]["menu-only"] == "메뉴", "Late globals preserve menu strings");
 
+        const string changedKey = "5c1242fa86f7742aa04fed52";
+        manager.UpdateLocales("kr", new Dictionary<string, string> { [changedKey.ToUpperInvariant()] = "MOD REPLACEMENT" });
+        manager.UpdateLocales("kr", new Dictionary<string, string> { ["unrelated-fragment"] = "later" });
+        foreach (var mode in new[] { "kr", "kr-en" })
+            Expect(manager.Locales[mode][changedKey] == "MOD REPLACEMENT", "Existing mod text survives aliases and unrelated fragments");
+        var definition = JObject.Parse(File.ReadAllText(Path.Combine(bundleRoot, "manifest.json")))["profiles"][bundle.ProfileVersion];
+        var sourcePath = Path.Combine(profile[3], ((string)definition["englishPath"]).Replace('/', Path.DirectorySeparatorChar));
+        var original = JObject.Parse(File.ReadAllText(sourcePath));
+        var krPath = Path.Combine(Path.GetDirectoryName(sourcePath), "kr.json");
+        var originalKr = File.Exists(krPath) ? JObject.Parse(File.ReadAllText(krPath)) : new JObject();
+        manager.UpdateLocales("kr", new Dictionary<string, string> { [changedKey] = (string)(originalKr[changedKey] ?? original[changedKey]) });
+        foreach (var mode in new[] { "kr", "kr-en" })
+        {
+            var expected = JObject.Parse(File.ReadAllText(Path.Combine(bundleRoot, "locales", profile[1], mode + ".json")));
+            Expect(manager.Locales[mode][changedKey] == (string)expected[changedKey], "Original text restores translation after a mod is removed");
+        }
+
         backend.Fail = true;
         manager.MainMenuCultures.Clear();
         try
@@ -219,6 +268,47 @@ internal static class Program
         {
             Expect(error.Message == "fixture network failure", "Original async failures propagate");
         }
+    }
+
+    private static async Task CheckBetterKeys(ClientLocaleBundle bundle, string[] profile,
+        string bundleRoot, string snapshotPath, bool cached)
+    {
+        var snapshot = JObject.Parse(File.ReadAllText(snapshotPath));
+        Expect((string)snapshot["sptVersion"] == profile[0], "BetterKeys snapshot matches SPT profile");
+        var before = ((JObject)snapshot["before"]).Properties().ToDictionary(p => p.Name, p => (string)p.Value);
+        var after = ((JObject)snapshot["after"]).Properties().ToDictionary(p => p.Name, p => (string)p.Value);
+        var changed = after.Where(p => !before.TryGetValue(p.Key, out var value) || value != p.Value).ToArray();
+        Expect(changed.Length > 0, "Actual BetterKeys server modified locale entries");
+        var backend = new NativeBackend();
+        backend.Global.Clear();
+        foreach (var entry in after) backend.Global[entry.Key] = entry.Value;
+        var manager = new NativeLocaleManager { Culture = "kr-en" };
+        NativeLocaleManager.Instance = manager;
+        NativeDataPreparation.CacheGlobals = cached;
+        var session = new NativeSession { Backend = backend };
+        foreach (var mode in new[] { "kr-en", "kr", "en", "kr-en" })
+        {
+            manager.Culture = mode;
+            await NativeDataPreparation.ReloadBackendLocale(backend, session, mode);
+            if (mode == "en") continue;
+            foreach (var entry in changed)
+                Expect(manager.Locales[mode][entry.Key] == entry.Value, "BetterKeys information survives " + mode + ": " + entry.Key);
+        }
+        manager.UpdateLocales("kr", new Dictionary<string, string> { ["later-mod-fragment"] = "later" });
+        foreach (var mode in new[] { "kr", "kr-en" })
+        {
+            foreach (var entry in changed)
+                Expect(manager.Locales[mode][entry.Key] == entry.Value, "BetterKeys survives partial updates");
+            var translation = JObject.Parse(File.ReadAllText(Path.Combine(bundleRoot, "locales", profile[1], mode + ".json")));
+            var untouched = before.First(p => after.TryGetValue(p.Key, out var value) && value == p.Value && translation[p.Key] != null && (string)translation[p.Key] != p.Value);
+            Expect(manager.Locales[mode][untouched.Key] == (string)translation[untouched.Key], "Unmodified text is still translated with BetterKeys installed");
+        }
+        Expect(after.All(p => backend.Global[p.Key] == p.Value), "BetterKeys server snapshot is not mutated");
+        betterKeysChecks.Add(new JObject { ["sptVersion"] = profile[0], ["mod"] = snapshot["mod"],
+            ["modVersion"] = snapshot["modVersion"], ["sourceCommit"] = snapshot["sourceCommit"],
+            ["changedEntries"] = changed.Length, ["cachedBackend"] = cached,
+            ["validation"] = "actual server output through Harmony native-flow fixture; not in-game rendering" });
+        Console.WriteLine($"BetterKeys actual server snapshot passed: {changed.Length} changed entries, cached={cached}.");
     }
 
     private static void CheckInvalidPayloads(string bundleRoot, string gameRoot)

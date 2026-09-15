@@ -2,12 +2,12 @@
 
 ## Stable Identities
 
-The BepInEx identity remains `com.GoLani.koreanpatchfix` / `Korean Patch Fix`, with package version `2.1.0`. The historical server mod GUID is `com.golani.korean`; no server module is included in the unified release.
+The BepInEx identity remains `com.GoLani.koreanpatchfix` / `Korean Patch Fix`, with package version `2.1.1`. The historical server mod GUID is `com.golani.korean`; no server module is included in the unified release.
 
 ## Package Names
 
 ```text
-SPT-KR-2.1.0.zip
+SPT-KR-2.1.1.zip
 ```
 
 `tools/package_release.py` produces one plugin-only archive for all nine profiles in `tools/client-locale-prototype.json`. Six translation datasets are included; all supported SPT 4.1 profiles share the identical data in `locales/4.1.5`. The build-only `translationSources` mapping packages the unchanged 4.1.3 source dataset under the 4.1.5 folder name. The manifest records the packaged translation version, EFT version, installed English path and payload hashes for each profile.
@@ -36,4 +36,4 @@ The archive contains exactly 23 files for the current profile matrix. Installati
 
 Archive entries must be relative, remain under `BepInEx/plugins`, and contain no `.bat`, `.cmd`, or `.exe` file. Every entry must match the verified staging manifest by SHA-256. The locale manifest also records the client DLL hash and version. The completed ZIP is extracted and its payloads are rechecked by the Windows locale contract.
 
-`tools/package_release_versions.py` retains the historical server-based, version-specific packaging implementation; it is not the 2.1.0 release entry point.
+`tools/package_release_versions.py` retains the historical server-based, version-specific packaging implementation; it is not the 2.1.1 release entry point.
