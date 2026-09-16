@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>GoLani.KoreanLocaleProbe50</AssemblyName>
+    <Version>0.1.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <SptRoot Condition="'$(SptRoot)' == ''">D:\SPT_5.0_TEST</SptRoot>
+    <!-- Compile against the exact bundled .NET 6 runtime without downloading targeting packs. -->
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <RuntimeRefs>$(SptRoot)\dotnet</RuntimeRefs>
+    <BepCore>$(SptRoot)\BepInEx\core</BepCore>
+    <InteropRefs>$(SptRoot)\BepInEx\interop</InteropRefs>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(RuntimeRefs)\System.*.dll" Exclude="$(RuntimeRefs)\System.IO.Compression.Native.dll"><Private>false</Private></Reference>
+    <Reference Include="$(RuntimeRefs)\netstandard.dll"><Private>false</Private></Reference>
+    <Reference Include="$(BepCore)\BepInEx.Core.dll"><Private>false</Private></Reference>
+    <Reference Include="$(BepCore)\BepInEx.Unity.IL2CPP.dll"><Private>false</Private></Reference>
+    <Reference Include="$(BepCore)\Il2CppInterop.Runtime.dll"><Private>false</Private></Reference>
+    <Reference Include="$(BepCore)\0Harmony.dll"><Private>false</Private></Reference>
+    <Reference Include="$(InteropRefs)\Assembly-CSharp.dll"><Private>false</Private></Reference>
+    <Reference Include="$(InteropRefs)\Il2Cppmscorlib.dll"><Private>false</Private></Reference>
+    <Reference Include="$(InteropRefs)\UnityEngine.CoreModule.dll"><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

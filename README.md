@@ -43,6 +43,10 @@ python .\tools\package_release.py --spt-383-root D:\SPT_3.8.3 --spt-415-root D:\
 
 또는 `make-release-packages.bat`을 실행합니다. 결과는 `artifacts/release-2.1.1`에 저장되며 Git에 포함하지 않습니다. 배포 경로는 공통 ZIP 한 개를 생성하고, Windows 및 발견된 게임의 Unity Mono 환경에서 검증한 뒤 압축을 다시 풀어 검사합니다. 이전 서버 배포 프로젝트와 `package_release_versions.py`는 과거 구현이며 현재 릴리즈 경로가 아닙니다.
 
+An isolated **SPT 5.0 IL2CPP test plugin** and its build/verification command are
+documented in [the 5.0 locale probe guide](docs/client-locale-probe-5.0.md).
+It is separate from the stable release and only marks three Korean menu labels.
+
 ## English
 
 Version 2.1.1 is prepared for publication. Install the single `SPT-KR-2.1.1.zip` by copying its BepInEx folder into the game root. Back up and remove the previous Korean server mod and duplicate plugin DLLs first. Both Korean and Korean–English modes are available in the native language setting. The matching local SPT server database is required. See the linked installation guide for supported profiles and verification limits.
